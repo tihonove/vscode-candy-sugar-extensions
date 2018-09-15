@@ -1,0 +1,76 @@
+{
+	"name": "lsp-sample",
+	"description": "A language server example",
+	"author": "Microsoft Corporation",
+	"license": "MIT",
+	"version": "1.0.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Microsoft/vscode-extension-samples"
+	},
+	"publisher": "vscode",
+	"categories": [],
+	"keywords": [
+		"SKBKontur sugar VSCode extension"
+	],
+	"engines": {
+		"vscode": "^1.23.0"
+	},
+	"activationEvents": [
+		"onLanguage:plaintext"
+	],
+	"main": "./client/out/extension",
+	"contributes": {
+		"configuration": {
+			"type": "object",
+			"title": "Example configuration",
+			"properties": {
+				"languageServerExample.maxNumberOfProblems": {
+					"scope": "resource",
+					"type": "number",
+					"default": 100,
+					"description": "Controls the maximum number of problems produced by the server."
+				},
+				"languageServerExample.trace.server": {
+					"scope": "window",
+					"type": "string",
+					"enum": [
+						"off",
+						"messages",
+						"verbose"
+					],
+					"default": "off",
+					"description": "Traces the communication between VS Code and the language server."
+				}
+			}
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "cd client && npm run update-vscode && cd .. && npm run compile",
+		"compile:client": "babel --source-maps --extensions \".ts\" ./client/src --out-dir ./client/out",
+		"compile:server": "babel --source-maps --extensions \".ts\" ./server/src --out-dir ./server/out",
+		"compile": "yarn compile:client && yarn compile:server",
+		"postinstall": "cd client && yarn install && cd ../server && yarn install && cd ..",
+		"test": "sh ./scripts/e2e.sh",
+        "todo:watch:client": "tsc -w -p ./client/tsconfig.json",
+        "todo:watch:server": "tsc -w -p ./server/tsconfig.json"
+	},
+	"devDependencies": {
+		"@types/mocha": "^5.2.0",
+		"@types/node": "^8.0.0",
+		"typescript": "^3.0.3"
+	},
+	"dependencies": {
+		"@babel/cli": "^7.0.0",
+		"@babel/core": "^7.0.1",
+		"@babel/plugin-proposal-class-properties": "^7.0.0",
+		"@babel/plugin-proposal-decorators": "^7.0.0",
+		"@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+		"@babel/preset-env": "^7.0.0",
+		"@babel/preset-typescript": "^7.0.0",
+		"prettier": "^1.14.2",
+		"tslint": "^5.11.0",
+		"tslint-config-prettier": "^1.15.0",
+		"tslint-plugin-prettier": "^1.3.0"
+	}
+}
