@@ -52,8 +52,8 @@
 		"compile": "yarn compile:client && yarn compile:server",
 		"postinstall": "cd client && yarn install && cd ../server && yarn install && cd ..",
 		"test": "sh ./scripts/e2e.sh",
-        "todo:watch:client": "tsc -w -p ./client/tsconfig.json",
-        "todo:watch:server": "tsc -w -p ./server/tsconfig.json"
+        "watch:client": "tsc -w -p ./client/tsconfig.json",
+        "watch:server": "tsc -w -p ./server/tsconfig.json"
 	},
 	"devDependencies": {
 		"@types/mocha": "^5.2.0",
