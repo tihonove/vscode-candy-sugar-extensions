@@ -13,9 +13,6 @@
 	"keywords": [
 		"SKBKontur sugar VSCode extension"
 	],
-	"engines": {
-		"vscode": "^1.23.0"
-	},
 	"activationEvents": [
 		"onLanguage:plaintext"
 	],
@@ -52,8 +49,8 @@
 		"compile": "yarn compile:client && yarn compile:server",
 		"postinstall": "cd client && yarn install && cd ../server && yarn install && cd ..",
 		"test": "sh ./scripts/e2e.sh",
-        "watch:client": "tsc -w -p ./client/tsconfig.json",
-        "watch:server": "tsc -w -p ./server/tsconfig.json"
+		"watch:client": "tsc -w -p ./client/tsconfig.json",
+		"watch:server": "tsc -w -p ./server/tsconfig.json"
 	},
 	"devDependencies": {
 		"@types/mocha": "^5.2.0",
@@ -68,6 +65,14 @@
 		"@babel/plugin-proposal-object-rest-spread": "^7.0.0",
 		"@babel/preset-env": "^7.0.0",
 		"@babel/preset-typescript": "^7.0.0",
+		"@babel/register": "^7.0.0",
+		"@types/chai": "^4.1.4",
+		"@types/nearley": "^2.11.0",
+		"babel-plugin-preval": "^3.0.1",
+		"chai": "^4.1.2",
+		"mocha": "^5.2.0",
+		"mocha-typescript": "^1.1.17",
+		"nearley": "^2.15.1",
 		"prettier": "^1.14.2",
 		"tslint": "^5.11.0",
 		"tslint-config-prettier": "^1.15.0",
