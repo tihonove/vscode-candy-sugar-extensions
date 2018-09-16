@@ -109,6 +109,7 @@ documents.onDidClose(e => {
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent(change => {
+    documents[change.document.uri] = change.document.getText();
     validateTextDocument(change.document);
 });
 
@@ -165,11 +166,17 @@ connection.onDidChangeWatchedFiles(_change => {
 });
 
 // This handler provides the initial list of the completion items.
+
 connection.onCompletion(
-    (_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
+    (textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
         // The pass parameter contains the position of the text document in
         // which code complete got requested. For the example we ignore this
         // info and always provide the same completion items.
+        const text = documents.get(textDocumentPosition.textDocument.uri);
+        if (text == undefined) {
+            return [];
+        }
+        const absolute = text.offsetAt(textDocumentPosition.position);
         return [
             {
                 label: "TypeScript",
@@ -202,11 +209,9 @@ connection.onCompletionResolve(
 
 /*
 connection.onDidOpenTextDocument((params) => {
-	// A text document got opened in VSCode.
-	// params.uri uniquely identifies the document. For documents store on disk this is a file URI.
-	// params.text the initial full content of the document.
-	connection.console.log(`${params.textDocument.uri} opened.`);
+    textDocuments[params.textDocument.uri] = params.textDocument;
 });
+
 connection.onDidChangeTextDocument((params) => {
 	// The content of a text document did change in VSCode.
 	// params.uri uniquely identifies the document.

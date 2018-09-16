@@ -7,6 +7,9 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Microsoft/vscode-extension-samples"
+    },
+	"engines": {
+		"vscode": "^1.23.0"
 	},
 	"publisher": "vscode",
 	"categories": [],
@@ -49,8 +52,8 @@
 		"compile": "yarn compile:client && yarn compile:server",
 		"postinstall": "cd client && yarn install && cd ../server && yarn install && cd ..",
 		"test": "sh ./scripts/e2e.sh",
-		"watch:client": "tsc -w -p ./client/tsconfig.json",
-		"watch:server": "tsc -w -p ./server/tsconfig.json"
+        "watch:client": "babel --watch --source-maps --extensions \".ts\" ./client/src --out-dir ./client/out",
+        "watch:server": "babel --watch --source-maps --extensions \".ts\" ./server/src --out-dir ./server/out"
 	},
 	"devDependencies": {
 		"@types/mocha": "^5.2.0",
