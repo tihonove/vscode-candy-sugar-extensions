@@ -13,6 +13,7 @@ export class XmlParserTest {
             "<tag />",
             "<tag>asdsad</tag>",
             "<tag><a><b>asdsad",
+            "just text",
             // `<tag a="1">`,
             // `<tag a="1" a>`,
             // `<tag a="1" a=>`,
@@ -121,6 +122,28 @@ export class XmlParserTest {
                     },
                 ],
                 type: "tag",
+            },
+        ]);
+    }
+
+    @test
+    public testAstPartialTag(): void {
+        this.assertFullAst(`<tag`, [
+            {
+                body: `<tag`,
+                position: { start: 0, end: 16 },
+                type: "tag",
+            },
+        ]);
+    }
+
+    @test
+    public testAstForJustText(): void {
+        this.assertFullAst(`just text`, [
+            {
+                body: `just text`,
+                position: { start: 0, end: 8 },
+                type: "text",
             },
         ]);
     }

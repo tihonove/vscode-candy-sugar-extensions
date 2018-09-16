@@ -54,6 +54,8 @@ Element ->
 	"<" Identifier __ AttributeList "/>"  {% elementVariationWithAttributes("selfClosingTag") %}
 	|
 	"</" Identifier ">"  {% elementVariation("closingTag") %}
+	|
+	"<" Identifier _ {% elementVariation("tag") %}
 
 AttributeList -> (Attribute _) :* {%
     function([attributes], start) {
