@@ -107,7 +107,7 @@ export class XmlParserTest {
     public testAstForAttributes02(): void {
         this.assertFullAst(`<tag a="1" b="2">`, [
             {
-                body: `<tag a="1">`,
+                body: `<tag a="1" b="2">`,
                 position: { start: 0, end: 16 },
                 attributes: [
                     {
