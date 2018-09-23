@@ -1,3 +1,6 @@
+import fs from "fs";
+import path from "path";
+import util from "util";
 import {
     CompletionItem,
     CompletionItemKind,
@@ -13,14 +16,11 @@ import {
 } from "vscode-languageserver";
 
 import { ExpectedToken, getCompletionContext } from "./Suggester/ComletionClassificator";
+import { UriUtils } from "./UriUtils";
 
-// Create a connection for the server. The connection uses Node's IPC as a transport.
-// Also include all preview / proposed LSP features.
 const connection = createConnection(ProposedFeatures.all);
-
-// Create a simple text document manager. The text document manager
-// supports full document sync only
 const documents: TextDocuments = new TextDocuments();
+const schemaDocuments: { [uri: string]: string } = {};
 
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
@@ -28,9 +28,6 @@ let hasDiagnosticRelatedInformationCapability = false;
 
 connection.onInitialize((params: InitializeParams) => {
     const capabilities = params.capabilities;
-
-    // Does the client support the `workspace/configuration` request?
-    // If not, we will fall back using global settings
     hasConfigurationCapability = !!capabilities.workspace && !!capabilities.workspace.configuration;
     hasWorkspaceFolderCapability = Boolean(capabilities.workspace && !!capabilities.workspace.workspaceFolders);
     hasDiagnosticRelatedInformationCapability = Boolean(
@@ -52,7 +49,6 @@ connection.onInitialize((params: InitializeParams) => {
 
 connection.onInitialized(() => {
     if (hasConfigurationCapability) {
-        // Register for all configuration changes.
         connection.client.register(DidChangeConfigurationNotification.type, undefined);
     }
     if (hasWorkspaceFolderCapability) {
@@ -62,29 +58,21 @@ connection.onInitialized(() => {
     }
 });
 
-// The example settings
 interface ExampleSettings {
     maxNumberOfProblems: number;
 }
 
-// The global settings, used when the `workspace/configuration` request is not supported by the client.
-// Please note that this is not the case when using this server with the client provided in this example
-// but could happen with other clients.
 const defaultSettings: ExampleSettings = { maxNumberOfProblems: 1000 };
 let globalSettings: ExampleSettings = defaultSettings;
 
-// Cache the settings of all open documents
 const documentSettings: Map<string, Thenable<ExampleSettings>> = new Map();
 
 connection.onDidChangeConfiguration(change => {
     if (hasConfigurationCapability) {
-        // Reset all cached document settings
         documentSettings.clear();
     } else {
         globalSettings = (change.settings.languageServerExample || defaultSettings) as ExampleSettings;
     }
-
-    // Revalidate all open text documents
     documents.all().forEach(validateTextDocument);
 });
 
@@ -103,15 +91,24 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
     return result;
 }
 
-// Only keep settings for open documents
 documents.onDidClose(e => {
     documentSettings.delete(e.document.uri);
 });
 
-// The content of a text document has changed. This event is emitted
-// when the text document first opened or when its content has changed.
 documents.onDidChangeContent(change => {
     documents[change.document.uri] = change.document.getText();
+    const filename = UriUtils.toFileName(change.document.uri);
+    const formDirName = path.basename(path.dirname(path.dirname(filename)));
+
+    const schemaFile = path.join(path.dirname(filename), "..", "schemas", formDirName + ".rng.xml");
+    const schemaFileUri = UriUtils.fileNameToUri(schemaFile);
+    if (schemaDocuments[schemaFileUri] == undefined) {
+        try {
+            schemaDocuments[schemaFileUri] = fs.readFileSync(schemaFile, "utf8");
+        } catch (e) {
+            // ignore read error
+        }
+    }
     validateTextDocument(change.document);
 });
 
@@ -174,6 +171,7 @@ connection.onCompletion(
             return [];
         }
         const textToCursor = text.getText({ start: text.positionAt(0), end: textDocumentPosition.position });
+        const sh = schemaDocuments;
         const context = getCompletionContext(textToCursor);
         if (context != undefined) {
             if (context.expectedToken === ExpectedToken.ElementName) {

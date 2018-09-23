@@ -17,10 +17,28 @@
 		"SKBKontur sugar VSCode extension"
 	],
 	"activationEvents": [
-		"onLanguage:plaintext"
+		"onLanguage:sugar-xml"
 	],
 	"main": "./client/out/extension",
 	"contributes": {
+        "languages": [
+            {
+                "id": "sugar-xml",
+                "aliases": [
+                    "Candy Sugar XML"
+                ],
+                "filenamePatterns": [
+                    "*.sugar.xml"
+                ]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "sugar-xml",
+                "scopeName": "text.xml",
+                "path": "./syntaxes/sugar.tmLanguage.json"
+            }
+        ],
 		"configuration": {
 			"type": "object",
 			"title": "Example configuration",
