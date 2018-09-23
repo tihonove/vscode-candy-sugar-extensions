@@ -12,6 +12,8 @@ import {
     TextDocuments,
 } from "vscode-languageserver";
 
+import { ExpectedToken, getCompletionContext } from "./Suggester/ComletionClassificator";
+
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 const connection = createConnection(ProposedFeatures.all);
@@ -165,30 +167,55 @@ connection.onDidChangeWatchedFiles(_change => {
     connection.console.log("We received an file change event");
 });
 
-// This handler provides the initial list of the completion items.
-
 connection.onCompletion(
     (textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-        // The pass parameter contains the position of the text document in
-        // which code complete got requested. For the example we ignore this
-        // info and always provide the same completion items.
         const text = documents.get(textDocumentPosition.textDocument.uri);
         if (text == undefined) {
             return [];
         }
-        const absolute = text.offsetAt(textDocumentPosition.position);
-        return [
-            {
-                label: "TypeScript",
-                kind: CompletionItemKind.Text,
-                data: 1,
-            },
-            {
-                label: "JavaScript",
-                kind: CompletionItemKind.Text,
-                data: 2,
-            },
-        ];
+        const textToCursor = text.getText({ start: text.positionAt(0), end: textDocumentPosition.position });
+        const context = getCompletionContext(textToCursor);
+        if (context != undefined) {
+            if (context.expectedToken === ExpectedToken.ElementName) {
+                return [
+                    {
+                        label: "input",
+                        kind: CompletionItemKind.Text,
+                        data: 1,
+                    },
+                    {
+                        label: "page",
+                        kind: CompletionItemKind.Text,
+                        data: 2,
+                    },
+                    {
+                        label: "type",
+                        kind: CompletionItemKind.Text,
+                        data: 3,
+                    },
+                ];
+            }
+            if (context.expectedToken === ExpectedToken.AttributeName) {
+                return [
+                    {
+                        label: "attr1",
+                        kind: CompletionItemKind.Text,
+                        data: 1,
+                    },
+                    {
+                        label: "baa1",
+                        kind: CompletionItemKind.Text,
+                        data: 2,
+                    },
+                    {
+                        label: "qxxx2",
+                        kind: CompletionItemKind.Text,
+                        data: 3,
+                    },
+                ];
+            }
+        }
+        return [];
     }
 );
 

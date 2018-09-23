@@ -2,7 +2,11 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "compile",
+            "label": "compile",
+            "group": {
+				"kind": "build",
+				"isDefault": true
+			},
 			"dependsOn": [
 				{
 					"type": "npm",
@@ -37,50 +41,6 @@
 			},
 			"problemMatcher": [
 				"$tsc"
-			]
-		},
-		{
-			"label": "watch",
-			"dependsOn": [
-				{
-					"type": "npm",
-					"script": "watch:client"
-				},
-				{
-					"type": "npm",
-					"script": "watch:server"
-				}
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"problemMatcher": []
-		},
-		{
-			"type": "npm",
-			"script": "watch:client",
-			"isBackground": true,
-			"group": "build",
-			"presentation": {
-				"panel": "dedicated",
-				"reveal": "never"
-			},
-			"problemMatcher": [
-				"$tsc-watch"
-			]
-		},
-		{
-			"type": "npm",
-			"script": "watch:server",
-			"isBackground": true,
-			"group": "build",
-			"presentation": {
-				"panel": "dedicated",
-				"reveal": "never"
-			},
-			"problemMatcher": [
-				"$tsc-watch"
 			]
 		}
 	]

@@ -7,7 +7,7 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Microsoft/vscode-extension-samples"
-    },
+	},
 	"engines": {
 		"vscode": "^1.23.0"
 	},
@@ -47,13 +47,13 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "cd client && npm run update-vscode && cd .. && npm run compile",
-		"compile:client": "babel --source-maps --extensions \".ts\" ./client/src --out-dir ./client/out",
-		"compile:server": "babel --source-maps --extensions \".ts\" ./server/src --out-dir ./server/out",
+		"compile:client": "babel --source-maps --extensions \".ts,.js\" ./client/src --out-dir ./client/out",
+		"compile:server": "babel --source-maps --extensions \".ts,.js\" ./server/src --out-dir ./server/out",
 		"compile": "yarn compile:client && yarn compile:server",
 		"postinstall": "cd client && yarn install && cd ../server && yarn install && cd ..",
 		"test": "sh ./scripts/e2e.sh",
-        "watch:client": "babel --watch --source-maps --extensions \".ts\" ./client/src --out-dir ./client/out",
-        "watch:server": "babel --watch --source-maps --extensions \".ts\" ./server/src --out-dir ./server/out"
+		"watch:client": "babel --watch --source-maps --extensions \".ts\" ./client/src --out-dir ./client/out",
+		"watch:server": "babel --watch --source-maps --extensions \".ts\" ./server/src --out-dir ./server/out"
 	},
 	"devDependencies": {
 		"@types/mocha": "^5.2.0",
@@ -76,6 +76,7 @@
 		"mocha": "^5.2.0",
 		"mocha-typescript": "^1.1.17",
 		"nearley": "^2.15.1",
+		"pegjs": "^0.10.0",
 		"prettier": "^1.14.2",
 		"tslint": "^5.11.0",
 		"tslint-config-prettier": "^1.15.0",
