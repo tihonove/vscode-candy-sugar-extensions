@@ -3,6 +3,7 @@ export enum AttributeType {
     Type,
     String,
     Number,
+    Boolean
 }
 
 export enum AvailableChildrenType {

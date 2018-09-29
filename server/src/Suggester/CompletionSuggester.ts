@@ -1,8 +1,8 @@
 import { CompletionContext, ExpectedToken, getCompletionContext } from "./ComletionClassificator";
+import { DataAttributeSuggester } from "./DataAttributeSuggester";
 import { DataSchemaNode } from "./DataSchemaNode";
 import { AttributeType, SugarAttributeInfo, SugarElementInfo } from "./SugarElementInfo";
 import { SugarTypeInfo } from "./SugarTypeInfo";
-import { DataAttributeSuggester } from "./DataAttributeSuggester";
 
 export interface Suggestions {
     items: SuggestionItem[];
@@ -34,7 +34,7 @@ export class CompletionSuggester {
         this.sugarTypes = sugarTypes;
         this.sugarElementInfos = sugarElementInfos;
         this.dataSchemaRoot = dataSchemaRoot;
-        this.dataAttributeSuggester = new DataAttributeSuggester();
+        this.dataAttributeSuggester = new DataAttributeSuggester(sugarElementInfos);
     }
 
     public suggest(codeBeforeCursor: string): Suggestions {
@@ -71,10 +71,6 @@ export class CompletionSuggester {
         return emptyResult;
     }
 
-    private suggestDataPath(dataSchemaNode: DataSchemaNode, valueAttribute: string): SuggestionItem[] {
-        return this.dataAttributeSuggester.suggest(dataSchemaNode, valueAttribute);
-    }
-
     private getElementInfoByContext(context: CompletionContext): undefined | SugarElementInfo {
         const elementContext = context.elementContext;
         if (elementContext == undefined) {
@@ -108,9 +104,10 @@ export class CompletionSuggester {
         }
         let result: SuggestionItem[] = [];
         if (attribute.valueTypes.includes(AttributeType.Path)) {
+            const contextualRoot = this.dataAttributeSuggester.findCurrentRootByContext(this.dataSchemaRoot, context);
             result = result.concat(
-                this.suggestDataPath(
-                    this.dataSchemaRoot,
+                this.dataAttributeSuggester.suggest(
+                    contextualRoot || this.dataSchemaRoot,
                     (context.attributeContext && context.attributeContext.attributeValue) || ""
                 )
             );
@@ -118,4 +115,3 @@ export class CompletionSuggester {
         return result;
     }
 }
-

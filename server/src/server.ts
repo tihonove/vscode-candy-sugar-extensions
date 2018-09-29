@@ -12,21 +12,21 @@ import {
     TextDocuments,
 } from "vscode-languageserver";
 
+import { SchemaRngParser } from "./SchemaParser/SchemaRngParser";
+import { allElements } from "./SugarElements/DefaultSugarElements";
 import { CompletionSuggester, SuggestionItemType } from "./Suggester/CompletionSuggester";
-import { AttributeType, AvailableChildrenType } from "./Suggester/SugarElementInfo";
+import { DataSchemaNode } from "./Suggester/DataSchemaNode";
 import { UriUtils } from "./UriUtils";
+import { isNotNullOrUndefined } from "./Utils/TypingUtils";
 
 const connection = createConnection(ProposedFeatures.all);
 const documents: TextDocuments = new TextDocuments();
 const schemaDocuments: { [uri: string]: string } = {};
+const parsedSchemaDocuments: { [uri: string]: DataSchemaNode } = {};
 const suggesters: { [uri: string]: CompletionSuggester } = {};
 
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
-
-export function isNotNullOrUndefined<T extends Object>(input: null | undefined | T): input is T {
-    return input != null;
-}
 
 connection.onInitialize((params: InitializeParams) => {
     const capabilities = params.capabilities;
@@ -38,6 +38,7 @@ connection.onInitialize((params: InitializeParams) => {
             textDocumentSync: documents.syncKind,
             completionProvider: {
                 resolveProvider: true,
+                triggerCharacters: ["/"],
             },
         },
     };
@@ -60,7 +61,7 @@ interface ExampleSettings {
 
 const documentSettings: Map<string, Thenable<ExampleSettings>> = new Map();
 
-connection.onDidChangeConfiguration(change => {
+connection.onDidChangeConfiguration(() => {
     if (hasConfigurationCapability) {
         documentSettings.clear();
     }
@@ -72,36 +73,26 @@ documents.onDidClose(e => {
 
 documents.onDidChangeContent(change => {
     documents[change.document.uri] = change.document.getText();
-    if (suggesters[change.document.uri] == undefined) {
-        suggesters[change.document.uri] = new CompletionSuggester(
-            [],
-            [
-                {
-                    name: "input",
-                    availableChildren: {
-                        type: AvailableChildrenType.TextOny,
-                    },
-                    attributes: [
-                        {
-                            name: "path",
-                            valueTypes: [AttributeType.Path],
-                        },
-                    ],
-                },
-            ],
-            { name: "Root" }
-        );
-    }
     const filename = UriUtils.toFileName(change.document.uri);
     const formDirName = path.basename(path.dirname(path.dirname(filename)));
     const schemaFile = path.join(path.dirname(filename), "..", "schemas", formDirName + ".rng.xml");
     const schemaFileUri = UriUtils.fileNameToUri(schemaFile);
+    const schemaParser = new SchemaRngParser();
     if (schemaDocuments[schemaFileUri] == undefined) {
         try {
             schemaDocuments[schemaFileUri] = fs.readFileSync(schemaFile, "utf8");
+            parsedSchemaDocuments[change.document.uri] = schemaParser.toDataSchema(schemaDocuments[schemaFileUri]);
         } catch (e) {
             // ignore read error
         }
+    }
+
+    if (suggesters[change.document.uri] == undefined) {
+        suggesters[change.document.uri] = new CompletionSuggester(
+            [],
+            allElements,
+            parsedSchemaDocuments[change.document.uri] || { name: "" }
+        );
     }
 });
 
@@ -117,6 +108,7 @@ connection.onCompletion(
         }
         const textToCursor = text.getText({ start: text.positionAt(0), end: textDocumentPosition.position });
         const suggester = suggesters[textDocumentPosition.textDocument.uri];
+
         if (suggester == undefined) {
             return [];
         }
@@ -137,6 +129,20 @@ connection.onCompletion(
                     return {
                         label: x.name,
                         kind: CompletionItemKind.Method,
+                        data: x.name,
+                    };
+                }
+                if (x.type === SuggestionItemType.DataElement) {
+                    return {
+                        label: x.name,
+                        kind: CompletionItemKind.Module,
+                        data: x.name,
+                    };
+                }
+                if (x.type === SuggestionItemType.DataAttribute) {
+                    return {
+                        label: x.name,
+                        kind: CompletionItemKind.Field,
                         data: x.name,
                     };
                 }
