@@ -1,8 +1,8 @@
 {
     "rules": {
-        "cyclomatic-complexity": false, // TODO Подумать включать или нет
+        "cyclomatic-complexity": false,
         "max-classes-per-file": false,
-        "max-file-line-count": [false,  1000], // TODO Подумать включать или нет
+        "max-file-line-count": [false,  1000],
         "no-default-export": true,
         "no-duplicate-imports": true,
         "no-mergeable-namespace": true,

@@ -1,4 +1,3 @@
-import { expect } from "chai";
 import { suite, test } from "mocha-typescript";
 
 import {
@@ -9,8 +8,10 @@ import {
     getCompletionContext,
 } from "../server/src/Suggester/ComletionClassificator";
 
+import { expect } from "./Expect";
+
 @suite
-export class SugarParserCompletionTest {
+export class CompletionClassificatorTest {
     @test
     public testCompleteElement(): void {
         const completionContext = getCompletionContext("<a");
@@ -25,6 +26,24 @@ export class SugarParserCompletionTest {
         const completionContext = getCompletionContext("<aa><bb");
         this.assertCompletionContext(completionContext, ExpectedToken.ElementName, {
             elementName: "bb",
+            attributes: [],
+        });
+    }
+
+    @test
+    public testCompleteAfterSelfClosingElement(): void {
+        const completionContext = getCompletionContext("<aa><bb /><cc");
+        this.assertCompletionContext(completionContext, ExpectedToken.ElementName, {
+            elementName: "cc",
+            attributes: [],
+        });
+    }
+
+    @test
+    public testCompleteAfterSelfClosingElementWithAttribute(): void {
+        const completionContext = getCompletionContext('<aa><bb value="1" /><cc');
+        this.assertCompletionContext(completionContext, ExpectedToken.ElementName, {
+            elementName: "cc",
             attributes: [],
         });
     }
@@ -130,6 +149,93 @@ export class SugarParserCompletionTest {
     }
 
     @test
+    public testGetElementStack(): void {
+        const completionContext = getCompletionContext('<aaa attr="content" attr2');
+        expect(completionContext != undefined).to.eql(true);
+        if (completionContext != undefined) {
+            expect(completionContext.elementContextStack).to.shallowDeepEqual([
+                {
+                    elementName: "aaa",
+                    attributes: [
+                        {
+                            attributeName: "attr",
+                            attributeValue: "content",
+                        },
+                        {
+                            attributeName: "attr2",
+                        },
+                    ],
+                },
+            ]);
+        }
+    }
+
+    @test
+    public testGetElementStackWithTwoItems(): void {
+        const completionContext = getCompletionContext('<bbb attr2="zzz"><aaa attr="content" attr2');
+        expect(completionContext != undefined).to.eql(true);
+        if (completionContext != undefined) {
+            expect(completionContext.elementContextStack).to.shallowDeepEqual([
+                {
+                    elementName: "bbb",
+                    attributes: [
+                        {
+                            attributeName: "attr2",
+                            attributeValue: "zzz",
+                        },
+                    ],
+                },
+                {
+                    elementName: "aaa",
+                    attributes: [
+                        {
+                            attributeName: "attr",
+                            attributeValue: "content",
+                        },
+                        {
+                            attributeName: "attr2",
+                        },
+                    ],
+                },
+            ]);
+        }
+    }
+
+    @test
+    public testGetElementStackWithClosingItem(): void {
+        const completionContext = getCompletionContext('<xxx><yyy></yyy><bbb attr2="zzz"><aaa attr="content" attr2');
+        expect(completionContext != undefined).to.eql(true);
+        if (completionContext != undefined) {
+            expect(completionContext.elementContextStack).to.shallowDeepEqual([
+                {
+                    elementName: "xxx",
+                },
+                {
+                    elementName: "bbb",
+                    attributes: [
+                        {
+                            attributeName: "attr2",
+                            attributeValue: "zzz",
+                        },
+                    ],
+                },
+                {
+                    elementName: "aaa",
+                    attributes: [
+                        {
+                            attributeName: "attr",
+                            attributeValue: "content",
+                        },
+                        {
+                            attributeName: "attr2",
+                        },
+                    ],
+                },
+            ]);
+        }
+    }
+
+    @test
     public testCompleteSecondAttributeValue(): void {
         const completionContext = getCompletionContext('<aaa attr="content" attr2');
         this.assertCompletionContext(
@@ -159,8 +265,8 @@ export class SugarParserCompletionTest {
         elementContext: undefined | ElementContext,
         attributeContext?: undefined | AttributeContext
     ): void {
-        expect(completionContext != null).to.eql(true);
-        if (completionContext != null) {
+        expect(completionContext != undefined).to.eql(true);
+        if (completionContext != undefined) {
             expect(completionContext.expectedToken).to.eql(expectedToken);
             if (elementContext != undefined) {
                 expect(completionContext.elementContext).to.eql(elementContext);

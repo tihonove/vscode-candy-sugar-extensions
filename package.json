@@ -21,24 +21,24 @@
 	],
 	"main": "./client/out/extension",
 	"contributes": {
-        "languages": [
-            {
-                "id": "sugar-xml",
-                "aliases": [
-                    "Candy Sugar XML"
-                ],
-                "filenamePatterns": [
-                    "*.sugar.xml"
-                ]
-            }
-        ],
-        "grammars": [
-            {
-                "language": "sugar-xml",
-                "scopeName": "text.xml",
-                "path": "./syntaxes/sugar.tmLanguage.json"
-            }
-        ],
+		"languages": [
+			{
+				"id": "sugar-xml",
+				"aliases": [
+					"Candy Sugar XML"
+				],
+				"filenamePatterns": [
+					"*.sugar.xml"
+				]
+			}
+		],
+		"grammars": [
+			{
+				"language": "sugar-xml",
+				"scopeName": "text.xml",
+				"path": "./syntaxes/sugar.tmLanguage.json"
+			}
+		],
 		"configuration": {
 			"type": "object",
 			"title": "Example configuration",
@@ -91,6 +91,7 @@
 		"@types/nearley": "^2.11.0",
 		"babel-plugin-preval": "^3.0.1",
 		"chai": "^4.1.2",
+		"chai-shallow-deep-equal": "^1.4.6",
 		"mocha": "^5.2.0",
 		"mocha-typescript": "^1.1.17",
 		"nearley": "^2.15.1",
@@ -98,6 +99,8 @@
 		"prettier": "^1.14.2",
 		"tslint": "^5.11.0",
 		"tslint-config-prettier": "^1.15.0",
-		"tslint-plugin-prettier": "^1.3.0"
+		"tslint-plugin-prettier": "^1.3.0",
+		"vscode-jsonrpc": "^4.0.0",
+		"vscode-languageserver-types": "^3.13.0"
 	}
 }

@@ -18,43 +18,32 @@
         "no-dynamic-delete": true,
         "no-empty": true,
         "no-eval": true,
-        "no-floating-promises": false, // TODO Подумать включать или нет
+        "no-floating-promises": false,
         "no-for-in-array": true,
         "no-implicit-dependencies": false,
-        "no-inferred-empty-object-type": false, // TODO Включить
+        "no-inferred-empty-object-type": false,
         "no-invalid-template-strings": true,
         "no-misused-new": true,
-        "no-null-keyword": false, // TODO Включить
+        "no-null-keyword": true,
         "no-object-literal-type-assertion": true,
         "no-return-await": true,
-        "no-shadowed-variable": false, // TODO Включить
-//        {
-//            "class": true,
-//            "enum": true,
-//            "function": true,
-//            "import": true,
-//            "interface": true,
-//            "namespace": true,
-//            "typeAlias": true,
-//            "typeParameter": true,
-//            "temporalDeadZone": false
-//        },
-        "no-string-literal": false,
+        "no-shadowed-variable": false,
+        "no-string-literal": true,
         "no-string-throw": true,
         "no-sparse-arrays": true,
         "no-submodule-imports": false,
-        "no-unbound-method": false, // TODO Подумать включать или нет
+        "no-unbound-method": false,
         "no-unnecessary-class": false,
-        "no-unsafe-any": false, // TODO Включить
+        "no-unsafe-any": false,
         "no-unsafe-finally": true,
-        "no-unused-expression": false, // TODO Разобраться с тестами и включать
+        "no-unused-expression": false,
         "no-unused-variable": false,
         "no-use-before-declare": false,
         "no-var-keyword": true,
         "no-void-expression": [true, "ignore-arrow-function-shorthand"],
         "prefer-conditional-expression": false,
         "radix": true,
-        "restrict-plus-operands": false, // TODO Подумать включать или нет
+        "restrict-plus-operands": false,
         "strict-boolean-expressions": false,
         "strict-type-predicates": false,
         "switch-default": true,

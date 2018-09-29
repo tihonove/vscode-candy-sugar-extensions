@@ -1,7 +1,7 @@
 Document = Element
 
 Element =
-    "<" ElementName SpaceAfterElement? AttributeList?
+    "<" ElementName SpaceAfterElement? AttributeList? _?
     (
             "/>"
         /

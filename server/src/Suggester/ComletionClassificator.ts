@@ -19,6 +19,7 @@ export interface AttributeContext {
 
 export interface CompletionContext {
     expectedToken: ExpectedToken;
+    elementContextStack: ElementContext[];
     elementContext?: ElementContext;
     attributeContext?: AttributeContext;
 }
@@ -41,18 +42,15 @@ class ElementContextTracer {
     private readonly expectedRulesToFail: string[];
     private readonly caretOffset: number;
     public failedRule?: string;
+    public failedRuleStackSnapshot?: ElementContext[];
 
     public constructor(expectedRulesToFail: string[], caretOffset: number) {
         this.expectedRulesToFail = expectedRulesToFail;
         this.caretOffset = caretOffset;
     }
 
-    public peekElement(): undefined | ElementContext {
-        return this.elementStack[this.elementStack.length - 1];
-    }
-
     public peekAttribute(): undefined | AttributeContext {
-        const topElement = this.peekElement();
+        const topElement = this.peekElementFromFailedSnapshot();
         if (topElement == undefined || topElement.attributes == undefined) {
             return undefined;
         }
@@ -70,6 +68,7 @@ class ElementContextTracer {
             if (this.failedRule == undefined && this.expectedRulesToFail.includes(context.rule)) {
                 if (context.location.end.offset === this.caretOffset) {
                     this.failedRule = context.rule;
+                    this.failedRuleStackSnapshot = [...this.elementStack];
                 }
             }
         }
@@ -93,6 +92,27 @@ class ElementContextTracer {
                 topElement.attributes[topElement.attributes.length - 1].attributeValue = context.result;
             }
         }
+        if (context.type === "rule.match" && context.rule === "Element") {
+            this.elementStack.pop();
+        }
+        if (context.type === "rule.fail" && context.rule === "Element") {
+            this.elementStack.pop();
+        }
+    }
+
+    public peekElementFromFailedSnapshot(): undefined | ElementContext {
+        if (this.failedRuleStackSnapshot == undefined) {
+            return undefined;
+        }
+        return this.failedRuleStackSnapshot[this.failedRuleStackSnapshot.length - 1];
+    }
+
+    public getElementStackSnapshot(): ElementContext[] {
+        return this.failedRuleStackSnapshot || [];
+    }
+
+    private peekElement(): undefined | ElementContext {
+        return this.elementStack[this.elementStack.length - 1];
     }
 }
 
@@ -116,43 +136,49 @@ export function getCompletionContext(input: string): undefined | CompletionConte
     } catch (e) {
         if (tracer.failedRule === "SpaceAfterElement") {
             return {
-                elementContext: tracer.peekElement(),
+                elementContext: tracer.peekElementFromFailedSnapshot(),
                 expectedToken: ExpectedToken.ElementName,
+                elementContextStack: tracer.getElementStackSnapshot(),
             };
         }
         if (tracer.failedRule === "ElementName") {
             return {
-                elementContext: tracer.peekElement(),
+                elementContext: tracer.peekElementFromFailedSnapshot(),
                 expectedToken: ExpectedToken.ElementName,
+                elementContextStack: tracer.getElementStackSnapshot(),
             };
         }
         if (tracer.failedRule === "EqualsAfterAttributeName") {
             return {
-                elementContext: tracer.peekElement(),
+                elementContext: tracer.peekElementFromFailedSnapshot(),
                 attributeContext: tracer.peekAttribute(),
                 expectedToken: ExpectedToken.AttributeName,
+                elementContextStack: tracer.getElementStackSnapshot(),
             };
         }
         if (tracer.failedRule === "AttributeName") {
             return {
-                elementContext: tracer.peekElement(),
+                elementContext: tracer.peekElementFromFailedSnapshot(),
                 expectedToken: ExpectedToken.AttributeName,
+                elementContextStack: tracer.getElementStackSnapshot(),
             };
         }
         if (tracer.failedRule === "AttributeValue") {
             return {
-                elementContext: tracer.peekElement(),
+                elementContext: tracer.peekElementFromFailedSnapshot(),
                 attributeContext: tracer.peekAttribute(),
                 expectedToken: ExpectedToken.AttributeValue,
+                elementContextStack: tracer.getElementStackSnapshot(),
             };
         }
         if (tracer.failedRule === "AttributeValueClosingQuote") {
             const attribute = tracer.peekAttribute();
             if (attribute != undefined && attribute.attributeValue != undefined) {
                 return {
-                    elementContext: tracer.peekElement(),
+                    elementContext: tracer.peekElementFromFailedSnapshot(),
                     attributeContext: tracer.peekAttribute(),
                     expectedToken: ExpectedToken.AttributeValueContent,
+                    elementContextStack: tracer.getElementStackSnapshot(),
                 };
             }
         }

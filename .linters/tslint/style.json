@@ -20,7 +20,6 @@
         "no-angle-bracket-type-assertion": true,
         "no-boolean-literal-compare": true,
         "no-parameter-properties": true,
-        "no-parameter-properties": true,
         "no-redundant-jsdoc": true,
         "no-reference-import": true,
         "no-unnecessary-callback-wrapper": true,
