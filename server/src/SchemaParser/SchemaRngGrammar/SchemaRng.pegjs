@@ -2,6 +2,7 @@ Document = preamble: XmlPreamble? _? body: Element _? {
     return {
         preamble: preamble,
         body: body,
+        position: location(),
     };
 }
 

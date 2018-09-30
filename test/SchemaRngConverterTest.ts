@@ -135,10 +135,16 @@ export class SchemaRngConverterTest {
                 {
                     name: "Root",
                     position: {
-                        start: {
-                            start: 1,
+                        end: {
+                            column: 11,
+                            line: 5,
+                            offset: 132,
                         },
-                        end: {},
+                        start: {
+                            column: 1,
+                            line: 2,
+                            offset: 39,
+                        },
                     },
                 },
             ],

@@ -9,6 +9,7 @@ export class SchemaRngConverter {
         return {
             name: "",
             children: [this.createDataSchemaNode(parseResult.body)],
+            position: parseResult.position,
         };
     }
 
@@ -18,6 +19,7 @@ export class SchemaRngConverter {
         return {
             name: elementName || "",
             multiple: properties.multiple === "true",
+            position: xmlSchemaAsJson.position,
             attributes: this.buildElementAttributes(
                 this.normalizeSingleNode(xmlSchemaAsJson.children).filter(x => x.name === "attribute")
             ),

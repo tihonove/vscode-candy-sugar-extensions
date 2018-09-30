@@ -7,12 +7,14 @@ const { parse: evalParse } = eval(source);
 export interface SchemaRngDocument {
     preamble: SchemaRngPreamble;
     body: SchemaRngNode;
+    position: Position;
 }
 
 export interface SchemaRngNode {
     name: string;
     attributes?: SchemaRngNodeAttributeList;
     children?: SchemaRngNode[];
+    position: Position;
 }
 
 export interface SchemaRngNodeAttributeList {
