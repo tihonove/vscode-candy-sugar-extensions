@@ -35,15 +35,15 @@ const page: SugarElementInfo = {
     name: "page",
     attributes: [
         {
-            name: "align",
+            name: "id",
             valueTypes: [AttributeType.String],
         },
         {
-            name: "width",
-            valueTypes: [AttributeType.Number],
+            name: "navigationName",
+            valueTypes: [AttributeType.String],
         },
         {
-            name: "formula",
+            name: "template",
             valueTypes: [AttributeType.String],
         },
         {
