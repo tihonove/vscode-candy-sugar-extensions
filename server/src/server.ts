@@ -11,8 +11,9 @@ import {
     TextDocumentPositionParams,
     TextDocuments,
 } from "vscode-languageserver";
+import { Definition, Hover } from "vscode-languageserver-types";
 
-import { SchemaRngParser } from "./SchemaParser/SchemaRngParser";
+import { SchemaRngConverter } from "./SchemaParser/SchemaRngConverter";
 import { allElements } from "./SugarElements/DefaultSugarElements";
 import { CompletionSuggester, SuggestionItemType } from "./Suggester/CompletionSuggester";
 import { DataSchemaNode } from "./Suggester/DataSchemaNode";
@@ -36,6 +37,8 @@ connection.onInitialize((params: InitializeParams) => {
     return {
         capabilities: {
             textDocumentSync: documents.syncKind,
+            hoverProvider: true,
+            definitionProvider: true,
             completionProvider: {
                 resolveProvider: true,
                 triggerCharacters: ["/"],
@@ -49,6 +52,9 @@ connection.onInitialized(() => {
         connection.client.register(DidChangeConfigurationNotification.type, undefined);
     }
     if (hasWorkspaceFolderCapability) {
+        connection.workspace.onDidChangeWorkspaceFolders(_event => {
+            connection.console.log("Workspace folder change event received.");
+        });
         connection.workspace.onDidChangeWorkspaceFolders(_event => {
             connection.console.log("Workspace folder change event received.");
         });
@@ -77,12 +83,13 @@ documents.onDidChangeContent(change => {
     const formDirName = path.basename(path.dirname(path.dirname(filename)));
     const schemaFile = path.join(path.dirname(filename), "..", "schemas", formDirName + ".rng.xml");
     const schemaFileUri = UriUtils.fileNameToUri(schemaFile);
-    const schemaParser = new SchemaRngParser();
+    const schemaParser = new SchemaRngConverter();
     if (schemaDocuments[schemaFileUri] == undefined) {
         try {
             schemaDocuments[schemaFileUri] = fs.readFileSync(schemaFile, "utf8");
             parsedSchemaDocuments[change.document.uri] = schemaParser.toDataSchema(schemaDocuments[schemaFileUri]);
         } catch (e) {
+            connection.console.log(e)
             // ignore read error
         }
     }
@@ -95,6 +102,46 @@ documents.onDidChangeContent(change => {
         );
     }
 });
+
+connection.onHover(
+    (positionParams: TextDocumentPositionParams): Hover => {
+        const d = documents;
+        return {
+            range: {
+                start: {
+                    ...positionParams.position,
+                    character: positionParams.position.character - 1,
+                },
+                end: {
+                    ...positionParams.position,
+                    character: positionParams.position.character + 1,
+                },
+            },
+            contents: {
+                kind: "markdown",
+                value: "ZZZZZ ZZZZZ",
+            },
+        }
+    }
+);
+
+connection.onDefinition(
+    (positionParams: TextDocumentPositionParams): Definition => ({
+        range: {
+            start: {
+                ...positionParams.position,
+                character: positionParams.position.character - 3,
+                line: positionParams.position.line - 1,
+            },
+            end: {
+                ...positionParams.position,
+                character: positionParams.position.character + 3,
+                line: positionParams.position.line - 1,
+            },
+        },
+        uri: positionParams.textDocument.uri,
+    })
+);
 
 connection.onDidChangeWatchedFiles(_change => {
     connection.console.log("We received an file change event");
@@ -158,7 +205,8 @@ connection.onCompletionResolve(
     (item: CompletionItem): CompletionItem => {
         if (item.data === 1) {
             item.documentation = "TypeScript documentation";
-            (item.detail = "Zzz\nsadsajdasd\nsadsa"), (item.documentation = "#aaaa\nsadkjdsa\nsadjsajsa\nsadjlak");
+            item.detail = "Zzz\nsadsajdasd\nsadsa";
+            item.documentation = "#aaaa\nsadkjdsa\nsadjsajsa\nsadjlak";
         } else if (item.data === 2) {
             item.detail = "JavaScript details";
             item.documentation = "JavaScript documentation";

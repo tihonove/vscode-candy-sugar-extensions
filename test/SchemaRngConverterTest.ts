@@ -1,0 +1,159 @@
+import fs from "fs";
+import { suite, test } from "mocha-typescript";
+
+import { SchemaRngConverter } from "../server/src/SchemaParser/SchemaRngConverter";
+
+import { expect } from "./Expect";
+
+const xmlPreamble = `<?xml version="1.0" encoding="utf-8"?>`;
+
+@suite
+export class SchemaRngConverterTest {
+    @test
+    public testSingleRoot(): void {
+        const parser = new SchemaRngConverter();
+        const node = parser.toDataSchema(
+            xmlPreamble + `<element name="Файл" type="string" description="Файл обмена"></element>`
+        );
+        expect(node).to.shallowDeepEqual({
+            name: "",
+            children: [
+                {
+                    name: "Файл",
+                },
+            ],
+        });
+    }
+
+    @test
+    public testChildAttribute(): void {
+        const parser = new SchemaRngConverter();
+        const node = parser.toDataSchema(
+            xmlPreamble +
+                `
+<element name="Root">
+  <attribute name="ИдФайл">
+    <type base="string">
+      <minLength value="1" />
+      <maxLength value="255" />
+    </type>
+  </attribute>
+</element>`
+        );
+        expect(node).to.shallowDeepEqual({
+            name: "",
+            children: [
+                {
+                    name: "Root",
+                    attributes: [
+                        {
+                            name: "ИдФайл",
+                        },
+                    ],
+                },
+            ],
+        });
+    }
+
+    @test
+    public testChoiceElements(): void {
+        const parser = new SchemaRngConverter();
+        const node = parser.toDataSchema(
+            xmlPreamble +
+                `
+<element name="Root">
+    <choice>
+        <element name="Choice1"></element>
+        <element name="Choice2"></element>
+    </choice>
+</element>
+`
+        );
+        expect(node).to.shallowDeepEqual({
+            name: "",
+            children: [
+                {
+                    name: "Root",
+                    children: [
+                        {
+                            name: "Choice1",
+                        },
+                        {
+                            name: "Choice2",
+                        },
+                    ],
+                },
+            ],
+        });
+    }
+
+    @test
+    public testSelfClosingTag(): void {
+        const parser = new SchemaRngConverter();
+        const node = parser.toDataSchema(
+            xmlPreamble +
+                `
+<element name="Root">
+    <element name="Choice1" />
+    <element name="Choice2"/>
+</element>
+`
+        );
+        expect(node).to.shallowDeepEqual({
+            name: "",
+            children: [
+                {
+                    name: "Root",
+                    children: [
+                        {
+                            name: "Choice1",
+                        },
+                        {
+                            name: "Choice2",
+                        },
+                    ],
+                },
+            ],
+        });
+    }
+
+    @test
+    public testPositionOfElement(): void {
+        const parser = new SchemaRngConverter();
+        const node = parser.toDataSchema(
+            xmlPreamble +
+                `
+<element name="Root">
+    <element name="Choice1" />
+    <element name="Choice2"/>
+</element>
+`
+        );
+        expect(node).to.shallowDeepEqual({
+            name: "",
+            children: [
+                {
+                    name: "Root",
+                    position: {
+                        start: {
+                            start: 1,
+                        },
+                        end: {},
+                    },
+                },
+            ],
+        });
+    }
+
+    @test
+    public testRealSchemaSkipBom(): void {
+        const parser = new SchemaRngConverter();
+        parser.toDataSchema(fs.readFileSync(require.resolve("./RealSchemas/Schema02.xml"), "utf8"));
+    }
+
+    @test
+    public testRealSchema(): void {
+        const parser = new SchemaRngConverter();
+        parser.toDataSchema(fs.readFileSync(require.resolve("./RealSchemas/Schema01.xml"), "utf8"));
+    }
+}

@@ -21,7 +21,10 @@ export function activate(context: ExtensionContext) {
     };
 
     const clientOptions: LanguageClientOptions = {
-        documentSelector: [{ scheme: "file", language: "sugar-xml" }],
+        documentSelector: [
+            { scheme: "file", language: "sugar-xml" },
+            { scheme: "file", language: "xml" },
+        ],
         synchronize: {
             // Notify the server about file changes to '.clientrc files contained in the workspace
             fileEvents: workspace.createFileSystemWatcher("**/.clientrc"),
