@@ -1,20 +1,25 @@
 {
-	"name": "lsp-sample",
-	"description": "A language server example",
-	"author": "Microsoft Corporation",
+	"name": "vscode-candy-sugar",
+	"description": "Editor extensions for Candy.Sugar",
+	"author": "tihonove",
 	"license": "MIT",
 	"version": "1.0.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-extension-samples"
+		"url": "https://github.com/tihonove/vscode-candy-sugar-extensions"
 	},
 	"engines": {
 		"vscode": "^1.23.0"
 	},
-	"publisher": "vscode",
+	"publisher": "tihonove",
 	"categories": [],
 	"keywords": [
-		"SKBKontur sugar VSCode extension"
+		"SKBKontur",
+        "vscode",
+        "candy.sugar",
+        "candy",
+        "extension",
+        "vscode-extension"
 	],
 	"activationEvents": [
 		"onLanguage:sugar-xml"
