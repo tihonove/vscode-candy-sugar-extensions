@@ -3,7 +3,7 @@
 	"description": "Editor extensions for Candy.Sugar",
 	"author": "tihonove",
 	"license": "MIT",
-	"version": "1.0.0",
+	"version": "0.0.1",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/tihonove/vscode-candy-sugar-extensions"
@@ -69,7 +69,7 @@
 		}
 	},
 	"scripts": {
-		"vscode:prepublish": "cd client && npm run update-vscode && cd .. && npm run compile",
+		"vscode:prepublish": "cd client && yarn run update-vscode && cd .. && yarn run compile",
 		"compile:client": "babel --source-maps --extensions \".ts,.js\" ./client/src --out-dir ./client/out",
 		"compile:server": "babel --source-maps --extensions \".ts,.js\" ./server/src --out-dir ./server/out",
 		"compile": "yarn compile:client && yarn compile:server",

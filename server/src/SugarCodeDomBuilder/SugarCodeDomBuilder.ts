@@ -1,33 +1,9 @@
-import { IPegJSTracer, TraceContext } from "../PegJSTypes/PegJSTypes";
+import { CodePosition, IPegJSTracer, TraceContext } from "../PegJSTypes/PegJSTypes";
+import { AttributeContext, ElementContext } from "../Suggester/CompletionClassificator";
+import { parseSugar } from "../Suggester/SugarGrammar/SugarParser";
 import { valueOrDefault } from "../Utils/TypingUtils";
 
-import { parseSugar } from "./SugarGrammar/SugarParser";
-
-export enum ExpectedToken {
-    ElementName = "ElementName",
-    AttributeName = "AttributeName",
-    AttributeValue = "AttributeValue",
-    AttributeValueContent = "AttributeValueContent",
-}
-
-export interface ElementContext {
-    elementName?: string;
-    attributes?: AttributeContext[];
-}
-
-export interface AttributeContext {
-    attributeName?: string;
-    attributeValue?: string;
-}
-
-export interface CompletionContext {
-    expectedToken: ExpectedToken;
-    elementContextStack: ElementContext[];
-    elementContext?: ElementContext;
-    attributeContext?: AttributeContext;
-}
-
-class ElementContextTracer implements IPegJSTracer {
+class PositionGettingTracer implements IPegJSTracer {
     private readonly elementStack: ElementContext[] = [];
     private readonly expectedRulesToFail: string[];
     private readonly caretOffset: number;
@@ -35,7 +11,7 @@ class ElementContextTracer implements IPegJSTracer {
     public failedRuleStackSnapshot?: ElementContext[];
 
     public constructor(expectedRulesToFail: string[], caretOffset: number) {
-        this.expectedRulesToFail = expectedRulesToFail;
+        this.expectedRulesToFail = [];
         this.caretOffset = caretOffset;
     }
 
@@ -109,72 +85,32 @@ class ElementContextTracer implements IPegJSTracer {
     }
 }
 
-export function getCompletionContext(input: string): undefined | CompletionContext {
-    const tracer = new ElementContextTracer(
-        [
-            "SpaceAfterElement",
-            "ElementName",
-            "AttributeName",
-            "EqualsAfterAttributeName",
-            "AttributeValue",
-            "AttributeValueClosingQuote",
-        ],
-        input.length
-    );
-    try {
+export class SugarCodeDomBuilder {
+    public buildPositionToNodeMap(input: string): PositionToNodeMap {
+        const positionGettingTracer = new PositionGettingTracer();
         parseSugar(input, {
-            tracer: tracer,
+            tracer: positionGettingTracer,
         });
-        return undefined;
-    } catch (e) {
-        if (tracer.failedRule === "SpaceAfterElement") {
-            return {
-                elementContext: tracer.peekElementFromFailedSnapshot(),
-                expectedToken: ExpectedToken.ElementName,
-                elementContextStack: tracer.getElementStackSnapshot(),
-            };
-        }
-        if (tracer.failedRule === "ElementName") {
-            return {
-                elementContext: tracer.peekElementFromFailedSnapshot(),
-                expectedToken: ExpectedToken.ElementName,
-                elementContextStack: tracer.getElementStackSnapshot(),
-            };
-        }
-        if (tracer.failedRule === "EqualsAfterAttributeName") {
-            return {
-                elementContext: tracer.peekElementFromFailedSnapshot(),
-                attributeContext: tracer.peekAttribute(),
-                expectedToken: ExpectedToken.AttributeName,
-                elementContextStack: tracer.getElementStackSnapshot(),
-            };
-        }
-        if (tracer.failedRule === "AttributeName") {
-            return {
-                elementContext: tracer.peekElementFromFailedSnapshot(),
-                expectedToken: ExpectedToken.AttributeName,
-                elementContextStack: tracer.getElementStackSnapshot(),
-            };
-        }
-        if (tracer.failedRule === "AttributeValue") {
-            return {
-                elementContext: tracer.peekElementFromFailedSnapshot(),
-                attributeContext: tracer.peekAttribute(),
-                expectedToken: ExpectedToken.AttributeValue,
-                elementContextStack: tracer.getElementStackSnapshot(),
-            };
-        }
-        if (tracer.failedRule === "AttributeValueClosingQuote") {
-            const attribute = tracer.peekAttribute();
-            if (attribute != undefined && attribute.attributeValue != undefined) {
-                return {
-                    elementContext: tracer.peekElementFromFailedSnapshot(),
-                    attributeContext: tracer.peekAttribute(),
-                    expectedToken: ExpectedToken.AttributeValueContent,
-                    elementContextStack: tracer.getElementStackSnapshot(),
-                };
-            }
-        }
+        return new PositionToNodeMap();
+    }
+}
+
+interface SugarCodeDomNode {}
+
+class SugarElementName implements SugarCodeDomNode {
+    public readonly name: string;
+    public readonly position: CodePosition;
+    public readonly parentNode?: SugarElementName;
+
+    public constructor(name: string, position: CodePosition, parentNode?: SugarElementName) {
+        this.name = name;
+        this.position = position;
+        this.parentNode = parentNode;
+    }
+}
+
+class PositionToNodeMap {
+    public getNodeByOffset(offset: number): undefined | SugarCodeDomNode {
         return undefined;
     }
 }
