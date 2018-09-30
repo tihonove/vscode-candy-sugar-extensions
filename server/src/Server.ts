@@ -16,7 +16,7 @@ import { Definition, Hover } from "vscode-languageserver-types";
 import { SchemaRngConverter } from "./SchemaParser/SchemaRngConverter";
 import { SugarDocumentServices } from "./SugarDocumentServices";
 import { SuggestionItemType } from "./Suggester/CompletionSuggester";
-import { DataSchemaNode } from "./Suggester/DataSchemaNode";
+import { DataSchemaNode } from "./DataShema/DataSchemaNode";
 import { UriUtils } from "./UriUtils";
 import { isNotNullOrUndefined, valueOrDefault } from "./Utils/TypingUtils";
 

@@ -1,8 +1,9 @@
+import { DataSchemaAttribute, DataSchemaNode } from "../DataShema/DataSchemaNode";
+import { DataSchemaUtils } from "../DataShema/DataSchemaUtils";
 import { isNotNullOrUndefined, valueOrDefault } from "../Utils/TypingUtils";
 
-import { CompletionContext, ElementContext } from "./ComletionClassificator";
+import { CompletionContext, ElementContext } from "./CompletionClassificator";
 import { SuggestionItem, SuggestionItemType } from "./CompletionSuggester";
-import { DataSchemaAttribute, DataSchemaNode } from "./DataSchemaNode";
 import { SugarElementInfo } from "./SugarElementInfo";
 
 export class DataAttributeSuggester {
@@ -82,12 +83,12 @@ export class DataAttributeSuggester {
             ...valueOrDefault<DataSchemaNode[]>(element.children, []).map<SuggestionItem>(x => ({
                 type: SuggestionItemType.DataElement,
                 name: x.name,
-                fullPath: [...scopedPath, x.name],
+                fullPath: [...scopedPath, ...itemsWithoutLastItem, x.name],
             })),
             ...valueOrDefault<DataSchemaAttribute[]>(element.attributes, []).map<SuggestionItem>(x => ({
                 type: SuggestionItemType.DataAttribute,
                 name: x.name,
-                fullPath: [...scopedPath, x.name],
+                fullPath: [...scopedPath, ...itemsWithoutLastItem, x.name],
             })),
         ];
     }
@@ -111,15 +112,6 @@ export class DataAttributeSuggester {
     }
 
     private findElementByPath(root: DataSchemaNode, itemsWithoutLastItem: string[]): undefined | DataSchemaNode {
-        if (itemsWithoutLastItem.length === 0) {
-            return root;
-        } else {
-            const nextNode =
-                root.children != undefined ? root.children.find(x => x.name === itemsWithoutLastItem[0]) : undefined;
-            if (nextNode == undefined) {
-                return undefined;
-            }
-            return this.findElementByPath(nextNode, itemsWithoutLastItem.slice(1));
-        }
+        return DataSchemaUtils.findElementByPath(root, itemsWithoutLastItem);
     }
 }

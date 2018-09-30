@@ -74,12 +74,13 @@
 		"compile:server": "babel --source-maps --extensions \".ts,.js\" ./server/src --out-dir ./server/out",
 		"compile": "yarn compile:client && yarn compile:server",
 		"postinstall": "cd client && yarn install && cd ../server && yarn install && cd ..",
-		"test": "sh ./scripts/e2e.sh",
 		"watch:client": "babel --watch --source-maps --extensions \".ts\" ./client/src --out-dir ./client/out",
 		"watch:server": "babel --watch --source-maps --extensions \".ts\" ./server/src --out-dir ./server/out",
 		"lint:server": "tslint --project ./server/tsconfig.json",
 		"lint:client": "tslint --project ./client/tsconfig.json",
-		"lint:test": "tslint --project ./test/tsconfig.json"
+		"lint:test": "tslint --project ./test/tsconfig.json",
+		"test": "mocha",
+        "test:coverage": "nyc --reporter=html --reporter=text mocha"
 	},
 	"devDependencies": {
 		"@types/mocha": "^5.2.0",
@@ -102,6 +103,7 @@
 		"chai-shallow-deep-equal": "^1.4.6",
 		"mocha": "^5.2.0",
 		"mocha-typescript": "^1.1.17",
+		"nyc": "^13.0.1",
 		"pegjs": "^0.10.0",
 		"prettier": "^1.14.2",
 		"tslint": "^5.11.0",
@@ -110,5 +112,17 @@
 		"tslint-plugin-prettier": "^1.3.0",
 		"vscode-jsonrpc": "^4.0.0",
 		"vscode-languageserver-types": "^3.13.0"
-	}
+	},
+    "nyc": {
+        "check-coverage": true,
+        "per-file": true,
+        "include": [
+            "server/**/*.ts"
+        ],
+        "extension": [
+            ".ts",
+            ".js"
+        ],
+        "all": true
+    }
 }

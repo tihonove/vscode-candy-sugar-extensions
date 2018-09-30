@@ -1,4 +1,6 @@
 .idea/workspace.xml
+.nyc_output
+coverage
 out
 node_modules
 client/server

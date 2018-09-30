@@ -1,7 +1,7 @@
 import fs from "fs";
 import { suite, test } from "mocha-typescript";
 
-import { SchemaRngConverter } from "../server/src/SchemaParser/SchemaRngConverter";
+import { SchemaRngConverter } from "../../server/src/SchemaParser/SchemaRngConverter";
 
 import { expect } from "./Expect";
 

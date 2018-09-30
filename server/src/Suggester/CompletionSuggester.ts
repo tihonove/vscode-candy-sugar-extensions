@@ -1,8 +1,8 @@
+import { DataSchemaNode } from "../DataShema/DataSchemaNode";
 import { valueOrDefault } from "../Utils/TypingUtils";
 
-import { CompletionContext, ExpectedToken, getCompletionContext } from "./ComletionClassificator";
+import { CompletionContext, ExpectedToken, getCompletionContext } from "./CompletionClassificator";
 import { DataAttributeSuggester } from "./DataAttributeSuggester";
-import { DataSchemaNode } from "./DataSchemaNode";
 import { AttributeType, SugarAttributeInfo, SugarElementInfo } from "./SugarElementInfo";
 import { SugarTypeInfo } from "./SugarTypeInfo";
 

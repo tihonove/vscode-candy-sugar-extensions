@@ -1,4 +1,4 @@
-import { DataSchemaAttribute, DataSchemaNode } from "../Suggester/DataSchemaNode";
+import { DataSchemaAttribute, DataSchemaNode } from "../DataShema/DataSchemaNode";
 import { isNotNullOrUndefined, valueOrDefault } from "../Utils/TypingUtils";
 
 import { parse, SchemaRngNode, SchemaRngNodeAttributeList } from "./SchemaRngGrammar/SchemaRngParser";

@@ -6,7 +6,7 @@ import {
     ElementContext,
     ExpectedToken,
     getCompletionContext,
-} from "../server/src/Suggester/ComletionClassificator";
+} from "../../server/src/Suggester/CompletionClassificator";
 
 import { expect } from "./Expect";
 

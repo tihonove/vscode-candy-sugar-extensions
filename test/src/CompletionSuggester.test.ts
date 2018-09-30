@@ -1,5 +1,7 @@
-import { CompletionSuggester, SuggestionItemType } from "../server/src/Suggester/CompletionSuggester";
-import { AttributeType, AvailableChildrenType } from "../server/src/Suggester/SugarElementInfo";
+import { suite, test } from "mocha-typescript";
+
+import { CompletionSuggester, SuggestionItemType } from "../../server/src/Suggester/CompletionSuggester";
+import { AttributeType, AvailableChildrenType } from "../../server/src/Suggester/SugarElementInfo";
 
 import { expect } from "./Expect";
 
@@ -98,6 +100,36 @@ export class CompletionSuggesterTest {
                 {
                     type: SuggestionItemType.DataAttribute,
                     name: "attr2",
+                },
+            ],
+        });
+    }
+
+    @test
+    public "Непустой аттрибут path у первого открывающегося тэга. Проверка полного пути"(): void {
+        const fileSuggester = this.createTestCompletionSuggester();
+        const suggestions = fileSuggester.suggest('<atag1 path="Root/');
+        expect(suggestions).to.shallowDeepEqual({
+            items: [
+                {
+                    type: SuggestionItemType.DataElement,
+                    name: "Children1",
+                    fullPath: ["Root", "Children1"],
+                },
+                {
+                    type: SuggestionItemType.DataElement,
+                    name: "Child2",
+                    fullPath: ["Root", "Child2"],
+                },
+                {
+                    type: SuggestionItemType.DataAttribute,
+                    name: "attr1",
+                    fullPath: ["Root", "attr1"],
+                },
+                {
+                    type: SuggestionItemType.DataAttribute,
+                    name: "attr2",
+                    fullPath: ["Root", "attr2"],
                 },
             ],
         });
