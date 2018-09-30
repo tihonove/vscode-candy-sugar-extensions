@@ -85,7 +85,7 @@
                 ]
             }
         ],
-        "no-any": false, // TODO Включить
+        "no-any": true, // TODO Включить
         "no-empty-interface": true,
         "no-import-side-effect": [true, {"ignore-module": "(\\.less)$"}],
         "no-inferrable-types": [true, "ignore-params"],
@@ -104,7 +104,7 @@
         "prefer-readonly": true,
         "promise-function-async": false, // TODO Подумать включать или нет
         "typedef": [
-            false, // TODO Включить
+            true, // TODO Включить
             "call-signature",
             "property-declaration"
         ],

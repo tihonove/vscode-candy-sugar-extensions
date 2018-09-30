@@ -14,14 +14,10 @@
         "strict": true,
         "skipLibCheck": true,
         "sourceMap": true,
-        "strictNullChecks": true,
         "maxNodeModuleJsDepth": 5,
         "experimentalDecorators": true,
-        "noImplicitAny": true,
-        "noImplicitThis": true,
         "noImplicitReturns": true,
         "suppressImplicitAnyIndexErrors": true,
-        "strictFunctionTypes": true,
         "lib": ["esnext"],
         "paths": {
             "*": ["typings/*"]

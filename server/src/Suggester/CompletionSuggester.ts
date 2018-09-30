@@ -1,3 +1,5 @@
+import { valueOrDefault } from "../Utils/TypingUtils";
+
 import { CompletionContext, ExpectedToken, getCompletionContext } from "./ComletionClassificator";
 import { DataAttributeSuggester } from "./DataAttributeSuggester";
 import { DataSchemaNode } from "./DataSchemaNode";
@@ -15,16 +17,32 @@ export enum SuggestionItemType {
     DataAttribute,
 }
 
-export interface SuggestionItem {
-    type: SuggestionItemType;
-    name: string;
-}
+export type SuggestionItem =
+    | {
+          type: SuggestionItemType.Element;
+          name: string;
+      }
+    | {
+          type: SuggestionItemType.DataElement;
+          name: string;
+          fullPath: string[];
+      }
+    | {
+          type: SuggestionItemType.DataAttribute;
+          name: string;
+          fullPath: string[];
+      }
+    | {
+          type: SuggestionItemType.Attribute;
+          name: string;
+          parentElementName: string;
+      };
 
 export class CompletionSuggester {
     private readonly sugarElementInfos: SugarElementInfo[];
-    private sugarTypes: SugarTypeInfo[];
-    private dataSchemaRoot: DataSchemaNode;
-    private dataAttributeSuggester: DataAttributeSuggester;
+    private readonly sugarTypes: SugarTypeInfo[];
+    private readonly dataSchemaRoot: DataSchemaNode;
+    private readonly dataAttributeSuggester: DataAttributeSuggester;
 
     public constructor(
         sugarTypes: SugarTypeInfo[],
@@ -39,13 +57,13 @@ export class CompletionSuggester {
 
     public suggest(codeBeforeCursor: string): Suggestions {
         const context = getCompletionContext(codeBeforeCursor);
-        const emptyResult = { items: [] };
+        const emptyResult: Suggestions = { items: [] };
         if (context == undefined) {
             return emptyResult;
         }
         if (context.expectedToken === ExpectedToken.ElementName) {
             return {
-                items: this.sugarElementInfos.map(x => ({
+                items: this.sugarElementInfos.map<SuggestionItem>(x => ({
                     type: SuggestionItemType.Element,
                     name: x.name,
                 })),
@@ -57,9 +75,10 @@ export class CompletionSuggester {
                 return emptyResult;
             }
             return {
-                items: currentElementInfo.attributes.map(x => ({
+                items: currentElementInfo.attributes.map<SuggestionItem>(x => ({
                     type: SuggestionItemType.Attribute,
                     name: x.name,
+                    parentElementName: currentElementInfo.name,
                 })),
             };
         }
@@ -104,11 +123,16 @@ export class CompletionSuggester {
         }
         let result: SuggestionItem[] = [];
         if (attribute.valueTypes.includes(AttributeType.Path)) {
+            const scopingPath = this.dataAttributeSuggester.getScopePathByContext(this.dataSchemaRoot, context);
             const contextualRoot = this.dataAttributeSuggester.findCurrentRootByContext(this.dataSchemaRoot, context);
             result = result.concat(
                 this.dataAttributeSuggester.suggest(
-                    contextualRoot || this.dataSchemaRoot,
-                    (context.attributeContext && context.attributeContext.attributeValue) || ""
+                    scopingPath,
+                    valueOrDefault(contextualRoot, this.dataSchemaRoot),
+                    valueOrDefault<string>(
+                        context.attributeContext != undefined ? context.attributeContext.attributeValue : undefined,
+                        ""
+                    )
                 )
             );
         }

@@ -19,6 +19,7 @@
       <w>internalsubset</w>
       <w>linters</w>
       <w>localname</w>
+      <w>maxunitscount</w>
       <w>mergeable</w>
       <w>nolazy</w>
       <w>pegjs</w>

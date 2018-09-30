@@ -6,6 +6,11 @@ const input: SugarElementInfo = {
         {
             name: "align",
             valueTypes: [AttributeType.String],
+            markdownDescription: `**Выравнивание текста внутри поля ввода**
+            
+Значения: \`left\` или \`right\`
+
+Значение по умолчанию: \`left\``,
         },
         {
             name: "width",
@@ -21,6 +26,9 @@ const input: SugarElementInfo = {
         },
     ],
     availableChildren: { type: AvailableChildrenType.NoChildren },
+    markdownDescription: `**input**
+
+Текстовое поле ввода`,
 };
 
 const page: SugarElementInfo = {

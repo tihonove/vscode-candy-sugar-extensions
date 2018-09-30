@@ -20,6 +20,7 @@ export class SchemaRngConverterTest {
             children: [
                 {
                     name: "Файл",
+                    description: "Файл обмена",
                 },
             ],
         });
@@ -32,7 +33,7 @@ export class SchemaRngConverterTest {
             xmlPreamble +
                 `
 <element name="Root">
-  <attribute name="ИдФайл">
+  <attribute name="ИдФайл" description="ИдФайл description">
     <type base="string">
       <minLength value="1" />
       <maxLength value="255" />
@@ -48,6 +49,7 @@ export class SchemaRngConverterTest {
                     attributes: [
                         {
                             name: "ИдФайл",
+                            description: "ИдФайл description",
                         },
                     ],
                 },

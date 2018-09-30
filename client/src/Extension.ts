@@ -5,7 +5,7 @@ import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } f
 
 let client: LanguageClient;
 
-export function activate(context: ExtensionContext) {
+export function activate(context: ExtensionContext): void {
     const serverModule = context.asAbsolutePath(path.join("server", "out", "Server.js"));
     const debugOptions = { execArgv: ["--nolazy", "--inspect=6009"] };
 
@@ -21,10 +21,7 @@ export function activate(context: ExtensionContext) {
     };
 
     const clientOptions: LanguageClientOptions = {
-        documentSelector: [
-            { scheme: "file", language: "sugar-xml" },
-            { scheme: "file", language: "xml" },
-        ],
+        documentSelector: [{ scheme: "file", language: "sugar-xml" }, { scheme: "file", language: "xml" }],
         synchronize: {
             // Notify the server about file changes to '.clientrc files contained in the workspace
             fileEvents: workspace.createFileSystemWatcher("**/.clientrc"),

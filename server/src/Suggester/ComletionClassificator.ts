@@ -1,3 +1,6 @@
+import { IPegJSTracer, TraceContext } from "../PegJSTypes/PegJSTypes";
+import { valueOrDefault } from "../Utils/TypingUtils";
+
 import { parse } from "./SugarGrammar/SugarParser";
 
 export enum ExpectedToken {
@@ -24,20 +27,7 @@ export interface CompletionContext {
     attributeContext?: AttributeContext;
 }
 
-interface CodeLocation {
-    offset: number;
-    line: number;
-    column: number;
-}
-
-interface TraceContext {
-    type: "rule.match" | "rule.fail" | "rule.enter";
-    rule: string;
-    location: { start: CodeLocation; end: CodeLocation };
-    result: any;
-}
-
-class ElementContextTracer {
+class ElementContextTracer implements IPegJSTracer {
     private readonly elementStack: ElementContext[] = [];
     private readonly expectedRulesToFail: string[];
     private readonly caretOffset: number;
@@ -57,11 +47,12 @@ class ElementContextTracer {
         return topElement.attributes[topElement.attributes.length - 1];
     }
 
-    public trace(context: TraceContext) {
+    public trace(context: TraceContext): void {
         if (context.type === "rule.enter" && context.rule === "Element") {
             this.elementStack.push({});
         }
         if (context.type === "rule.match" && context.rule === "ElementName") {
+            // tslint:disable-next-line no-unsafe-any
             this.elementStack[this.elementStack.length - 1].elementName = context.result;
         }
         if (context.type === "rule.fail") {
@@ -75,20 +66,22 @@ class ElementContextTracer {
         if (context.type === "rule.enter" && context.rule === "AttributeList") {
             const topElement = this.peekElement();
             if (topElement != undefined) {
-                topElement.attributes = topElement.attributes || [];
+                topElement.attributes = valueOrDefault<AttributeContext[]>(topElement.attributes, []);
             }
         }
         if (context.type === "rule.match" && context.rule === "AttributeName") {
             const topElement = this.peekElement();
             if (topElement != undefined) {
-                topElement.attributes = topElement.attributes || [];
+                topElement.attributes = valueOrDefault<AttributeContext[]>(topElement.attributes, []);
                 topElement.attributes.push({});
+                // tslint:disable-next-line no-unsafe-any
                 topElement.attributes[topElement.attributes.length - 1].attributeName = context.result;
             }
         }
         if (context.type === "rule.match" && context.rule === "AttributeValueContent") {
             const topElement = this.peekElement();
             if (topElement != undefined && topElement.attributes != undefined && topElement.attributes.length > 0) {
+                // tslint:disable-next-line no-unsafe-any
                 topElement.attributes[topElement.attributes.length - 1].attributeValue = context.result;
             }
         }
@@ -108,7 +101,7 @@ class ElementContextTracer {
     }
 
     public getElementStackSnapshot(): ElementContext[] {
-        return this.failedRuleStackSnapshot || [];
+        return valueOrDefault<ElementContext[]>(this.failedRuleStackSnapshot, []);
     }
 
     private peekElement(): undefined | ElementContext {

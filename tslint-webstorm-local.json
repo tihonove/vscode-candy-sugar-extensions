@@ -1,6 +1,6 @@
 {
     "rules": {
-        "no-unsafe-any": false,
+        "no-unsafe-any": true,
         "no-for-in-array": true,
         "deprecation": true,
         "no-boolean-literal-compare": true,
@@ -12,10 +12,11 @@
         "promise-function-async": false,
         "await-promise": true,
         "no-floating-promises": false,
-        "no-inferred-empty-object-type": false,
-        "no-unbound-method": false,
+        "no-inferred-empty-object-type": true,
+        "no-unbound-method": true,
         "no-use-before-declare": false,
         "use-default-type-parameter": true,
+        "strict-boolean-expressions": true,
         "no-void-expression": [
             true,
             "ignore-arrow-function-shorthand"

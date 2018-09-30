@@ -1,5 +1,6 @@
 export interface DataSchemaAttribute {
     name: string;
+    description?: string;
 }
 
 export interface DataSchemaNode {
@@ -8,6 +9,7 @@ export interface DataSchemaNode {
     attributes?: DataSchemaAttribute[];
     children?: DataSchemaNode[];
     position: DataSchemaNodePosition;
+    description?: string;
 }
 
 export interface DataSchemaNodeLocation {

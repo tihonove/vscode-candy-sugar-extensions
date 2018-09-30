@@ -1,8 +1,8 @@
 // @ts-ignore
 import source from "./SchemaRngParserSource";
 
-// tslint:disable-next-line no-eval
-const { parse: evalParse } = eval(source);
+// tslint:disable-next-line no-eval no-unsafe-any
+const evalParse: SchemaRngParseFunction = eval(source).parse;
 
 export interface SchemaRngDocument {
     preamble: SchemaRngPreamble;
@@ -39,4 +39,4 @@ export interface SchemaRngPreamble {
 
 export type SchemaRngParseFunction = (input: string) => SchemaRngDocument;
 
-export const parse: SchemaRngParseFunction = evalParse;
+export const parse = evalParse;

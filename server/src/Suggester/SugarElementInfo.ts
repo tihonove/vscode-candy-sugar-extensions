@@ -3,7 +3,7 @@ export enum AttributeType {
     Type,
     String,
     Number,
-    Boolean
+    Boolean,
 }
 
 export enum AvailableChildrenType {
@@ -16,6 +16,7 @@ export enum AvailableChildrenType {
 export interface SugarAttributeInfo {
     name: string;
     valueTypes: AttributeType[];
+    markdownDescription?: string;
 }
 
 export type SugarElementAvailableChildrenInfo =
@@ -38,4 +39,5 @@ export interface SugarElementInfo {
     createPathScope?: boolean;
     attributes?: SugarAttributeInfo[];
     availableChildren: SugarElementAvailableChildrenInfo;
+    markdownDescription?: string;
 }

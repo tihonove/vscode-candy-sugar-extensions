@@ -14,25 +14,26 @@ import {
 import { Definition, Hover } from "vscode-languageserver-types";
 
 import { SchemaRngConverter } from "./SchemaParser/SchemaRngConverter";
-import { allElements } from "./SugarElements/DefaultSugarElements";
-import { CompletionSuggester, SuggestionItemType } from "./Suggester/CompletionSuggester";
+import { SugarDocumentServices } from "./SugarDocumentServices";
+import { SuggestionItemType } from "./Suggester/CompletionSuggester";
 import { DataSchemaNode } from "./Suggester/DataSchemaNode";
 import { UriUtils } from "./UriUtils";
-import { isNotNullOrUndefined } from "./Utils/TypingUtils";
+import { isNotNullOrUndefined, valueOrDefault } from "./Utils/TypingUtils";
 
 const connection = createConnection(ProposedFeatures.all);
 const documents: TextDocuments = new TextDocuments();
 const schemaDocuments: { [uri: string]: string } = {};
 const parsedSchemaDocuments: { [uri: string]: DataSchemaNode } = {};
-const suggesters: { [uri: string]: CompletionSuggester } = {};
+const documentServices: { [uri: string]: SugarDocumentServices } = {};
 
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
 
 connection.onInitialize((params: InitializeParams) => {
     const capabilities = params.capabilities;
-    hasConfigurationCapability = !!capabilities.workspace && !!capabilities.workspace.configuration;
-    hasWorkspaceFolderCapability = Boolean(capabilities.workspace && !!capabilities.workspace.workspaceFolders);
+    hasConfigurationCapability = capabilities.workspace != undefined && Boolean(capabilities.workspace.configuration);
+    hasWorkspaceFolderCapability =
+        capabilities.workspace != undefined && Boolean(capabilities.workspace.workspaceFolders);
 
     return {
         capabilities: {
@@ -89,40 +90,42 @@ documents.onDidChangeContent(change => {
             schemaDocuments[schemaFileUri] = fs.readFileSync(schemaFile, "utf8");
             parsedSchemaDocuments[change.document.uri] = schemaParser.toDataSchema(schemaDocuments[schemaFileUri]);
         } catch (e) {
-            connection.console.log(e)
             // ignore read error
         }
     }
 
-    if (suggesters[change.document.uri] == undefined) {
-        suggesters[change.document.uri] = new CompletionSuggester(
-            [],
-            allElements,
-            parsedSchemaDocuments[change.document.uri] || { name: "" }
+    if (documentServices[change.document.uri] == undefined) {
+        documentServices[change.document.uri] = new SugarDocumentServices(
+            valueOrDefault(parsedSchemaDocuments[change.document.uri], emptyDataSchema)
         );
     }
 });
 
+const emptyDataSchema: DataSchemaNode = {
+    name: "",
+    position: {
+        start: { line: 0, column: 0, offset: 0 },
+        end: { line: 0, column: 0, offset: 0 },
+    },
+};
+
 connection.onHover(
-    (positionParams: TextDocumentPositionParams): Hover => {
-        const d = documents;
-        return {
-            range: {
-                start: {
-                    ...positionParams.position,
-                    character: positionParams.position.character - 1,
-                },
-                end: {
-                    ...positionParams.position,
-                    character: positionParams.position.character + 1,
-                },
+    (positionParams: TextDocumentPositionParams): Hover => ({
+        range: {
+            start: {
+                ...positionParams.position,
+                character: positionParams.position.character - 1,
             },
-            contents: {
-                kind: "markdown",
-                value: "ZZZZZ ZZZZZ",
+            end: {
+                ...positionParams.position,
+                character: positionParams.position.character + 1,
             },
-        }
-    }
+        },
+        contents: {
+            kind: "markdown",
+            value: "ZZZZZ ZZZZZ",
+        },
+    })
 );
 
 connection.onDefinition(
@@ -154,7 +157,7 @@ connection.onCompletion(
             return [];
         }
         const textToCursor = text.getText({ start: text.positionAt(0), end: textDocumentPosition.position });
-        const suggester = suggesters[textDocumentPosition.textDocument.uri];
+        const suggester = documentServices[textDocumentPosition.textDocument.uri].suggester;
 
         if (suggester == undefined) {
             return [];
@@ -169,28 +172,40 @@ connection.onCompletion(
                     return {
                         label: x.name,
                         kind: CompletionItemKind.Constructor,
-                        data: x.name,
+                        data: {
+                            suggestionItem: x,
+                            uri: textDocumentPosition.textDocument.uri,
+                        },
                     };
                 }
                 if (x.type === SuggestionItemType.Attribute) {
                     return {
                         label: x.name,
                         kind: CompletionItemKind.Method,
-                        data: x.name,
+                        data: {
+                            suggestionItem: x,
+                            uri: textDocumentPosition.textDocument.uri,
+                        },
                     };
                 }
                 if (x.type === SuggestionItemType.DataElement) {
                     return {
                         label: x.name,
                         kind: CompletionItemKind.Module,
-                        data: x.name,
+                        data: {
+                            suggestionItem: x,
+                            uri: textDocumentPosition.textDocument.uri,
+                        },
                     };
                 }
                 if (x.type === SuggestionItemType.DataAttribute) {
                     return {
                         label: x.name,
                         kind: CompletionItemKind.Field,
-                        data: x.name,
+                        data: {
+                            suggestionItem: x,
+                            uri: textDocumentPosition.textDocument.uri,
+                        },
                     };
                 }
                 return undefined;
@@ -203,14 +218,11 @@ connection.onCompletion(
 // the completion list.
 connection.onCompletionResolve(
     (item: CompletionItem): CompletionItem => {
-        if (item.data === 1) {
-            item.documentation = "TypeScript documentation";
-            item.detail = "Zzz\nsadsajdasd\nsadsa";
-            item.documentation = "#aaaa\nsadkjdsa\nsadjsajsa\nsadjlak";
-        } else if (item.data === 2) {
-            item.detail = "JavaScript details";
-            item.documentation = "JavaScript documentation";
-        }
+        // tslint:disable-next-line no-unsafe-any
+        const { suggestionItem, uri } = item.data;
+        const services = documentServices[uri];
+        // tslint:disable-next-line no-unsafe-any
+        services.descriptionResolver.enrichCompletionItem(item, suggestionItem);
         return item;
     }
 );

@@ -1,7 +1,7 @@
 import { DataSchemaAttribute, DataSchemaNode } from "../Suggester/DataSchemaNode";
-import { isNotNullOrUndefined } from "../Utils/TypingUtils";
+import { isNotNullOrUndefined, valueOrDefault } from "../Utils/TypingUtils";
 
-import { parse, SchemaRngNode } from "./SchemaRngGrammar/SchemaRngParser";
+import { parse, SchemaRngNode, SchemaRngNodeAttributeList } from "./SchemaRngGrammar/SchemaRngParser";
 
 export class SchemaRngConverter {
     public toDataSchema(xmlSchemaFileContent: string): DataSchemaNode {
@@ -14,12 +14,13 @@ export class SchemaRngConverter {
     }
 
     private createDataSchemaNode(xmlSchemaAsJson: SchemaRngNode): DataSchemaNode {
-        const properties = xmlSchemaAsJson.attributes || {};
+        const properties = xmlSchemaAsJson.attributes != undefined ? xmlSchemaAsJson.attributes : {};
         const elementName = properties.name;
         return {
-            name: elementName || "",
+            name: elementName != undefined ? elementName : "",
             multiple: properties.multiple === "true",
             position: xmlSchemaAsJson.position,
+            description: properties.description,
             attributes: this.buildElementAttributes(
                 this.normalizeSingleNode(xmlSchemaAsJson.children).filter(x => x.name === "attribute")
             ),
@@ -49,9 +50,17 @@ export class SchemaRngConverter {
     }
 
     private buildElementAttributes(nodes: SchemaRngNode[]): DataSchemaAttribute[] {
-        return nodes
-            .map(x => (x.attributes || {}).name)
-            .filter(isNotNullOrUndefined)
-            .map(x => ({ name: x }));
+        return nodes.map(x => this.buildElementAttribute(x)).filter(isNotNullOrUndefined);
+    }
+
+    private buildElementAttribute(node: SchemaRngNode): undefined | DataSchemaAttribute {
+        const attributeList = valueOrDefault<SchemaRngNodeAttributeList>(node.attributes, {});
+        if (attributeList == undefined || attributeList.name == undefined) {
+            return undefined;
+        }
+        return {
+            name: attributeList.name,
+            description: attributeList.description,
+        };
     }
 }
