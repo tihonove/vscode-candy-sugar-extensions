@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 
 import { CompletionItemDescriptionResolver } from "./CompletionItemDescriptionResolver";
-import { DataSchemaNode } from "./DataShema/DataSchemaNode";
+import { DataSchemaNode } from "./DataSchema/DataSchemaNode";
 import { ILogger } from "./Logger/Logger";
 import { allElements } from "./SugarElements/DefaultSugarElements";
 import { CompletionSuggester } from "./Suggester/CompletionSuggester";

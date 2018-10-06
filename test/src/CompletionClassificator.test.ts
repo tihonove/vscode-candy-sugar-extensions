@@ -8,7 +8,7 @@ import {
 } from "../../server/src/Suggester/CompletionClassificator/CompletionClassificator";
 import { ExpectedTokenType } from "../../server/src/Suggester/CompletionClassificator/ExpectedTokenType";
 
-import { expect } from "./Expect";
+import { expect } from "./Utils/Expect";
 
 @suite
 export class CompletionClassificatorTest {

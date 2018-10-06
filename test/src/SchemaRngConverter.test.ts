@@ -3,7 +3,7 @@ import { suite, test } from "mocha-typescript";
 
 import { SchemaRngConverter } from "../../server/src/SchemaParser/SchemaRngConverter";
 
-import { expect } from "./Expect";
+import { expect } from "./Utils/Expect";
 
 const xmlPreamble = `<?xml version="1.0" encoding="utf-8"?>`;
 

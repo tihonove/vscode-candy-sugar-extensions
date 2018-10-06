@@ -1,7 +1,7 @@
 import { CompletionItem } from "vscode-languageserver-types";
 
-import { DataSchemaNode } from "./DataShema/DataSchemaNode";
-import { DataSchemaUtils } from "./DataShema/DataSchemaUtils";
+import { DataSchemaNode } from "./DataSchema/DataSchemaNode";
+import { DataSchemaUtils } from "./DataSchema/DataSchemaUtils";
 import { allElements } from "./SugarElements/DefaultSugarElements";
 import { SuggestionItem, SuggestionItemType } from "./Suggester/CompletionSuggester";
 import { AttributeType } from "./Suggester/SugarElementInfo";

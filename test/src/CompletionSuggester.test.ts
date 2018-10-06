@@ -1,9 +1,9 @@
 import { suite, test } from "mocha-typescript";
 
 import { CompletionSuggester, SuggestionItemType } from "../../server/src/Suggester/CompletionSuggester";
-import { AttributeType, AvailableChildrenType } from "../../server/src/Suggester/SugarElementInfo";
 
-import { expect } from "./Expect";
+import { expect } from "./Utils/Expect";
+import { testDataSchema, testSugarElementInfos, testSugarTypes } from "./Utils/TestInfos";
 
 @suite
 export class CompletionSuggesterTest {
@@ -192,104 +192,6 @@ export class CompletionSuggesterTest {
     }
 
     private createTestCompletionSuggester(): CompletionSuggester {
-        const fakePosition = {
-            start: { column: 0, line: 0, offset: 0 },
-            end: { column: 0, line: 0, offset: 0 },
-        };
-        return new CompletionSuggester(
-            [
-                {
-                    name: "a-type1",
-                },
-                {
-                    name: "b-type2",
-                },
-            ],
-            [
-                {
-                    name: "atag1",
-                    createPathScope: true,
-                    attributes: [
-                        {
-                            name: "path",
-                            valueTypes: [AttributeType.Path],
-                        },
-                    ],
-                    availableChildren: {
-                        type: AvailableChildrenType.Any,
-                    },
-                },
-                {
-                    name: "btag2",
-                    createPathScope: false,
-                    attributes: [
-                        {
-                            name: "type",
-                            valueTypes: [AttributeType.Type],
-                        },
-                    ],
-                    availableChildren: {
-                        type: AvailableChildrenType.List,
-                        list: ["tag3"],
-                    },
-                },
-                {
-                    name: "ctag3",
-                    createPathScope: true,
-                    attributes: [
-                        {
-                            name: "path",
-                            valueTypes: [AttributeType.Path],
-                        },
-                    ],
-                    availableChildren: {
-                        type: AvailableChildrenType.Any,
-                    },
-                },
-            ],
-            {
-                name: "",
-                position: fakePosition,
-                children: [
-                    {
-                        name: "Root",
-                        position: fakePosition,
-                        attributes: [
-                            {
-                                name: "attr1",
-                            },
-                            {
-                                name: "attr2",
-                            },
-                        ],
-                        children: [
-                            {
-                                name: "Children1",
-                                position: fakePosition,
-                                children: [
-                                    {
-                                        name: "Child1",
-                                        position: fakePosition,
-                                        multiple: true,
-                                        attributes: [
-                                            {
-                                                name: "ChildAttr1",
-                                            },
-                                            {
-                                                name: "ChildAttr2",
-                                            },
-                                        ],
-                                    },
-                                ],
-                            },
-                            {
-                                name: "Child2",
-                                position: fakePosition,
-                            },
-                        ],
-                    },
-                ],
-            }
-        );
+        return new CompletionSuggester(testSugarTypes, testSugarElementInfos, testDataSchema);
     }
 }

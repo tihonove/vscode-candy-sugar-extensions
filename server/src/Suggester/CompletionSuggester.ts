@@ -1,4 +1,4 @@
-import { DataSchemaNode } from "../DataShema/DataSchemaNode";
+import { DataSchemaNode } from "../DataSchema/DataSchemaNode";
 import { valueOrDefault } from "../Utils/TypingUtils";
 
 import { CompletionContext, getCompletionContext } from "./CompletionClassificator/CompletionClassificator";

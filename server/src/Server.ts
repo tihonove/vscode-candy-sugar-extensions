@@ -14,7 +14,7 @@ import {
 } from "vscode-languageserver";
 import { Definition, Hover } from "vscode-languageserver-types";
 
-import { DataSchemaNode } from "./DataShema/DataSchemaNode";
+import { DataSchemaNode } from "./DataSchema/DataSchemaNode";
 import { VsCodeServerLogger } from "./Logger/Logger";
 import { SchemaRngConverter } from "./SchemaParser/SchemaRngConverter";
 import { SugarElementName } from "./SugarCodeDomBuilder/SugarCodeDomBuilder";

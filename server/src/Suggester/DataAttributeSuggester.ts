@@ -1,5 +1,5 @@
-import { DataSchemaAttribute, DataSchemaNode } from "../DataShema/DataSchemaNode";
-import { DataSchemaUtils } from "../DataShema/DataSchemaUtils";
+import { DataSchemaAttribute, DataSchemaNode } from "../DataSchema/DataSchemaNode";
+import { DataSchemaUtils } from "../DataSchema/DataSchemaUtils";
 import { isNotNullOrUndefined, valueOrDefault } from "../Utils/TypingUtils";
 
 import { CompletionContext, ElementContext } from "./CompletionClassificator/CompletionClassificator";
