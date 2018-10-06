@@ -2,7 +2,7 @@ import { DataSchemaAttribute, DataSchemaNode } from "../DataShema/DataSchemaNode
 import { DataSchemaUtils } from "../DataShema/DataSchemaUtils";
 import { isNotNullOrUndefined, valueOrDefault } from "../Utils/TypingUtils";
 
-import { CompletionContext, ElementContext } from "./CompletionClassificator";
+import { CompletionContext, ElementContext } from "./CompletionClassificator/CompletionClassificator";
 import { SuggestionItem, SuggestionItemType } from "./CompletionSuggester";
 import { SugarElementInfo } from "./SugarElementInfo";
 

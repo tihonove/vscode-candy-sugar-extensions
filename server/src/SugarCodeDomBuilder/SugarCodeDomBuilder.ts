@@ -1,91 +1,62 @@
-import { CodePosition, IPegJSTracer, TraceContext } from "../PegJSTypes/PegJSTypes";
-import { AttributeContext, ElementContext } from "../Suggester/CompletionClassificator";
-import { parseSugar } from "../Suggester/SugarGrammar/SugarParser";
-import { valueOrDefault } from "../Utils/TypingUtils";
+import { NullTracer } from "../PegJSUtils/NullTracer";
+import { CodePosition } from "../PegJSUtils/Types";
 
-class PositionGettingTracer implements IPegJSTracer {
-    private readonly elementStack: ElementContext[] = [];
-    public readonly foundElements: SugarCodeDomNode[] = [];
+import {
+    parseSugar,
+    SugarAttributeName,
+    SugarAttributeValue,
+    SugarElementName,
+    SugarSyntaxNode,
+} from "./SugarGrammar/SugarParser";
 
-    public constructor() {}
-
-    public trace(context: TraceContext): void {
-        if (context.type === "rule.enter" && context.rule === "Element") {
-            this.elementStack.push({});
-        }
-        if (context.type === "rule.match" && context.rule === "ElementName") {
-            this.elementStack[this.elementStack.length - 1].elementName = context.result;
-            this.foundElements.push(new SugarElementName(context.result, context.location));
-        }
-        if (context.type === "rule.enter" && context.rule === "AttributeList") {
-            const topElement = this.peekElement();
-            if (topElement != undefined) {
-                topElement.attributes = valueOrDefault<AttributeContext[]>(topElement.attributes, []);
-            }
-        }
-        if (context.type === "rule.match" && context.rule === "AttributeName") {
-            const topElement = this.peekElement();
-            if (topElement != undefined) {
-                topElement.attributes = valueOrDefault<AttributeContext[]>(topElement.attributes, []);
-                topElement.attributes.push({});
-                // tslint:disable-next-line no-unsafe-any
-                topElement.attributes[topElement.attributes.length - 1].attributeName = context.result;
-            }
-        }
-        if (context.type === "rule.match" && context.rule === "AttributeValueContent") {
-            const topElement = this.peekElement();
-            if (topElement != undefined && topElement.attributes != undefined && topElement.attributes.length > 0) {
-                // tslint:disable-next-line no-unsafe-any
-                topElement.attributes[topElement.attributes.length - 1].attributeValue = context.result;
-            }
-        }
-        if (context.type === "rule.match" && context.rule === "Element") {
-            this.elementStack.pop();
-        }
-        if (context.type === "rule.fail" && context.rule === "Element") {
-            this.elementStack.pop();
-        }
-    }
-
-    private peekElement(): undefined | ElementContext {
-        return this.elementStack[this.elementStack.length - 1];
-    }
-}
+type NodeWithDefinition = SugarElementName | SugarAttributeName | SugarAttributeValue;
 
 export class SugarCodeDomBuilder {
     public buildPositionToNodeMap(input: string): PositionToNodeMap {
-        const positionGettingTracer = new PositionGettingTracer();
-        parseSugar(input, {
-            tracer: positionGettingTracer,
+        const parseResult = parseSugar(input, {
+            tracer: new NullTracer(),
         });
-        return new PositionToNodeMap(positionGettingTracer.foundElements);
+        const foundElements: NodeWithDefinition[] = [];
+        this.traverseSugarAstAndGetNodes(parseResult, foundElements);
+        return new PositionToNodeMap(foundElements);
     }
-}
 
-interface SugarCodeDomNode {
-    readonly position: CodePosition;
-}
-
-export class SugarElementName implements SugarCodeDomNode {
-    public readonly name: string;
-    public readonly position: CodePosition;
-    public readonly parentNode?: SugarElementName;
-
-    public constructor(name: string, position: CodePosition, parentNode?: SugarElementName) {
-        this.name = name;
-        this.position = position;
-        this.parentNode = parentNode;
+    private traverseSugarAstAndGetNodes(root: SugarSyntaxNode, foundNodes: NodeWithDefinition[]): void {
+        if (root.type === "Element") {
+            this.traverseSugarAstAndGetNodes(root.name, foundNodes);
+            for (const attribute of root.attributes || []) {
+                this.traverseSugarAstAndGetNodes(attribute, foundNodes);
+            }
+            for (const child of root.children || []) {
+                this.traverseSugarAstAndGetNodes(child, foundNodes);
+            }
+        }
+        if (root.type === "ElementName") {
+            foundNodes.push(root);
+        }
+        if (root.type === "Attribute") {
+            this.traverseSugarAstAndGetNodes(root.name, foundNodes);
+            if (root.value != undefined) {
+                this.traverseSugarAstAndGetNodes(root.value, foundNodes);
+            }
+        }
+        if (root.type === "AttributeName") {
+            foundNodes.push(root);
+        }
+        if (root.type === "AttributeValue") {
+            foundNodes.push(root);
+        }
     }
 }
 
 export class PositionToNodeMap {
-    private readonly nodes: SugarCodeDomNode[];
+    private readonly nodes: NodeWithDefinition[];
 
-    public constructor(nodes: SugarCodeDomNode[]) {
+    public constructor(nodes: NodeWithDefinition[]) {
         this.nodes = nodes;
     }
 
-    public getNodeByOffset(offset: number): undefined | SugarCodeDomNode {
+    public getNodeByOffset(offset: number): undefined | NodeWithDefinition {
         return this.nodes.find(x => PositionUtils.includes(x.position, offset));
     }
 }

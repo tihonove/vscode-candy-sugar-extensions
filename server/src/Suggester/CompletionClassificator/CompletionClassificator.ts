@@ -1,14 +1,9 @@
-import { IPegJSTracer, TraceContext } from "../PegJSTypes/PegJSTypes";
-import { valueOrDefault } from "../Utils/TypingUtils";
+import { SubscriptionsTracer } from "../../PegJSUtils/SubscriptionsTracer";
+import { RuleAction, TraceContext } from "../../PegJSUtils/Types";
+import { valueOrDefault } from "../../Utils/TypingUtils";
+import { parseSugar } from "../SugarCompletionGrammar/SugarCompletionParser";
 
-import { parseSugar } from "./SugarGrammar/SugarParser";
-
-export enum ExpectedToken {
-    ElementName = "ElementName",
-    AttributeName = "AttributeName",
-    AttributeValue = "AttributeValue",
-    AttributeValueContent = "AttributeValueContent",
-}
+import { ExpectedTokenType } from "./ExpectedTokenType";
 
 export interface ElementContext {
     elementName?: string;
@@ -21,13 +16,13 @@ export interface AttributeContext {
 }
 
 export interface CompletionContext {
-    expectedToken: ExpectedToken;
+    expectedToken: ExpectedTokenType;
     elementContextStack: ElementContext[];
     elementContext?: ElementContext;
     attributeContext?: AttributeContext;
 }
 
-class ElementContextTracer implements IPegJSTracer {
+class ElementContextTracer extends SubscriptionsTracer {
     private readonly elementStack: ElementContext[] = [];
     private readonly expectedRulesToFail: string[];
     private readonly caretOffset: number;
@@ -35,8 +30,11 @@ class ElementContextTracer implements IPegJSTracer {
     public failedRuleStackSnapshot?: ElementContext[];
 
     public constructor(expectedRulesToFail: string[], caretOffset: number) {
+        super();
         this.expectedRulesToFail = expectedRulesToFail;
         this.caretOffset = caretOffset;
+        this.register<void>(RuleAction.Enter, "Element", this.enterElement);
+        this.register<string>(RuleAction.Match, "ElementName", this.matchElementName);
     }
 
     public peekAttribute(): undefined | AttributeContext {
@@ -48,13 +46,7 @@ class ElementContextTracer implements IPegJSTracer {
     }
 
     public trace(context: TraceContext): void {
-        if (context.type === "rule.enter" && context.rule === "Element") {
-            this.elementStack.push({});
-        }
-        if (context.type === "rule.match" && context.rule === "ElementName") {
-            // tslint:disable-next-line no-unsafe-any
-            this.elementStack[this.elementStack.length - 1].elementName = context.result;
-        }
+        super.trace(context);
         if (context.type === "rule.fail") {
             if (this.failedRule == undefined && this.expectedRulesToFail.includes(context.rule)) {
                 if (context.location.end.offset === this.caretOffset) {
@@ -107,6 +99,14 @@ class ElementContextTracer implements IPegJSTracer {
     private peekElement(): undefined | ElementContext {
         return this.elementStack[this.elementStack.length - 1];
     }
+
+    private readonly matchElementName = (elementName: string) => {
+        this.elementStack[this.elementStack.length - 1].elementName = elementName;
+    };
+
+    private readonly enterElement = () => {
+        this.elementStack.push({});
+    };
 }
 
 export function getCompletionContext(input: string): undefined | CompletionContext {
@@ -130,14 +130,14 @@ export function getCompletionContext(input: string): undefined | CompletionConte
         if (tracer.failedRule === "SpaceAfterElement") {
             return {
                 elementContext: tracer.peekElementFromFailedSnapshot(),
-                expectedToken: ExpectedToken.ElementName,
+                expectedToken: ExpectedTokenType.ElementName,
                 elementContextStack: tracer.getElementStackSnapshot(),
             };
         }
         if (tracer.failedRule === "ElementName") {
             return {
                 elementContext: tracer.peekElementFromFailedSnapshot(),
-                expectedToken: ExpectedToken.ElementName,
+                expectedToken: ExpectedTokenType.ElementName,
                 elementContextStack: tracer.getElementStackSnapshot(),
             };
         }
@@ -145,14 +145,14 @@ export function getCompletionContext(input: string): undefined | CompletionConte
             return {
                 elementContext: tracer.peekElementFromFailedSnapshot(),
                 attributeContext: tracer.peekAttribute(),
-                expectedToken: ExpectedToken.AttributeName,
+                expectedToken: ExpectedTokenType.AttributeName,
                 elementContextStack: tracer.getElementStackSnapshot(),
             };
         }
         if (tracer.failedRule === "AttributeName") {
             return {
                 elementContext: tracer.peekElementFromFailedSnapshot(),
-                expectedToken: ExpectedToken.AttributeName,
+                expectedToken: ExpectedTokenType.AttributeName,
                 elementContextStack: tracer.getElementStackSnapshot(),
             };
         }
@@ -160,7 +160,7 @@ export function getCompletionContext(input: string): undefined | CompletionConte
             return {
                 elementContext: tracer.peekElementFromFailedSnapshot(),
                 attributeContext: tracer.peekAttribute(),
-                expectedToken: ExpectedToken.AttributeValue,
+                expectedToken: ExpectedTokenType.AttributeValue,
                 elementContextStack: tracer.getElementStackSnapshot(),
             };
         }
@@ -170,7 +170,7 @@ export function getCompletionContext(input: string): undefined | CompletionConte
                 return {
                     elementContext: tracer.peekElementFromFailedSnapshot(),
                     attributeContext: tracer.peekAttribute(),
-                    expectedToken: ExpectedToken.AttributeValueContent,
+                    expectedToken: ExpectedTokenType.AttributeValueContent,
                     elementContextStack: tracer.getElementStackSnapshot(),
                 };
             }

@@ -9,8 +9,14 @@ export interface CodePosition {
     end: CodeLocation;
 }
 
+export enum RuleAction {
+    Match = "rule.match",
+    Enter = "rule.enter",
+    Fail = "rule.fail",
+}
+
 export interface TraceContext {
-    type: "rule.match" | "rule.fail" | "rule.enter";
+    type: RuleAction;
     rule: string;
     location: CodePosition;
     // tslint:disable-next-line no-any

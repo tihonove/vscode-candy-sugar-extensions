@@ -4,9 +4,9 @@ import {
     AttributeContext,
     CompletionContext,
     ElementContext,
-    ExpectedToken,
     getCompletionContext,
-} from "../../server/src/Suggester/CompletionClassificator";
+} from "../../server/src/Suggester/CompletionClassificator/CompletionClassificator";
+import { ExpectedTokenType } from "../../server/src/Suggester/CompletionClassificator/ExpectedTokenType";
 
 import { expect } from "./Expect";
 
@@ -15,7 +15,7 @@ export class CompletionClassificatorTest {
     @test
     public testCompleteElement(): void {
         const completionContext = getCompletionContext("<a");
-        this.assertCompletionContext(completionContext, ExpectedToken.ElementName, {
+        this.assertCompletionContext(completionContext, ExpectedTokenType.ElementName, {
             elementName: "a",
             attributes: [],
         });
@@ -24,7 +24,7 @@ export class CompletionClassificatorTest {
     @test
     public testCompleteSecondElement(): void {
         const completionContext = getCompletionContext("<aa><bb");
-        this.assertCompletionContext(completionContext, ExpectedToken.ElementName, {
+        this.assertCompletionContext(completionContext, ExpectedTokenType.ElementName, {
             elementName: "bb",
             attributes: [],
         });
@@ -33,7 +33,7 @@ export class CompletionClassificatorTest {
     @test
     public testCompleteAfterSelfClosingElement(): void {
         const completionContext = getCompletionContext("<aa><bb /><cc");
-        this.assertCompletionContext(completionContext, ExpectedToken.ElementName, {
+        this.assertCompletionContext(completionContext, ExpectedTokenType.ElementName, {
             elementName: "cc",
             attributes: [],
         });
@@ -42,7 +42,7 @@ export class CompletionClassificatorTest {
     @test
     public testCompleteAfterSelfClosingElementWithAttribute(): void {
         const completionContext = getCompletionContext('<aa><bb value="1" /><cc');
-        this.assertCompletionContext(completionContext, ExpectedToken.ElementName, {
+        this.assertCompletionContext(completionContext, ExpectedTokenType.ElementName, {
             elementName: "cc",
             attributes: [],
         });
@@ -51,7 +51,7 @@ export class CompletionClassificatorTest {
     @test
     public testCompleteElementWithoutName(): void {
         const completionContext = getCompletionContext("<");
-        this.assertCompletionContext(completionContext, ExpectedToken.ElementName, {});
+        this.assertCompletionContext(completionContext, ExpectedTokenType.ElementName, {});
     }
 
     @test
@@ -59,7 +59,7 @@ export class CompletionClassificatorTest {
         const completionContext = getCompletionContext("<aaa at");
         this.assertCompletionContext(
             completionContext,
-            ExpectedToken.AttributeName,
+            ExpectedTokenType.AttributeName,
             {
                 elementName: "aaa",
                 attributes: [{ attributeName: "at" }],
@@ -73,7 +73,7 @@ export class CompletionClassificatorTest {
     @test
     public testCompleteAttributeNameWithoutAnyAttr(): void {
         const completionContext = getCompletionContext("<aaa ");
-        this.assertCompletionContext(completionContext, ExpectedToken.AttributeName, {
+        this.assertCompletionContext(completionContext, ExpectedTokenType.AttributeName, {
             elementName: "aaa",
             attributes: [],
         });
@@ -82,7 +82,7 @@ export class CompletionClassificatorTest {
     @test
     public testCompleteElementAfterNewLineAndSpaces(): void {
         const completionContext = getCompletionContext("<aaa>\n    <bb");
-        this.assertCompletionContext(completionContext, ExpectedToken.ElementName, {
+        this.assertCompletionContext(completionContext, ExpectedTokenType.ElementName, {
             elementName: "bb",
             attributes: [],
         });
@@ -93,7 +93,7 @@ export class CompletionClassificatorTest {
         const completionContext = getCompletionContext("<aaa attr=");
         this.assertCompletionContext(
             completionContext,
-            ExpectedToken.AttributeValue,
+            ExpectedTokenType.AttributeValue,
             {
                 elementName: "aaa",
                 attributes: [{ attributeName: "attr" }],
@@ -109,7 +109,7 @@ export class CompletionClassificatorTest {
         const completionContext = getCompletionContext('<aaa attr="');
         this.assertCompletionContext(
             completionContext,
-            ExpectedToken.AttributeValueContent,
+            ExpectedTokenType.AttributeValueContent,
             {
                 elementName: "aaa",
                 attributes: [
@@ -131,7 +131,7 @@ export class CompletionClassificatorTest {
         const completionContext = getCompletionContext('<aaa attr="cont');
         this.assertCompletionContext(
             completionContext,
-            ExpectedToken.AttributeValueContent,
+            ExpectedTokenType.AttributeValueContent,
             {
                 elementName: "aaa",
                 attributes: [
@@ -240,7 +240,7 @@ export class CompletionClassificatorTest {
         const completionContext = getCompletionContext('<aaa attr="content" attr2');
         this.assertCompletionContext(
             completionContext,
-            ExpectedToken.AttributeName,
+            ExpectedTokenType.AttributeName,
             {
                 elementName: "aaa",
                 attributes: [
@@ -261,7 +261,7 @@ export class CompletionClassificatorTest {
 
     private assertCompletionContext(
         completionContext: undefined | CompletionContext,
-        expectedToken: ExpectedToken,
+        expectedToken: ExpectedTokenType,
         elementContext: undefined | ElementContext,
         attributeContext?: undefined | AttributeContext
     ): void {

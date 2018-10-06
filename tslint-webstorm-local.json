@@ -16,7 +16,7 @@
         "no-unbound-method": true,
         "no-use-before-declare": false,
         "use-default-type-parameter": true,
-        "strict-boolean-expressions": true,
+        "strict-boolean-expressions": false,
         "no-void-expression": [
             true,
             "ignore-arrow-function-shorthand"

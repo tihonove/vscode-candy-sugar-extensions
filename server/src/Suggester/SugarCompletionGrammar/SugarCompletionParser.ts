@@ -1,7 +1,7 @@
-import { IPegJSTracer } from "../../PegJSTypes/PegJSTypes";
+import { IPegJSTracer } from "../../PegJSUtils/Types";
 
 // @ts-ignore
-import source from "./SugarParserSource";
+import source from "./SugarCompletionParserSource";
 
 // tslint:disable-next-line no-eval no-unsafe-any
 const evalParse: (input: string, options: { tracer?: IPegJSTracer }) => void = eval(source).parse;

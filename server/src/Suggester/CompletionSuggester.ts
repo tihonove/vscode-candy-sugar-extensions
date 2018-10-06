@@ -1,10 +1,11 @@
 import { DataSchemaNode } from "../DataShema/DataSchemaNode";
 import { valueOrDefault } from "../Utils/TypingUtils";
 
-import { CompletionContext, ExpectedToken, getCompletionContext } from "./CompletionClassificator";
+import { CompletionContext, getCompletionContext } from "./CompletionClassificator/CompletionClassificator";
 import { DataAttributeSuggester } from "./DataAttributeSuggester";
 import { AttributeType, SugarAttributeInfo, SugarElementInfo } from "./SugarElementInfo";
 import { SugarTypeInfo } from "./SugarTypeInfo";
+import { ExpectedTokenType } from "./CompletionClassificator/ExpectedTokenType";
 
 export interface Suggestions {
     items: SuggestionItem[];
@@ -61,7 +62,7 @@ export class CompletionSuggester {
         if (context == undefined) {
             return emptyResult;
         }
-        if (context.expectedToken === ExpectedToken.ElementName) {
+        if (context.expectedToken === ExpectedTokenType.ElementName) {
             return {
                 items: this.sugarElementInfos.map<SuggestionItem>(x => ({
                     type: SuggestionItemType.Element,
@@ -69,7 +70,7 @@ export class CompletionSuggester {
                 })),
             };
         }
-        if (context.expectedToken === ExpectedToken.AttributeName) {
+        if (context.expectedToken === ExpectedTokenType.AttributeName) {
             const currentElementInfo = this.getElementInfoByContext(context);
             if (currentElementInfo == undefined || currentElementInfo.attributes == undefined) {
                 return emptyResult;
@@ -82,7 +83,7 @@ export class CompletionSuggester {
                 })),
             };
         }
-        if (context.expectedToken === ExpectedToken.AttributeValueContent) {
+        if (context.expectedToken === ExpectedTokenType.AttributeValueContent) {
             return {
                 items: this.suggestAttributeValue(context),
             };
