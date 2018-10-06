@@ -80,7 +80,7 @@
 		"lint:client": "tslint --project ./client/tsconfig.json",
 		"lint:test": "tslint --project ./test/tsconfig.json",
 		"test": "mocha",
-        "test:coverage": "nyc --reporter=html --reporter=text mocha"
+		"test:coverage": "nyc --reporter=html --reporter=text mocha"
 	},
 	"devDependencies": {
 		"@types/mocha": "^5.2.0",
@@ -97,6 +97,7 @@
 		"@babel/preset-typescript": "^7.0.0",
 		"@babel/register": "^7.0.0",
 		"@types/chai": "^4.1.4",
+		"@types/lodash": "^4.14.116",
 		"@types/nearley": "^2.11.0",
 		"babel-plugin-preval": "^3.0.1",
 		"chai": "^4.1.2",
@@ -113,16 +114,16 @@
 		"vscode-jsonrpc": "^4.0.0",
 		"vscode-languageserver-types": "^3.13.0"
 	},
-    "nyc": {
-        "check-coverage": true,
-        "per-file": true,
-        "include": [
-            "server/**/*.ts"
-        ],
-        "extension": [
-            ".ts",
-            ".js"
-        ],
-        "all": true
-    }
+	"nyc": {
+		"check-coverage": true,
+		"per-file": true,
+		"include": [
+			"server/**/*.ts"
+		],
+		"extension": [
+			".ts",
+			".js"
+		],
+		"all": true
+	}
 }

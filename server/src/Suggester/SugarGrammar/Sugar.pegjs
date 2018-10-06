@@ -15,7 +15,7 @@ Content = Text? (Element Text?)*
 
 Text = [^<]+
 
-ElementName = value:[a-zA-Z0-9]+ {
+ElementName = value:[a-zA-Z0-9-]+ {
     return value.join("");
 }
 
@@ -26,7 +26,7 @@ Attribute =
 
 EqualsAfterAttributeName = "{!{FAKE_NODE}!}"? "="
 
-AttributeName = value:[a-zA-Z0-9]+ {
+AttributeName = value:[a-zA-Z0-9-]+ {
     return value.join("");
 }
 

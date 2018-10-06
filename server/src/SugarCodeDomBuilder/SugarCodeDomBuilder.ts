@@ -5,39 +5,17 @@ import { valueOrDefault } from "../Utils/TypingUtils";
 
 class PositionGettingTracer implements IPegJSTracer {
     private readonly elementStack: ElementContext[] = [];
-    private readonly expectedRulesToFail: string[];
-    private readonly caretOffset: number;
-    public failedRule?: string;
-    public failedRuleStackSnapshot?: ElementContext[];
+    public readonly foundElements: SugarCodeDomNode[] = [];
 
-    public constructor(expectedRulesToFail: string[], caretOffset: number) {
-        this.expectedRulesToFail = [];
-        this.caretOffset = caretOffset;
-    }
-
-    public peekAttribute(): undefined | AttributeContext {
-        const topElement = this.peekElementFromFailedSnapshot();
-        if (topElement == undefined || topElement.attributes == undefined) {
-            return undefined;
-        }
-        return topElement.attributes[topElement.attributes.length - 1];
-    }
+    public constructor() {}
 
     public trace(context: TraceContext): void {
         if (context.type === "rule.enter" && context.rule === "Element") {
             this.elementStack.push({});
         }
         if (context.type === "rule.match" && context.rule === "ElementName") {
-            // tslint:disable-next-line no-unsafe-any
             this.elementStack[this.elementStack.length - 1].elementName = context.result;
-        }
-        if (context.type === "rule.fail") {
-            if (this.failedRule == undefined && this.expectedRulesToFail.includes(context.rule)) {
-                if (context.location.end.offset === this.caretOffset) {
-                    this.failedRule = context.rule;
-                    this.failedRuleStackSnapshot = [...this.elementStack];
-                }
-            }
+            this.foundElements.push(new SugarElementName(context.result, context.location));
         }
         if (context.type === "rule.enter" && context.rule === "AttributeList") {
             const topElement = this.peekElement();
@@ -69,17 +47,6 @@ class PositionGettingTracer implements IPegJSTracer {
         }
     }
 
-    public peekElementFromFailedSnapshot(): undefined | ElementContext {
-        if (this.failedRuleStackSnapshot == undefined) {
-            return undefined;
-        }
-        return this.failedRuleStackSnapshot[this.failedRuleStackSnapshot.length - 1];
-    }
-
-    public getElementStackSnapshot(): ElementContext[] {
-        return valueOrDefault<ElementContext[]>(this.failedRuleStackSnapshot, []);
-    }
-
     private peekElement(): undefined | ElementContext {
         return this.elementStack[this.elementStack.length - 1];
     }
@@ -91,13 +58,15 @@ export class SugarCodeDomBuilder {
         parseSugar(input, {
             tracer: positionGettingTracer,
         });
-        return new PositionToNodeMap();
+        return new PositionToNodeMap(positionGettingTracer.foundElements);
     }
 }
 
-interface SugarCodeDomNode {}
+interface SugarCodeDomNode {
+    readonly position: CodePosition;
+}
 
-class SugarElementName implements SugarCodeDomNode {
+export class SugarElementName implements SugarCodeDomNode {
     public readonly name: string;
     public readonly position: CodePosition;
     public readonly parentNode?: SugarElementName;
@@ -109,8 +78,20 @@ class SugarElementName implements SugarCodeDomNode {
     }
 }
 
-class PositionToNodeMap {
+export class PositionToNodeMap {
+    private readonly nodes: SugarCodeDomNode[];
+
+    public constructor(nodes: SugarCodeDomNode[]) {
+        this.nodes = nodes;
+    }
+
     public getNodeByOffset(offset: number): undefined | SugarCodeDomNode {
-        return undefined;
+        return this.nodes.find(x => PositionUtils.includes(x.position, offset));
+    }
+}
+
+class PositionUtils {
+    public static includes(position: CodePosition, offset: number): boolean {
+        return position.start.offset <= offset && offset <= position.end.offset;
     }
 }

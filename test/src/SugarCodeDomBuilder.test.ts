@@ -1,8 +1,8 @@
 import { suite, test } from "mocha-typescript";
 
-import { SugarCodeDomBuilder } from "../../server/src/SugarCodeDomBuilder/SugarCodeDomBuilder";
+import { SugarCodeDomBuilder, SugarElementName } from "../../server/src/SugarCodeDomBuilder/SugarCodeDomBuilder";
 
-import { expect} from "./Expect";
+import { expect } from "./Expect";
 
 @suite
 export class SugarCodeDomBuilderTest {

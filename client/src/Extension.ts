@@ -33,7 +33,7 @@ export function activate(context: ExtensionContext): void {
 }
 
 export function deactivate(): undefined | Thenable<void> {
-    if (!client) {
+    if (client == undefined) {
         return undefined;
     }
     return client.stop();

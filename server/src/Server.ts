@@ -1,4 +1,5 @@
 import fs from "fs";
+import _ from "lodash";
 import path from "path";
 import { CancellationToken } from "vscode-jsonrpc";
 import {
@@ -13,14 +14,17 @@ import {
 } from "vscode-languageserver";
 import { Definition, Hover } from "vscode-languageserver-types";
 
+import { DataSchemaNode } from "./DataShema/DataSchemaNode";
+import { VsCodeServerLogger } from "./Logger/Logger";
 import { SchemaRngConverter } from "./SchemaParser/SchemaRngConverter";
+import { SugarElementName } from "./SugarCodeDomBuilder/SugarCodeDomBuilder";
 import { SugarDocumentServices } from "./SugarDocumentServices";
 import { SuggestionItemType } from "./Suggester/CompletionSuggester";
-import { DataSchemaNode } from "./DataShema/DataSchemaNode";
 import { UriUtils } from "./UriUtils";
 import { isNotNullOrUndefined, valueOrDefault } from "./Utils/TypingUtils";
 
 const connection = createConnection(ProposedFeatures.all);
+const logger = new VsCodeServerLogger(connection.console);
 const documents: TextDocuments = new TextDocuments();
 const schemaDocuments: { [uri: string]: string } = {};
 const parsedSchemaDocuments: { [uri: string]: DataSchemaNode } = {};
@@ -96,9 +100,11 @@ documents.onDidChangeContent(change => {
 
     if (documentServices[change.document.uri] == undefined) {
         documentServices[change.document.uri] = new SugarDocumentServices(
-            valueOrDefault(parsedSchemaDocuments[change.document.uri], emptyDataSchema)
+            valueOrDefault(parsedSchemaDocuments[change.document.uri], emptyDataSchema),
+            logger
         );
     }
+    documentServices[change.document.uri].sugarDocumentDom.processDocumentChange(change.document.getText());
 });
 
 const emptyDataSchema: DataSchemaNode = {
@@ -110,40 +116,53 @@ const emptyDataSchema: DataSchemaNode = {
 };
 
 connection.onHover(
-    (positionParams: TextDocumentPositionParams): Hover => ({
-        range: {
-            start: {
-                ...positionParams.position,
-                character: positionParams.position.character - 1,
-            },
-            end: {
-                ...positionParams.position,
-                character: positionParams.position.character + 1,
-            },
-        },
-        contents: {
-            kind: "markdown",
-            value: "ZZZZZ ZZZZZ",
-        },
-    })
+    (positionParams: TextDocumentPositionParams): undefined | Hover => {
+        if (documentServices[positionParams.textDocument.uri] != undefined) {
+            const sugarDocumentDom = documentServices[positionParams.textDocument.uri].sugarDocumentDom;
+            if (sugarDocumentDom.map != undefined) {
+                const textDocument = documents.get(positionParams.textDocument.uri);
+                if (textDocument == undefined) {
+                    return undefined;
+                }
+                const offset = textDocument.offsetAt(positionParams.position);
+                const node = sugarDocumentDom.map.getNodeByOffset(offset);
+                if (node instanceof SugarElementName) {
+                    return {
+                        range: {
+                            start: textDocument.positionAt(node.position.start.offset),
+                            end: textDocument.positionAt(node.position.end.offset),
+                        },
+                        contents: {
+                            kind: "markdown",
+                            value: "## " + node.name,
+                        },
+                    };
+                }
+            }
+        }
+        return undefined;
+    }
 );
 
 connection.onDefinition(
-    (positionParams: TextDocumentPositionParams): Definition => ({
-        range: {
-            start: {
-                ...positionParams.position,
-                character: positionParams.position.character - 3,
-                line: positionParams.position.line - 1,
+    (positionParams: TextDocumentPositionParams): undefined | Definition => {
+        return undefined;
+        return {
+            range: {
+                start: {
+                    ...positionParams.position,
+                    character: positionParams.position.character - 3,
+                    line: positionParams.position.line - 1,
+                },
+                end: {
+                    ...positionParams.position,
+                    character: positionParams.position.character + 3,
+                    line: positionParams.position.line - 1,
+                },
             },
-            end: {
-                ...positionParams.position,
-                character: positionParams.position.character + 3,
-                line: positionParams.position.line - 1,
-            },
-        },
-        uri: positionParams.textDocument.uri,
-    })
+            uri: positionParams.textDocument.uri,
+        };
+    }
 );
 
 connection.onDidChangeWatchedFiles(_change => {
