@@ -73,7 +73,12 @@ class SugarDocumentDom {
 
     private updateDom(text: string): void {
         this.logger.info("Begin update");
-        this.map = this.builder.buildPositionToNodeMap(text);
+        try {
+            this.map = this.builder.buildPositionToNodeMap(text);
+        } catch (ignoreError) {
+            // По всей вимдости код невалиден. Просто оставим последний валидный map
+        }
+
         this.logger.info("End update");
     }
 }
