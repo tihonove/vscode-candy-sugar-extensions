@@ -1,4 +1,4 @@
-import { DataSchemaAttribute, DataSchemaNode } from "../DataSchema/DataSchemaNode";
+import { DataSchemaAttribute, DataSchemaElementNode } from "../DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "../DataSchema/DataSchemaUtils";
 import { isNotNullOrUndefined, valueOrDefault } from "../Utils/TypingUtils";
 
@@ -14,7 +14,7 @@ export class DataAttributeSuggester {
         this.sugarElementInfos = sugarElementInfos;
     }
 
-    public getScopePathByContext(root: DataSchemaNode, context: CompletionContext): string[] {
+    public getScopePathByContext(root: DataSchemaElementNode, context: CompletionContext): string[] {
         if (context.elementContextStack == undefined) {
             return [];
         }
@@ -30,7 +30,7 @@ export class DataAttributeSuggester {
             .filter(isNotNullOrUndefined);
 
         const result: string[] = [];
-        let currentNode: undefined | DataSchemaNode = root;
+        let currentNode: undefined | DataSchemaElementNode = root;
         for (const [elementInfo, elementContext] of elementInfosStack) {
             const scopingPath = this.getScopingPath(elementInfo, elementContext);
             if (currentNode == undefined) {
@@ -44,7 +44,7 @@ export class DataAttributeSuggester {
         return result;
     }
 
-    public findCurrentRootByContext(root: DataSchemaNode, context: CompletionContext): undefined | DataSchemaNode {
+    public findCurrentRootByContext(root: DataSchemaElementNode, context: CompletionContext): undefined | DataSchemaElementNode {
         if (context.elementContextStack == undefined) {
             return root;
         }
@@ -59,7 +59,7 @@ export class DataAttributeSuggester {
             })
             .filter(isNotNullOrUndefined);
 
-        let x: undefined | DataSchemaNode = root;
+        let x: undefined | DataSchemaElementNode = root;
         for (const [elementInfo, elementContext] of elementInfosStack) {
             const scopingPath = this.getScopingPath(elementInfo, elementContext);
             if (x == undefined) {
@@ -72,7 +72,7 @@ export class DataAttributeSuggester {
         return x;
     }
 
-    public suggest(scopedPath: string[], root: DataSchemaNode, dataPathToCursor: string): SuggestionItem[] {
+    public suggest(scopedPath: string[], root: DataSchemaElementNode, dataPathToCursor: string): SuggestionItem[] {
         const pathItems = dataPathToCursor.split(this.pathSeparator);
         const itemsWithoutLastItem = pathItems.slice(0, -1);
         const element = this.findElementByPath(root, itemsWithoutLastItem);
@@ -80,7 +80,7 @@ export class DataAttributeSuggester {
             return [];
         }
         return [
-            ...valueOrDefault<DataSchemaNode[]>(element.children, []).map<SuggestionItem>(x => ({
+            ...valueOrDefault<DataSchemaElementNode[]>(element.children, []).map<SuggestionItem>(x => ({
                 type: SuggestionItemType.DataElement,
                 name: x.name,
                 fullPath: [...scopedPath, ...itemsWithoutLastItem, x.name],
@@ -111,7 +111,7 @@ export class DataAttributeSuggester {
         return this.sugarElementInfos.find(x => x.name === elementContext.elementName);
     }
 
-    private findElementByPath(root: DataSchemaNode, itemsWithoutLastItem: string[]): undefined | DataSchemaNode {
+    private findElementByPath(root: DataSchemaElementNode, itemsWithoutLastItem: string[]): undefined | DataSchemaElementNode {
         return DataSchemaUtils.findElementByPath(root, itemsWithoutLastItem);
     }
 }

@@ -1,22 +1,24 @@
-import { DataSchemaAttribute, DataSchemaNode } from "../DataSchema/DataSchemaNode";
+import { DataSchemaAttribute, DataSchemaElementNode } from "../DataSchema/DataSchemaNode";
 import { isNotNullOrUndefined, valueOrDefault } from "../Utils/TypingUtils";
 
 import { parse, SchemaRngNode, SchemaRngNodeAttributeList } from "./SchemaRngGrammar/SchemaRngParser";
 
 export class SchemaRngConverter {
-    public toDataSchema(xmlSchemaFileContent: string): DataSchemaNode {
+    public toDataSchema(xmlSchemaFileContent: string): DataSchemaElementNode {
         const parseResult = parse(xmlSchemaFileContent.replace(/^\uFEFF/, ""));
         return {
             name: "",
+            type: "DataSchemaElementNode",
             children: [this.createDataSchemaNode(parseResult.body)],
             position: parseResult.position,
         };
     }
 
-    private createDataSchemaNode(xmlSchemaAsJson: SchemaRngNode): DataSchemaNode {
+    private createDataSchemaNode(xmlSchemaAsJson: SchemaRngNode): DataSchemaElementNode {
         const properties = xmlSchemaAsJson.attributes != undefined ? xmlSchemaAsJson.attributes : {};
         const elementName = properties.name;
         return {
+            type: "DataSchemaElementNode",
             name: elementName != undefined ? elementName : "",
             multiple: properties.multiple === "true",
             position: xmlSchemaAsJson.position,
@@ -45,7 +47,7 @@ export class SchemaRngConverter {
         return element;
     }
 
-    private buildChildren(nodes: SchemaRngNode[]): DataSchemaNode[] {
+    private buildChildren(nodes: SchemaRngNode[]): DataSchemaElementNode[] {
         return nodes.map(x => this.createDataSchemaNode(x));
     }
 
@@ -59,8 +61,10 @@ export class SchemaRngConverter {
             return undefined;
         }
         return {
+            type: "DataSchemaAttribute",
             name: attributeList.name,
             description: attributeList.description,
+            position: node.position,
         };
     }
 }

@@ -1,0 +1,299 @@
+<form maxunitscount="15" templates="true" navigationLimit="15">
+    <types>
+        <type name="kppEnvd" base="string" description="КПП должен соответствовать разрешенному перечню. Согласно Письму ФНС от 05.02.2014 № ГД-4-3/1895 5-6 символ должен быть равен 35 или 77">
+            <length value="9" />
+            <pattern value="([0-9]{1}[1-9]{1}|[1-9]{1}[0-9]{1})([0-9]{2})(35|77)([0-9]{3})" />
+        </type>
+        <type name="orgAdress" description="Адрес заполнен не по КЛАДРу" requiredDescription="Адрес должен быть заполнен. Воспользуйтесь кнопкой Заполнить адрес">
+          <minLength value="1" />
+          <maxLength value="60" />
+        </type>
+        <type base="string" name="local" description="Поле заполнено не по справочнику" requiredDescription="Поле должно быть заполнено. Воспользуйтесь справочником для заполнения">
+            <length value="3" />       
+            <enumeration value="120" />
+            <enumeration value="214" />
+            <enumeration value="215" />
+            <enumeration value="245" />
+            <enumeration value="310" />
+            <enumeration value="320" />
+            <enumeration value="331" />
+        </type>
+        <type name="fio" base="string">        
+          <minLength value="1" />
+          <maxLength value="60" />
+        </type>
+		<type name="oktmo" base="string" description="Значение ОКТМО должно состоять из 8 цифр"  requiredDescription="Поле должно быть заполнено. Воспользуйтесь справочником для заполнения">
+			<length value="8"/>
+			<pattern value="[0-9]{8}"/>
+		</type>
+      <type name="int(10,0)" base="integer" description="Значение должно быть целым числом длиной не более 10 цифр" requiredDescription="Поле должно быть заполнено. Воспользуйтесь кнопкой расчета или укажите сумму налоговой базы вручную" >
+          <totalDigits value="10" />
+      </type>
+		<type name="kodvd" base="string" description="Значение должно быть строкой длиной 2 символа" requiredDescription="Поле должно быть заполнено. Воспользуйтесь справочником для заполнения">
+      <length value="2" />
+    </type>
+    <type name="bazdohod" base="string" description="Значение должно быть целым числом длиной не более 6 цифр" requiredDescription="Поле должно быть заполнено. Воспользуйтесь справочником для заполнения">
+		<totalDigits value="6"/>
+    </type>
+    <type name="nalBaza_int(10,0)" base="integer" description="Значение должно быть целым числом длиной не более 10 цифр" >
+      <totalDigits value="10" />
+    </type>
+    <type name="sumnalisch" base="integer" description="Значение должно быть целым числом длиной не более 10 цифр" requireDescription="Поле должно быть заполнено. Воспользуйтесь кнопкой расчета или укажите сумму исчисленного налога вручную">
+      <totalDigits value="10" />
+    </type>
+	 <type name="nalog_int(10,0)" base="integer" description="Значение должно быть целым числом длиной не более 10 цифр" requireDescription="Поле должно быть заполнено. Воспользуйтесь кнопкой расчета или укажите общую сумму налога вручную">
+      <totalDigits value="10" />
+    </type>
+		<type name="int(6,0)" base="integer" description="Значение должно быть целым числом длиной не более 6 цифр">
+            <totalDigits value="6" />
+        </type>
+		<type name="int(2,0)" base="integer" description="Значение должно быть целым числом длиной не более 2 цифр">
+            <totalDigits value="2" />
+        </type>
+		<type name="k12" base="decimal" description="Значение корректирующего коэффициента базовой доходности должно быть числом в пределах от 0,005 до 1" requiredDescription="Поле должно быть заполнено. Укажите корректирующий коэффициент базовой доходности, определенный в вашем районе">
+      <totalDigits value="4"/>
+			<fractionDigits value="3"/>
+    </type>
+    </types>
+    <page id="title" template="titlefns" navigationName="Титульный лист" path="/Файл/Документ" formName="Налоговая декларация по единому налогу на вмененный доход <br/> для отдельных видов деятельности" >
+        <content>
+          <inn/>
+          <kpp type="kppEnvd" />
+          <normativehelp id="20172" commonId="new_1152016_5.05_0" knd="1152016"/>
+          <corrnumber />
+          <period gId="10307" />
+          <year />
+          <ifns />
+          <local type="local" gIdIp="10308002" gIdOrg="10308001" fetchfn="local"/>
+          <name editable="true" />
+          <okved />
+          <phone />
+          <reorganization/>
+          <signer/>
+        </content>
+    </page>
+    <page path="Файл/Документ/ЕНВД/СумНалПУВД">
+        <input path="СумПУВД/НалПУ" />
+    </page>
+	<page id="unit1" navigationName="Раздел 1" path="/Файл/Документ/ЕНВД/СумНалПУВД" template="default" navigationName="Раздел 1">
+		<caption>Раздел 1</caption>
+        <header>Сумма единого налога на вмененный доход,<br/>подлежащая уплате в бюджет</header>
+        <normativehelp id="20182"/>
+		 <content>
+            <table addbutton="false" removebutton="false" usepager="false" grayColumn="2" path="СумПУВД" multiple="true" stickyHeader="true">
+                <row kind="head">
+                  <column width="450">Показатель</column>
+                  <column width="150">Код строки</column>
+                  <column width="280">Значение</column>
+                </row>
+                <row>
+                    <column>Код по ОКТМО</column>
+                    <column>010</column>
+                    <column>
+                        <text path="ОКТМО" type="oktmo" emptydescription="Укажите ОКТМО в Разделе 2" />
+                    </column>
+                </row>
+                <row>
+                    <column>Сумма налога, подлежащая уплате за налоговый период</column>
+                    <column>020</column>
+                    <column>
+                        <input path="НалПУ" type="int(10,0)" formula="стр.040 раздела 3 * (сумма стр.110 всех разделов 2 по данному ОКТМО) / стр.010 раздела 3" auto="true" width="200" defaultValue="0" />
+                    </column>
+                </row>
+            </table>
+            <gray visibilityPath="Текст">
+                <italic>Значения раздела 1 заполняются автоматически из данных разделов 2 и 3</italic>
+            </gray>
+            <warning visibilityPath="Предупреждение">
+                Мы заполним значения раздела 1 автоматически, используя данные разделов 2 и 3
+            </warning>
+        </content>
+        </page>
+	<page id="unit2" template="multiple" navigationName="Раздел 2" path="/Файл/Документ/ЕНВД/СумНалПУВД/РасчНалВД" title="Расчет суммы единого налога на вмененный доход по отдельным видам деятельности" labelFetchfn="envdlabel">
+		<caption>Раздел 2</caption>
+        <header>Расчет суммы единого налога на вмененный доход<br/>по отдельным видам деятельности</header>
+        <normativehelp id="20183"/>
+		 <content>
+		    <table grayColumn="2">
+                <row kind="head">
+                    <column width="465">Показатель</column>
+                    <column width="140">Код строки</column>
+                    <column width="315">Значение</column>
+                </row>
+				<row>
+                    <column>Код вида предпринимательской деятельности</column>
+                    <column>010</column>
+                    <column>
+                    </column>
+                </row>
+				<row>
+                    <column>Адрес места осуществления предпринимательской<br/>деятельности</column>
+                    <column>020</column>
+                    <column>
+                        <kladr title="Адрес места осуществления предпринимательской деятельности" path="АдрПредДеят" fetchfn="orgAdress"/>
+                    </column>
+
+                </row>
+				<row>
+                    <column>Код по ОКТМО</column>
+                    <column>030</column>
+                    <column>
+						  <combobox fetchfn="oktmo" path="ОКТМО" width="240" gId="999" type="oktmo" placeholder="Начните вводить код" title="Код по ОКТМО" />
+                    </column>
+                </row>
+				<row>
+                    <column>Базовая доходность на единицу физического показателя<br/>в месяц (руб.) </column>
+                    <column>040</column>
+                    <column>                      
+                    </column>
+                </row>
+				<row>
+                    <column>Корректирующий коэффициент К1</column>
+                    <column>050</column>
+                    <column>
+                      <text path="РасчНалВДАдр/К1" defaultValue="1.798" disabled="true" title="Корректирующий коэффициент К1" help="Коэффициент-дефлятор на 2015 год установлен в размере 1,798" />
+                    </column>
+                </row>
+				<row>
+                    <column>Корректирующий коэффициент К2</column>
+                    <column>060</column>
+                    <column>
+                        <input path="РасчНалВДАдр/К2" align="left" width="240" defaultValue="1" title="Корректирующий коэффициент К2" type="k12" />
+                    </column>
+                </row>
+            </table>
+            <br />
+            <table grayColumn="2">
+                <row kind="head">
+                    <column width="200">Показатель</column>
+                    <column width="100">Код строки</column>
+                    <column width="120">Величина<br/>физического<br/>показателя</column>
+					<column width="230">Количество календарных дней<br/>осуществления деятельности<br/>в месяце постановки на учет<br/>(снятия с учета) в качестве<br/>налогоплательщика единого<br/>налога</column>
+                    <column width="270">Налоговая база с учетом количества<br/>календарных дней осуществления<br/>деятельности в месяце постановки на<br/>учет (снятия с учета) в качестве<br/>налогоплательщика единого налога</column>
+                </row>
+				<row kind="head" subkind="numbers">
+                    <column></column>
+                    <column>1</column>
+                    <column>2</column>
+                    <column>3</column>
+                    <column>4</column>
+                </row>
+				<row>
+					<column>1 месяц квартала</column>
+					<column>070</column>
+					<column>
+                        <input path="РасчНалВДАдр/ФизПокМес1" optional="true" type="int(6,0)" width="110" />
+                    </column>
+				    <column>
+                        <input path="РасчНалВДАдр/КолДнейМес1" optional="true" type="int(2,0)" />
+                    </column>
+					<column>
+                        <input path="РасчНалВДАдр/НалБазаМес1" optional="true" type="nalBaza_int(10,0)" formula="Если заполнена стр.070 гр.3, то стр.040 * стр.050 * стр.060 * стр.070 гр.2 / полное количество дней в месяце * стр.070 по гр.3, иначе стр.040 * стр.050 * стр.060 * стр.070 гр.2" auto="true" />
+                    </column>
+                </row>
+				<row>
+                    <column>2 месяц квартала</column>
+                    <column>080</column>
+                    <column>
+                        <input path="РасчНалВДАдр/ФизПокМес2" optional="true" type="int(6,0)" width="110" />
+                    </column>
+					<column>
+                        <input path="РасчНалВДАдр/КолДнейМес2" optional="true" type="int(2,0)" />
+                    </column>
+					<column>
+                        <input path="РасчНалВДАдр/НалБазаМес2" optional="true" type="nalBaza_int(10,0)" formula="Если заполнена стр.080 гр.3, то стр.040 * стр.050 * стр.060 * стр.080 гр.2 / полное количество дней в месяце * стр.080 по гр.3, иначе стр.040 * стр.050 * стр.060 * стр.080 гр.2" auto="true" />
+                    </column>
+                </row>
+				<row>
+                    <column>3 месяц квартала</column>
+                    <column>090</column>
+                    <column>
+                        <input path="РасчНалВДАдр/ФизПокМес3" optional="true" type="int(6,0)" width="110" />
+                    </column>
+					<column>
+                        <input path="РасчНалВДАдр/КолДнейМес3" optional="true" type="int(2,0)" />
+                    </column>
+					<column>
+                        <input path="РасчНалВДАдр/НалБазаМес3" optional="true" type="nalBaza_int(10,0)" formula="Если заполнена стр.090 гр.3, то стр.040 * стр.050 * стр.060 * стр.090 гр.2 / полное количество дней в месяце * стр.090 по гр.3, иначе стр.040 * стр.050 * стр.060 * стр.090 гр.2" auto="true" />
+                    </column>
+                </row>
+            </table>
+			<table grayColumn="2">
+				<row>
+          <column width="600">Налоговая база всего (руб.) (сумма строк (070-090) гр. 4)</column>
+          <column width="50">100</column>
+          <column width="270">
+              <input path="РасчНалВДАдр/НалБаза" type="int(10,0)" formula="(стр.070 + стр.080 + стр.090) по гр.4" auto="true" defaultValue="0" />
+          </column>
+        </row>
+				<row>
+                    <column>Сумма исчисленного налога за налоговый период (руб.) (стр. 100 x 15/100)</column>
+                    <column>110</column>
+                    <column>
+                        <input path="РасчНалВДАдр/СумНалИсчисл" type="sumnalisch" formula="стр.100 * 15 / 100" auto="true" defaultValue="0" />
+                    </column>
+                </row>
+            </table>
+        </content>
+        </page>
+    <page id="unit3" navigationName="Раздел 3" path="/Файл/Документ/ЕНВД/СумНалПУ" template="default" navigationName="Раздел 3" >
+		<caption>Раздел 3</caption>
+        <header>Расчет суммы единого налога на вмененный доход <br/>за налоговый период </header>
+        <normativehelp id="20184"/>
+		 <content>
+       <grid-row cols="3">
+         <grid-col>
+            <text>Признак налогоплательщика:</text>
+            <gray>код строки 005</gray>
+         </grid-col>
+         <grid-col cols="2">
+           <radiogroup path="ПризнакНП" defaultValue="1">
+               <radio value="1" name="Налогоплательщик, производящий выплаты и иные вознаграждения физическим лицам" />
+               <radio value="2" name="Индивидуальный предприниматель, не производящий выплаты и иные вознаграждения физическим лицам" />
+           </radiogroup>
+         </grid-col>
+        </grid-row>
+            <br />
+            <table grayColumn="2">
+                <row kind="head">
+                    <column width="550">Показатель</column>
+                    <column width="120">Код строки</column>
+                    <column width="250">Значение в рублях</column>
+                </row>
+				 <row kind="head" subkind="numbers">
+                    <column>1</column>
+                    <column>2</column>
+                    <column>3</column>
+                </row>
+				<row>
+                    <column>Сумма исчисленного за налоговый период единого налога на вмененный доход (сумма значений стр.110 всех заполненных разделов 2 декларации)</column>
+                    <column>010</column>
+                    <column>
+                        <input path="СумНалИсчислОбщ" type="sumnalisch" formula="сумма стр.110 всех разделов 2" auto="true" width="210" defaultValue="0" />
+                    </column>
+                </row>
+				<row>
+                    <column>Сумма страховых взносов, платежей и расходов, предусмотренных пунктом 2 статьи 346.32 Налогового кодекса Российской Федерации, на которые может быть уменьшена сумма исчисленного за налоговый период единого налога на вмененный доход налогоплательщиком, производящим выплаты работникам, занятым в тех сферах деятельности налогоплательщика, по которым уплачивается единый налог</column>
+                    <column>020</column>
+                    <column>
+                        <input path="СумСВУм346.32.2" optional="true" type="nalBaza_int(10,0)" width="210" />
+                    </column>
+                </row>
+				<row>
+                    <column>Сумма страховых взносов, уплаченных индивидуальным предпринимателем<br/>в Пенсионный фонд Российской Федерации и в Федеральный фонд обязательного медицинского страхования в фиксированном размере</column>
+                    <column>030</column>
+                    <column>
+                        <input path="СумСВ_ИП" optional="true" type="nalBaza_int(10,0)" width="210" />
+                    </column>
+                </row>
+				<row>
+                    <column>Общая сумма единого налога на вмененный доход, подлежащая уплате в бюджет за налоговый период<br/>для стр. 005 = «1»: стр. 040 = стр. 010 – стр. 020 >= 50% стр.010<br/>для стр. 005 = «2»: стр. 040 = стр. 010 – стр. 030 >= 0 </column>
+                    <column>040</column>
+                    <column>
+                        <input path="НалПУРасч" type="nalog_int(10,0)" formula="Для стр.005=1: если стр.010 - стр.020 >= 50% стр.010, то стр.010 - стр.020, иначе 50% стр.010. Для стр.005=2: если стр.010 - стр.030 >=0, то стр.010 - стр.030, иначе 0" auto="true" width="210" defaultValue="0" />
+                    </column>
+                </row>
+            </table>
+        </content>
+        </page>
+</form>

@@ -156,12 +156,12 @@ export class SchemaRngConverterTest {
     @test
     public testRealSchemaSkipBom(): void {
         const parser = new SchemaRngConverter();
-        parser.toDataSchema(fs.readFileSync(require.resolve("./RealSchemas/Schema02.xml"), "utf8"));
+        parser.toDataSchema(fs.readFileSync(require.resolve("./RealData/Schema02.xml"), "utf8"));
     }
 
     @test
     public testRealSchema(): void {
         const parser = new SchemaRngConverter();
-        parser.toDataSchema(fs.readFileSync(require.resolve("./RealSchemas/Schema01.xml"), "utf8"));
+        parser.toDataSchema(fs.readFileSync(require.resolve("./RealData/Schema01.xml"), "utf8"));
     }
 }

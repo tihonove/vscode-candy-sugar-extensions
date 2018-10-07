@@ -1,24 +1,20 @@
+import { CodePosition } from "../PegJSUtils/Types";
+
+export type DataSchemaNode = DataSchemaAttribute | DataSchemaElementNode;
+
 export interface DataSchemaAttribute {
+    type: "DataSchemaAttribute";
     name: string;
     description?: string;
+    position: CodePosition;
 }
 
-export interface DataSchemaNode {
+export interface DataSchemaElementNode {
+    type: "DataSchemaElementNode";
     name: string;
     multiple?: boolean;
     attributes?: DataSchemaAttribute[];
-    children?: DataSchemaNode[];
-    position: DataSchemaNodePosition;
+    children?: DataSchemaElementNode[];
+    position: CodePosition;
     description?: string;
-}
-
-export interface DataSchemaNodeLocation {
-    line: number;
-    column: number;
-    offset: number;
-}
-
-export interface DataSchemaNodePosition {
-    start: DataSchemaNodeLocation;
-    end: DataSchemaNodeLocation;
 }

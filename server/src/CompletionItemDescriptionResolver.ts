@@ -1,15 +1,15 @@
 import { CompletionItem } from "vscode-languageserver-types";
 
-import { DataSchemaNode } from "./DataSchema/DataSchemaNode";
+import { DataSchemaElementNode } from "./DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "./DataSchema/DataSchemaUtils";
 import { allElements } from "./SugarElements/DefaultSugarElements";
 import { SuggestionItem, SuggestionItemType } from "./Suggester/CompletionSuggester";
 import { AttributeType } from "./Suggester/SugarElementInfo";
 
 export class CompletionItemDescriptionResolver {
-    private readonly dataSchemaRootNode: DataSchemaNode;
+    private readonly dataSchemaRootNode: DataSchemaElementNode;
 
-    public constructor(dataSchemaRootNode: DataSchemaNode) {
+    public constructor(dataSchemaRootNode: DataSchemaElementNode) {
         this.dataSchemaRootNode = dataSchemaRootNode;
     }
 

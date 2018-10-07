@@ -1,4 +1,6 @@
+import fs from "fs";
 import { suite, test } from "mocha-typescript";
+import path from "path";
 
 import { SugarCodeDomBuilder } from "../../server/src/SugarCodeDomBuilder/SugarCodeDomBuilder";
 
@@ -107,5 +109,14 @@ export class SugarCodeDomBuilderTest {
                 });
             }
         }
+    }
+
+    @test
+    public testParseRealSugar(): void {
+        const codeDomBuilder = new SugarCodeDomBuilder();
+        const positionToNodeMap = codeDomBuilder.buildPositionToNodeMap(
+            fs.readFileSync(path.join(__dirname, "RealData", "104812.sugar.xml"), "utf8")
+        );
+        expect(positionToNodeMap != undefined).to.eql(true);
     }
 }

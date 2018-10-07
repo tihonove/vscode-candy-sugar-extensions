@@ -1,4 +1,4 @@
-import { DataSchemaNode } from "../DataSchema/DataSchemaNode";
+import { DataSchemaElementNode } from "../DataSchema/DataSchemaNode";
 import { valueOrDefault } from "../Utils/TypingUtils";
 
 import { CompletionContext, getCompletionContext } from "./CompletionClassificator/CompletionClassificator";
@@ -41,14 +41,15 @@ export type SuggestionItem =
 
 export class CompletionSuggester {
     private readonly sugarElementInfos: SugarElementInfo[];
+    // @ts-ignore
     private readonly sugarTypes: SugarTypeInfo[];
-    private readonly dataSchemaRoot: DataSchemaNode;
+    private readonly dataSchemaRoot: DataSchemaElementNode;
     private readonly dataAttributeSuggester: DataAttributeSuggester;
 
     public constructor(
         sugarTypes: SugarTypeInfo[],
         sugarElementInfos: SugarElementInfo[],
-        dataSchemaRoot: DataSchemaNode
+        dataSchemaRoot: DataSchemaElementNode
     ) {
         this.sugarTypes = sugarTypes;
         this.sugarElementInfos = sugarElementInfos;

@@ -1,7 +1,7 @@
-import { DataSchemaAttribute, DataSchemaNode } from "./DataSchemaNode";
+import { DataSchemaAttribute, DataSchemaElementNode } from "./DataSchemaNode";
 
 export class DataSchemaUtils {
-    public static findElementByPath(root: DataSchemaNode, itemsWithoutLastItem: string[]): undefined | DataSchemaNode {
+    public static findElementByPath(root: DataSchemaElementNode, itemsWithoutLastItem: string[]): undefined | DataSchemaElementNode {
         if (itemsWithoutLastItem.length === 0) {
             return root;
         } else {
@@ -15,7 +15,7 @@ export class DataSchemaUtils {
     }
 
     public static findAttributeByPath(
-        root: DataSchemaNode,
+        root: DataSchemaElementNode,
         itemsWithoutLastItem: string[]
     ): undefined | DataSchemaAttribute {
         const element = this.findElementByPath(root, itemsWithoutLastItem.slice(0, -1));

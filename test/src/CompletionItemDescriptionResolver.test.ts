@@ -2,7 +2,7 @@ import { suite, test } from "mocha-typescript";
 import { CompletionItem } from "vscode-languageserver-types";
 
 import { CompletionItemDescriptionResolver } from "../../server/src/CompletionItemDescriptionResolver";
-import { DataSchemaNode } from "../../server/src/DataSchema/DataSchemaNode";
+import { DataSchemaElementNode } from "../../server/src/DataSchema/DataSchemaNode";
 import { CompletionSuggester } from "../../server/src/Suggester/CompletionSuggester";
 import { AttributeType, AvailableChildrenType } from "../../server/src/Suggester/SugarElementInfo";
 
@@ -121,7 +121,7 @@ export class CompletionItemDescriptionResolverTest {
         );
     }
 
-    private createTestDataSchema(): DataSchemaNode {
+    private createTestDataSchema(): DataSchemaElementNode {
         const fakePosition = {
             start: { column: 0, line: 0, offset: 0 },
             end: { column: 0, line: 0, offset: 0 },
@@ -129,36 +129,48 @@ export class CompletionItemDescriptionResolverTest {
 
         return {
             name: "",
+            type: "DataSchemaElementNode",
             position: fakePosition,
             children: [
                 {
+                    type: "DataSchemaElementNode",
                     name: "Root",
                     description: "Root Description",
                     position: fakePosition,
                     attributes: [
                         {
+                            type: "DataSchemaAttribute",
+                            position: fakePosition,
                             name: "attr1",
                             description: "attr1 Description",
                         },
                         {
+                            type: "DataSchemaAttribute",
+                            position: fakePosition,
                             name: "attr2",
                         },
                     ],
                     children: [
                         {
+                            type: "DataSchemaElementNode",
                             name: "Children1",
                             position: fakePosition,
                             description: "Children1 Description",
                             children: [
                                 {
+                                    type: "DataSchemaElementNode",
                                     name: "Child1",
                                     position: fakePosition,
                                     multiple: true,
                                     attributes: [
                                         {
+                                            type: "DataSchemaAttribute",
+                                            position: fakePosition,
                                             name: "ChildAttr1",
                                         },
                                         {
+                                            type: "DataSchemaAttribute",
+                                            position: fakePosition,
                                             name: "ChildAttr2",
                                         },
                                     ],
@@ -166,6 +178,7 @@ export class CompletionItemDescriptionResolverTest {
                             ],
                         },
                         {
+                            type: "DataSchemaElementNode",
                             name: "Child2",
                             position: fakePosition,
                         },

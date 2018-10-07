@@ -1,4 +1,4 @@
-import { DataSchemaNode } from "../../../server/src/DataSchema/DataSchemaNode";
+import { DataSchemaElementNode } from "../../../server/src/DataSchema/DataSchemaNode";
 import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../../../server/src/Suggester/SugarElementInfo";
 import { SugarTypeInfo } from "../../../server/src/Suggester/SugarTypeInfo";
 
@@ -59,42 +59,55 @@ const fakePosition = {
     end: { column: 0, line: 0, offset: 0 },
 };
 
-export const testDataSchema: DataSchemaNode = {
+export const testDataSchema: DataSchemaElementNode = {
     name: "",
+    type: "DataSchemaElementNode",
     position: fakePosition,
     children: [
         {
+            type: "DataSchemaElementNode",
             name: "Root",
             position: fakePosition,
             attributes: [
                 {
+                    type: "DataSchemaAttribute",
                     name: "attr1",
+                    position: fakePosition,
                 },
                 {
+                    type: "DataSchemaAttribute",
                     name: "attr2",
+                    position: fakePosition,
                 },
             ],
             children: [
                 {
+                    type: "DataSchemaElementNode",
                     name: "Children1",
                     position: fakePosition,
                     children: [
                         {
+                            type: "DataSchemaElementNode",
                             name: "Child1",
                             position: fakePosition,
                             multiple: true,
                             attributes: [
                                 {
+                                    type: "DataSchemaAttribute",
                                     name: "ChildAttr1",
+                                    position: fakePosition,
                                 },
                                 {
+                                    type: "DataSchemaAttribute",
                                     name: "ChildAttr2",
+                                    position: fakePosition,
                                 },
                             ],
                         },
                     ],
                 },
                 {
+                    type: "DataSchemaElementNode",
                     name: "Child2",
                     position: fakePosition,
                 },

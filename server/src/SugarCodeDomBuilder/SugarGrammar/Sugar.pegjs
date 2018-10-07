@@ -1,4 +1,6 @@
-Document = Element
+Document = element: Element _? {
+    return element;
+}
 
 Element =
     "<" name: ElementName SpaceAfterElement? attributes: AttributeList? _?
@@ -27,7 +29,6 @@ Element =
             child.parent = result;
         }
         result.children = content[1];
-        console.log(result.children);
     }
     return result;
 }
