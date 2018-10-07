@@ -1,9 +1,9 @@
 export enum AttributeType {
-    Path,
-    Type,
-    String,
-    Number,
-    Boolean,
+    Path = "Path",
+    Type = "Type",
+    String = "String",
+    Number = "Number",
+    Boolean = "Boolean",
 }
 
 export enum AvailableChildrenType {

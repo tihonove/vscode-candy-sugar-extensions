@@ -5,7 +5,6 @@ import { DataSchemaUtils } from "./DataSchema/DataSchemaUtils";
 import { MarkdownUtils } from "./MarkdownUtils";
 import { allElements } from "./SugarElements/DefaultSugarElements";
 import { SuggestionItem, SuggestionItemType } from "./Suggester/CompletionSuggester";
-import { AttributeType } from "./Suggester/SugarElementInfo";
 
 export class CompletionItemDescriptionResolver {
     private readonly dataSchemaRootNode: DataSchemaElementNode;
@@ -37,15 +36,12 @@ export class CompletionItemDescriptionResolver {
                 if (elementInfo.attributes != undefined && elementInfo.attributes.length > 0) {
                     const attributeInfo = elementInfo.attributes.find(x => x.name === suggestionItem.name);
                     if (attributeInfo != undefined) {
-                        vsCodeCompletionItem.detail = attributeInfo.valueTypes
-                            .map(x => this.valueTypeToString(x))
-                            .join(" | ");
-                        if (attributeInfo.markdownDescription != undefined) {
-                            vsCodeCompletionItem.documentation = {
-                                kind: "markdown",
-                                value: attributeInfo.markdownDescription,
-                            };
-                        }
+                        vsCodeCompletionItem.detail = MarkdownUtils.buildAttributeHeader(attributeInfo);
+                        vsCodeCompletionItem.documentation = MarkdownUtils.buildAttributeDetails(
+                            elementInfo,
+                            attributeInfo,
+                            { appendHeader: false }
+                        );
                     }
                 }
             }
@@ -80,29 +76,6 @@ export class CompletionItemDescriptionResolver {
                     value: dataSchemaAttribute.description,
                 };
             }
-        }
-    }
-
-    private valueTypeToString(attributeType: AttributeType): string {
-        switch (attributeType) {
-            case AttributeType.Boolean:
-                return "boolean";
-                break;
-            case AttributeType.Number:
-                return "number";
-                break;
-            case AttributeType.Path:
-                return "DataPath";
-                break;
-            case AttributeType.String:
-                return "string";
-                break;
-            case AttributeType.Type:
-                return "Type";
-                break;
-            default:
-                return "any";
-                break;
         }
     }
 }

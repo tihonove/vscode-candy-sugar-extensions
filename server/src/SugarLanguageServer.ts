@@ -125,6 +125,20 @@ export class SugarLanguageServer {
                 contents: hoverContents,
             };
         }
+        if (context.type === "AttributeName") {
+            const hoverContents = MarkdownUtils.buildAttributeDetails(
+                context.currentElementInfo,
+                context.currentAttributeInfo,
+                { appendHeader: true }
+            );
+            if (hoverContents == undefined) {
+                return undefined;
+            }
+            return {
+                range: this.pegjsPositionToVsCodeRange(context.contextNode.position),
+                contents: hoverContents,
+            };
+        }
 
         // Примеры офрмления хинта
         // return {
