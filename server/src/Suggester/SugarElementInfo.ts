@@ -17,6 +17,7 @@ export interface SugarAttributeInfo {
     name: string;
     valueTypes: AttributeType[];
     markdownDescription?: string;
+    shortMarkdownDescription?: string;
 }
 
 export type SugarElementAvailableChildrenInfo =

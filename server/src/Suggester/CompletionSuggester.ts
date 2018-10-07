@@ -2,10 +2,10 @@ import { DataSchemaElementNode } from "../DataSchema/DataSchemaNode";
 import { valueOrDefault } from "../Utils/TypingUtils";
 
 import { CompletionContext, getCompletionContext } from "./CompletionClassificator/CompletionClassificator";
+import { ExpectedTokenType } from "./CompletionClassificator/ExpectedTokenType";
 import { DataAttributeSuggester } from "./DataAttributeSuggester";
 import { AttributeType, SugarAttributeInfo, SugarElementInfo } from "./SugarElementInfo";
 import { SugarTypeInfo } from "./SugarTypeInfo";
-import { ExpectedTokenType } from "./CompletionClassificator/ExpectedTokenType";
 
 export interface Suggestions {
     items: SuggestionItem[];

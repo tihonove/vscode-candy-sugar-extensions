@@ -11,14 +11,17 @@ import {
     TextDocumentPositionParams,
     TextDocuments,
 } from "vscode-languageserver";
-import { Definition, Hover, TextDocumentChangeEvent } from "vscode-languageserver-types";
+import { Definition, Hover, MarkupContent, Range, TextDocumentChangeEvent } from "vscode-languageserver-types";
 
 import { DataSchemaElementNode } from "./DataSchema/DataSchemaNode";
 import { ILogger, VsCodeServerLogger } from "./Logger/Logger";
+import { MarkdownUtils } from "./MarkdownUtils";
+import { CodePosition } from "./PegJSUtils/Types";
 import { SchemaRngConverter } from "./SchemaParser/SchemaRngConverter";
 import { SugarDocumentServices } from "./SugarDocumentServices";
 import { allElements } from "./SugarElements/DefaultSugarElements";
 import { SuggestionItemType } from "./Suggester/CompletionSuggester";
+import { SugarElementInfo } from "./Suggester/SugarElementInfo";
 import { UriUtils } from "./UriUtils";
 import { isNotNullOrUndefined, valueOrDefault } from "./Utils/TypingUtils";
 
@@ -29,7 +32,6 @@ export class SugarLanguageServer {
     private readonly schemaDocuments: { [uri: string]: string };
     private readonly parsedSchemaDocuments: { [uri: string]: DataSchemaElementNode };
     private readonly documentServices: { [uri: string]: SugarDocumentServices };
-
     public constructor() {
         this.connection = createConnection(ProposedFeatures.all);
         this.logger = new VsCodeServerLogger(this.connection.console);
@@ -102,10 +104,68 @@ export class SugarLanguageServer {
     }
 
     private readonly handleHover = (positionParams: TextDocumentPositionParams): undefined | Hover => {
+        const textDocument = this.documents.get(positionParams.textDocument.uri);
         const services = this.getDocumentServices(positionParams.textDocument.uri);
-        if (services == undefined) {
+        if (services == undefined || textDocument == undefined) {
             return undefined;
         }
+        const context = services.sugarDocumentDom.resolveContextAsOffset(
+            textDocument.offsetAt(positionParams.position)
+        );
+        if (context == undefined) {
+            return undefined;
+        }
+        if (context.type === "ElementName") {
+            const hoverContents = this.buildElementHoverContents(context.currentElementInfo);
+            if (hoverContents == undefined) {
+                return undefined;
+            }
+            return {
+                range: this.pegjsPositionToVsCodeRange(context.contextNode.position),
+                contents: hoverContents,
+            };
+        }
+
+        // Примеры офрмления хинта
+        // return {
+        //     range: {
+        //         start: {
+        //             ...positionParams.position,
+        //             character: positionParams.position.character - 1,
+        //         },
+        //         end: {
+        //             ...positionParams.position,
+        //             character: positionParams.position.character + 1,
+        //         },
+        //     },
+        //     contents: [
+        //         {
+        //             language: "css",
+        //             value: "value: string",
+        //         },
+        //         "Подробное или не очень на достаточное описаиние атрибута",
+        //     ],
+        // };
+        // return {
+        //     range: {
+        //         start: {
+        //             ...positionParams.position,
+        //             character: positionParams.position.character - 1,
+        //         },
+        //         end: {
+        //             ...positionParams.position,
+        //             character: positionParams.position.character + 1,
+        //         },
+        //     },
+        //     contents: [
+        //         {
+        //             language: "html",
+        //             value: "<input>",
+        //         },
+        //         "Текстовое поле ввода для строк.",
+        //     ],
+        // };
+
         // if (this.documentServices[positionParams.textDocument.uri] != undefined) {
         //     const sugarDocumentDom = this.documentServices[positionParams.textDocument.uri].sugarDocumentDom;
         //     if (sugarDocumentDom.map != undefined) {
@@ -131,6 +191,10 @@ export class SugarLanguageServer {
         // }
         return undefined;
     };
+
+    private buildElementHoverContents(sugarElementInfo: undefined | SugarElementInfo): undefined | MarkupContent {
+        return MarkdownUtils.buildElementDetails(sugarElementInfo, { appendHeader: true });
+    }
 
     private readonly handleResolveDefinition = (positionParams: TextDocumentPositionParams): undefined | Definition => {
         const services = this.getDocumentServices(positionParams.textDocument.uri);
@@ -167,10 +231,108 @@ export class SugarLanguageServer {
         return undefined;
     };
 
+    private pegjsPositionToVsCodeRange(position: CodePosition): Range {
+        return {
+            start: {
+                character: position.start.column - 1,
+                line: position.start.line - 1,
+            },
+            end: {
+                character: position.end.column - 1,
+                line: position.end.line - 1,
+            },
+        };
+    }
+
     private readonly handleResolveCompletion = (
         textDocumentPosition: TextDocumentPositionParams,
         _token: CancellationToken
     ): CompletionItem[] => {
+        // Примеры офрмления документашки
+        //         return [
+        //             {
+        //                 label: "some value",
+        //                 kind: CompletionItemKind.Constructor,
+        //                 data: {},
+        //                 documentation: {
+        //                     kind: "markdown",
+        //                     value: ` \`\`\`xml
+        // <element name="СумПУВД" multiple="true">
+        // \`\`\`
+        //
+        // Сумма единого налога на вмененный доход, подлежащая уплате в бюджет, по коду ОКТМО
+        // `,
+        //                 },
+        //             },
+        //         ];
+        //
+        //         return [
+        //             {
+        //                 label: "some value",
+        //                 kind: CompletionItemKind.Constructor,
+        //                 data: {},
+        //                 documentation: {
+        //                     kind: "markdown",
+        //                     value: ` \`\`\`xml
+        // <attribute name="ФормРеорг">
+        // \`\`\`
+        //
+        // Код формы реорганизации (ликвидация). Принимает значение: 0 – ликвидация | 1 – преобразование | 2 – слияние | 3 – разделение | 5 – присоединение | 6 – разделение с одновременным присоединением
+        //
+        // \`\`\`xml
+        // <type base="string">
+        //     <length value="1" />
+        //     <enumeration value="1" />
+        //     <enumeration value="2" />
+        //     <enumeration value="3" />
+        //     <enumeration value="5" />
+        //     <enumeration value="6" />
+        //     <enumeration value="0" />
+        // </type>
+        // \`\`\`
+        // `,
+        //                 },
+        //             },
+        //         ];
+        //
+        //         return [
+        //             {
+        //                 label: "some value",
+        //                 kind: CompletionItemKind.Constructor,
+        //                 data: {},
+        //                 documentation: {
+        //                     kind: "markdown",
+        //                     value: ` \`\`\`common
+        // value="[DataPath]"
+        // \`\`\`
+        //
+        // Путь до значения вся хуйня
+        // `,
+        //                 },
+        //             },
+        //         ];
+        //
+        //         return [
+        //             {
+        //                 label: "some value",
+        //                 kind: CompletionItemKind.Constructor,
+        //                 data: {},
+        //                 documentation: {
+        //                     kind: "markdown",
+        //                     value: ` \`\`\`html
+        // <input>
+        // \`\`\`
+        //
+        // Текстовое поле ввода
+        //
+        // **Атрибуты**:
+        // - \`value: DataPath\` - путь к данным
+        // - \`width: string\` - ширина тексового поля
+        // `,
+        //                 },
+        //             },
+        //         ];
+
         const text = this.documents.get(textDocumentPosition.textDocument.uri);
         if (text == undefined) {
             return [];

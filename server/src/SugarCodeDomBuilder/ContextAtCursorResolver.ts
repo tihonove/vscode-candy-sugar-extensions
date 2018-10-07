@@ -1,15 +1,18 @@
 import { SugarAttributeInfo, SugarElementInfo } from "../Suggester/SugarElementInfo";
 
 import { PositionToNodeMap } from "./SugarCodeDomBuilder";
-import { SugarElement } from "./SugarGrammar/SugarParser";
+import { SugarElement, SugarElementName } from "./SugarGrammar/SugarParser";
+
+export interface ElementCursorContext {
+    type: "ElementName";
+    contextNode: SugarElementName;
+    currentElementInfo?: SugarElementInfo;
+    elementStack: SugarElement[];
+    dataContext: string[];
+}
 
 export type CursorContext =
-    | {
-          type: "ElementName";
-          currentElementInfo?: SugarElementInfo;
-          elementStack: SugarElement[];
-          dataContext: string[];
-      }
+    | ElementCursorContext
     | {
           type: "AttributeName";
           currentElementInfo?: SugarElementInfo;
@@ -43,6 +46,7 @@ export class ContextAtCursorResolver {
             const currentElementInfo = this.resolveSugarElementInfo([...elementStack]);
             return {
                 type: "ElementName",
+                contextNode: node,
                 currentElementInfo: currentElementInfo,
                 elementStack: elementStack,
                 dataContext: this.resolveDataContext(this.withoutLast(elementStack)),

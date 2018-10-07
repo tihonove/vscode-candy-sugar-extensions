@@ -2,6 +2,7 @@ import { CompletionItem } from "vscode-languageserver-types";
 
 import { DataSchemaElementNode } from "./DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "./DataSchema/DataSchemaUtils";
+import { MarkdownUtils } from "./MarkdownUtils";
 import { allElements } from "./SugarElements/DefaultSugarElements";
 import { SuggestionItem, SuggestionItemType } from "./Suggester/CompletionSuggester";
 import { AttributeType } from "./Suggester/SugarElementInfo";
@@ -16,17 +17,16 @@ export class CompletionItemDescriptionResolver {
     public enrichCompletionItem(vsCodeCompletionItem: CompletionItem, suggestionItem: SuggestionItem): void {
         if (suggestionItem.type === SuggestionItemType.Element) {
             const elementInfo = allElements.find(x => x.name === suggestionItem.name);
+
             if (elementInfo != undefined) {
                 if (elementInfo.attributes != undefined && elementInfo.attributes.length > 0) {
                     vsCodeCompletionItem.detail = `<${elementInfo.name} ... />`;
                 } else {
                     vsCodeCompletionItem.detail = `<${elementInfo.name} />`;
                 }
-                if (elementInfo.markdownDescription != undefined) {
-                    vsCodeCompletionItem.documentation = {
-                        kind: "markdown",
-                        value: elementInfo.markdownDescription,
-                    };
+                const documentation = MarkdownUtils.buildElementDetails(elementInfo, { appendHeader: false });
+                if (documentation != undefined) {
+                    vsCodeCompletionItem.documentation = documentation;
                 }
             }
         }
