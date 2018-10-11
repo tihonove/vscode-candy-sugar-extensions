@@ -116,7 +116,7 @@ export class SugarLanguageServer {
             return undefined;
         }
         if (context.type === "ElementName") {
-            const hoverContents = this.buildElementHoverContents(context.currentElementInfo);
+            const hoverContents = MarkdownUtils.buildElementDetails(context.currentElementInfo, { appendHeader: true });
             if (hoverContents == undefined) {
                 return undefined;
             }
@@ -140,75 +140,48 @@ export class SugarLanguageServer {
             };
         }
 
-        // Примеры офрмления хинта
-        // return {
-        //     range: {
-        //         start: {
-        //             ...positionParams.position,
-        //             character: positionParams.position.character - 1,
-        //         },
-        //         end: {
-        //             ...positionParams.position,
-        //             character: positionParams.position.character + 1,
-        //         },
-        //     },
-        //     contents: [
-        //         {
-        //             language: "css",
-        //             value: "value: string",
-        //         },
-        //         "Подробное или не очень на достаточное описаиние атрибута",
-        //     ],
-        // };
-        // return {
-        //     range: {
-        //         start: {
-        //             ...positionParams.position,
-        //             character: positionParams.position.character - 1,
-        //         },
-        //         end: {
-        //             ...positionParams.position,
-        //             character: positionParams.position.character + 1,
-        //         },
-        //     },
-        //     contents: [
-        //         {
-        //             language: "html",
-        //             value: "<input>",
-        //         },
-        //         "Текстовое поле ввода для строк.",
-        //     ],
-        // };
-
-        // if (this.documentServices[positionParams.textDocument.uri] != undefined) {
-        //     const sugarDocumentDom = this.documentServices[positionParams.textDocument.uri].sugarDocumentDom;
-        //     if (sugarDocumentDom.map != undefined) {
-        //         const textDocument = this.documents.get(positionParams.textDocument.uri);
-        //         if (textDocument == undefined) {
-        //             return undefined;
-        //         }
-        //         const offset = textDocument.offsetAt(positionParams.position);
-        //         const node = sugarDocumentDom.map.getNodeByOffset(offset);
-        //         if (node != undefined && node.type === "ElementName") {
-        //             return {
-        //                 range: {
-        //                     start: textDocument.positionAt(node.position.start.offset),
-        //                     end: textDocument.positionAt(node.position.end.offset),
-        //                 },
-        //                 contents: {
-        //                     kind: "markdown",
-        //                     value: "## " + node.value,
-        //                 },
-        //             };
-        //         }
-        //     }
-        // }
+        if (context.type === "DataAttributeValue") {
+            if (context.currentDataContext == undefined) {
+                return undefined;
+            }
+            const value = services.sugarDocumentDom.getDataElementOrAttributeByPath(context.currentDataContext);
+            if (value == undefined) {
+                return undefined;
+            }
+            if (value.type === "DataSchemaElementNode") {
+                const hoverContents = MarkdownUtils.buildDataSchemaElementDetail(
+                    context.currentElementInfo,
+                    context.currentAttributeInfo,
+                    value,
+                    { appendHeader: true }
+                );
+                if (hoverContents == undefined) {
+                    return undefined;
+                }
+                return {
+                    range: this.pegjsPositionToVsCodeRange(context.contextNode.position),
+                    contents: hoverContents,
+                };
+            }
+            if (value.type === "DataSchemaAttribute") {
+                const hoverContents = MarkdownUtils.buildDataSchemaAttributeDetail(
+                    context.currentElementInfo,
+                    context.currentAttributeInfo,
+                    value,
+                    { appendHeader: true }
+                );
+                if (hoverContents == undefined) {
+                    return undefined;
+                }
+                return {
+                    range: this.pegjsPositionToVsCodeRange(context.contextNode.position),
+                    contents: hoverContents,
+                };
+            }
+            return undefined;
+        }
         return undefined;
     };
-
-    private buildElementHoverContents(sugarElementInfo: undefined | SugarElementInfo): undefined | MarkupContent {
-        return MarkdownUtils.buildElementDetails(sugarElementInfo, { appendHeader: true });
-    }
 
     private readonly handleResolveDefinition = (positionParams: TextDocumentPositionParams): undefined | Definition => {
         const services = this.getDocumentServices(positionParams.textDocument.uri);
@@ -262,91 +235,6 @@ export class SugarLanguageServer {
         textDocumentPosition: TextDocumentPositionParams,
         _token: CancellationToken
     ): CompletionItem[] => {
-        // Примеры офрмления документашки
-        //         return [
-        //             {
-        //                 label: "some value",
-        //                 kind: CompletionItemKind.Constructor,
-        //                 data: {},
-        //                 documentation: {
-        //                     kind: "markdown",
-        //                     value: ` \`\`\`xml
-        // <element name="СумПУВД" multiple="true">
-        // \`\`\`
-        //
-        // Сумма единого налога на вмененный доход, подлежащая уплате в бюджет, по коду ОКТМО
-        // `,
-        //                 },
-        //             },
-        //         ];
-        //
-        //         return [
-        //             {
-        //                 label: "some value",
-        //                 kind: CompletionItemKind.Constructor,
-        //                 data: {},
-        //                 documentation: {
-        //                     kind: "markdown",
-        //                     value: ` \`\`\`xml
-        // <attribute name="ФормРеорг">
-        // \`\`\`
-        //
-        // Код формы реорганизации (ликвидация). Принимает значение: 0 – ликвидация | 1 – преобразование | 2 – слияние | 3 – разделение | 5 – присоединение | 6 – разделение с одновременным присоединением
-        //
-        // \`\`\`xml
-        // <type base="string">
-        //     <length value="1" />
-        //     <enumeration value="1" />
-        //     <enumeration value="2" />
-        //     <enumeration value="3" />
-        //     <enumeration value="5" />
-        //     <enumeration value="6" />
-        //     <enumeration value="0" />
-        // </type>
-        // \`\`\`
-        // `,
-        //                 },
-        //             },
-        //         ];
-        //
-        //         return [
-        //             {
-        //                 label: "some value",
-        //                 kind: CompletionItemKind.Constructor,
-        //                 data: {},
-        //                 documentation: {
-        //                     kind: "markdown",
-        //                     value: ` \`\`\`common
-        // value="[DataPath]"
-        // \`\`\`
-        //
-        // Путь до значения вся хуйня
-        // `,
-        //                 },
-        //             },
-        //         ];
-        //
-        //         return [
-        //             {
-        //                 label: "some value",
-        //                 kind: CompletionItemKind.Constructor,
-        //                 data: {},
-        //                 documentation: {
-        //                     kind: "markdown",
-        //                     value: ` \`\`\`html
-        // <input>
-        // \`\`\`
-        //
-        // Текстовое поле ввода
-        //
-        // **Атрибуты**:
-        // - \`value: DataPath\` - путь к данным
-        // - \`width: string\` - ширина тексового поля
-        // `,
-        //                 },
-        //             },
-        //         ];
-
         const text = this.documents.get(textDocumentPosition.textDocument.uri);
         if (text == undefined) {
             return [];

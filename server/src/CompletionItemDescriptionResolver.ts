@@ -52,12 +52,14 @@ export class CompletionItemDescriptionResolver {
             if (dataSchemaNode == undefined) {
                 return;
             }
-            vsCodeCompletionItem.detail = "{ ... }";
+            vsCodeCompletionItem.detail = `<element name="${dataSchemaNode.name}">`;
             if (dataSchemaNode.description != undefined) {
-                vsCodeCompletionItem.documentation = {
-                    kind: "markdown",
-                    value: dataSchemaNode.description,
-                };
+                vsCodeCompletionItem.documentation = MarkdownUtils.buildDataSchemaElementDetail(
+                    undefined,
+                    undefined,
+                    dataSchemaNode,
+                    { appendHeader: false }
+                );
             }
         }
 
@@ -66,15 +68,17 @@ export class CompletionItemDescriptionResolver {
                 this.dataSchemaRootNode,
                 suggestionItem.fullPath
             );
-            vsCodeCompletionItem.detail = "<>";
             if (dataSchemaAttribute == undefined) {
                 return;
             }
+            vsCodeCompletionItem.detail = `<attribute name="${dataSchemaAttribute.name}">`;
             if (dataSchemaAttribute.description != undefined) {
-                vsCodeCompletionItem.documentation = {
-                    kind: "markdown",
-                    value: dataSchemaAttribute.description,
-                };
+                vsCodeCompletionItem.documentation = MarkdownUtils.buildDataSchemaAttributeDetail(
+                    undefined,
+                    undefined,
+                    dataSchemaAttribute,
+                    { appendHeader: false }
+                );
             }
         }
     }

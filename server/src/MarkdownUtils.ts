@@ -1,5 +1,6 @@
 import { MarkupContent, MarkupKind } from "vscode-languageserver-types";
 
+import { DataSchemaAttribute, DataSchemaElementNode } from "./DataSchema/DataSchemaNode";
 import { AttributeType, SugarAttributeInfo, SugarElementInfo } from "./Suggester/SugarElementInfo";
 import { isNotNullOrUndefined } from "./Utils/TypingUtils";
 
@@ -8,6 +9,36 @@ interface ElementDetailsOptions {
 }
 
 export class MarkdownUtils {
+    public static buildDataSchemaElementDetail(
+        _currentElementInfo: SugarElementInfo | undefined,
+        _currentAttributeInfo: SugarAttributeInfo | undefined,
+        dataSchemaNode: DataSchemaElementNode,
+        options: ElementDetailsOptions
+    ): undefined | MarkupContent {
+        const header = [
+            "```xml",
+            dataSchemaNode.multiple
+                ? `<element name="${dataSchemaNode.name}">`
+                : `<element name="${dataSchemaNode.name}" multiple="true">`,
+            "```",
+        ];
+        return {
+            kind: MarkupKind.Markdown,
+            value: [...(options.appendHeader ? header : []), dataSchemaNode.description].join("\n"),
+        };
+    }
+    public static buildDataSchemaAttributeDetail(
+        _currentElementInfo: SugarElementInfo | undefined,
+        _currentAttributeInfo: SugarAttributeInfo | undefined,
+        dataSchemaNode: DataSchemaAttribute,
+        options: ElementDetailsOptions
+    ): undefined | MarkupContent {
+        const header = ["```xml", `<attribute name="${dataSchemaNode.name}">`, "```"];
+        return {
+            kind: MarkupKind.Markdown,
+            value: [...(options.appendHeader ? header : []), dataSchemaNode.description].join("\n"),
+        };
+    }
     public static buildAttributeHeader(currentAttributeInfo: SugarAttributeInfo): string {
         return `${currentAttributeInfo.name}="${currentAttributeInfo.valueTypes
             .map(x => `[${this.valueTypeToString(x)}]`)
