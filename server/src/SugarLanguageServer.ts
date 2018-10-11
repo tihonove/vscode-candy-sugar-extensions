@@ -11,7 +11,7 @@ import {
     TextDocumentPositionParams,
     TextDocuments,
 } from "vscode-languageserver";
-import { Definition, Hover, MarkupContent, Range, TextDocumentChangeEvent } from "vscode-languageserver-types";
+import { Definition, Hover, Range, TextDocumentChangeEvent } from "vscode-languageserver-types";
 
 import { DataSchemaElementNode } from "./DataSchema/DataSchemaNode";
 import { ILogger, VsCodeServerLogger } from "./Logger/Logger";
@@ -21,7 +21,6 @@ import { SchemaRngConverter } from "./SchemaParser/SchemaRngConverter";
 import { SugarDocumentServices } from "./SugarDocumentServices";
 import { allElements } from "./SugarElements/DefaultSugarElements";
 import { SuggestionItemType } from "./Suggester/CompletionSuggester";
-import { SugarElementInfo } from "./Suggester/SugarElementInfo";
 import { UriUtils } from "./UriUtils";
 import { isNotNullOrUndefined, valueOrDefault } from "./Utils/TypingUtils";
 

@@ -11,7 +11,7 @@ export function insertAutoCloseTag(activeTextEditor: undefined | TextEditor, eve
     if (!event.contentChanges[0]) {
         return;
     }
-    const isRightAngleBracket = CheckRightAngleBracket(event.contentChanges[0]);
+    const isRightAngleBracket = checkRightAngleBracket(event.contentChanges[0]);
     if (!isRightAngleBracket && event.contentChanges[0].text !== "/") {
         return;
     }
@@ -94,11 +94,11 @@ export function insertAutoCloseTag(activeTextEditor: undefined | TextEditor, eve
     }
 }
 
-function CheckRightAngleBracket(contentChange: TextDocumentContentChangeEvent): boolean {
-    return contentChange.text === ">" || CheckRightAngleBracketInVSCode_1_8(contentChange);
+function checkRightAngleBracket(contentChange: TextDocumentContentChangeEvent): boolean {
+    return contentChange.text === ">" || checkRightAngleBracketInVSCode_1_8(contentChange);
 }
 
-function CheckRightAngleBracketInVSCode_1_8(contentChange: TextDocumentContentChangeEvent): boolean {
+function checkRightAngleBracketInVSCode_1_8(contentChange: TextDocumentContentChangeEvent): boolean {
     return (
         contentChange.text.endsWith(">") &&
         contentChange.range.start.character === 0 &&
