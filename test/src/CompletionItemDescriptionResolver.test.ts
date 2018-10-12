@@ -20,7 +20,7 @@ export class CompletionItemDescriptionResolverTest {
         descriptionResolver.enrichCompletionItem(completionItem, suggestions.items[0]);
 
         expect(completionItem).to.shallowDeepEqual({
-            detail: "{ ... }",
+            detail: '<element name="Children1">',
             documentation: {
                 kind: "markdown",
                 value: "Children1 Description",
@@ -38,7 +38,7 @@ export class CompletionItemDescriptionResolverTest {
         descriptionResolver.enrichCompletionItem(completionItem, suggestions.items[2]);
 
         expect(completionItem).to.shallowDeepEqual({
-            detail: "<>",
+            detail: '<attribute name="attr1">',
             documentation: {
                 kind: "markdown",
                 value: "attr1 Description",
@@ -56,7 +56,7 @@ export class CompletionItemDescriptionResolverTest {
         descriptionResolver.enrichCompletionItem(completionItem, suggestions.items[0]);
 
         expect(completionItem).to.shallowDeepEqual({
-            detail: "{ ... }",
+            detail: '<element name="Root">',
             documentation: {
                 kind: "markdown",
                 value: "Root Description",

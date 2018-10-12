@@ -1,4 +1,4 @@
-Document = preamble: XmlPreamble? _? body: Element _? {
+Document = preamble: XmlPreamble? _? NonElementContent* body: Element _? NonElementContent* {
     return {
         preamble: preamble,
         body: body,
@@ -32,15 +32,21 @@ Element =
     }
 
 
-Content = text: Text? rest: (Element Text?)* {
+Content = text: NonElementContent* rest: (Element NonElementContent*)* {
     return rest.map(x => x[0]);
 }
+
+NonElementContent = Comment / text: Text {
+    return text;
+}
+
+Comment = "<!--" (!"-->" .)* "-->"
 
 Text = body: [^<]+ {
     return body.join("");
 }
 
-ElementName = value:[a-zA-Z0-9]+ {
+ElementName = value:[a-zA-Z0-9-]+ {
     return value.join("");
 }
 
@@ -61,7 +67,7 @@ Attribute =
     }
 }
 
-AttributeName = value:[a-zA-Z0-9]+ {
+AttributeName = value:[a-zA-Z0-9-]+ {
     return value.join("");
 }
 

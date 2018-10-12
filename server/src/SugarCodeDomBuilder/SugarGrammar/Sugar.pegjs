@@ -1,4 +1,4 @@
-Document = element: Element _? {
+Document = _? element: Element _? {
     return element;
 }
 
@@ -34,7 +34,7 @@ Element =
 }
 
 
-Content = text: Text? rest: (Element Text?)* {
+Content = text: NonElementContent* rest: (Element NonElementContent*)* {
     const list = [text]
         .concat(
             (rest || []).reduce((result, x) => {
@@ -49,6 +49,17 @@ Content = text: Text? rest: (Element Text?)* {
         }
     }
     return result;
+}
+
+NonElementContent = Comment / Text {
+    return undefined;
+}
+
+Comment = "<!--" (!"-->" .)* "-->" {
+    return {
+        type: "Comment",
+        position: location(),
+    };
 }
 
 Text = value: [^<]+ {

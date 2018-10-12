@@ -154,6 +154,40 @@ export class SchemaRngConverterTest {
     }
 
     @test
+    public testNonMeaningfulCases(): void {
+        const parser = new SchemaRngConverter();
+        parser.toDataSchema(
+            xmlPreamble +
+                `
+<!-- comment -->
+
+<element name="Root">
+    <!-- comment -->
+    <element name="Choice1" />
+    <element name="Choice2"/>
+</element>
+
+<!-- comment -->
+
+`
+        );
+    }
+
+    @test
+    public testNamesWithDashes(): void {
+        const parser = new SchemaRngConverter();
+        parser.toDataSchema(
+            xmlPreamble +
+                `
+<element name="Root">
+    <element name="Choice1" />
+    <element name="Choice2"/>
+    <a-a b-b="a" />
+</element>`
+        );
+    }
+
+    @test
     public testRealSchemaSkipBom(): void {
         const parser = new SchemaRngConverter();
         parser.toDataSchema(fs.readFileSync(require.resolve("./RealData/Schema02.xml"), "utf8"));

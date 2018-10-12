@@ -259,6 +259,30 @@ export class CompletionClassificatorTest {
         );
     }
 
+    @test
+    public testNonMeaningfulCases(): void {
+        this.checkValidGrammarAtBeginning(` <z><a b="value-b" /> <aaa attr="content" attr2`);
+        this.checkValidGrammarAtBeginning(`<z><a b="value-b" />\n<aaa attr="content" attr2`);
+        this.checkValidGrammarAtBeginning(`<z><a b="value-b" />\t<aaa attr="content" attr2`);
+        this.checkValidGrammarAtBeginning(`\n<z><a b="value-b" /><aaa attr="content" attr2`);
+        this.checkValidGrammarAtBeginning(`\r<z><a b="value-b" /><aaa attr="content" attr2`);
+        this.checkValidGrammarAtBeginning(` <z><a b="value-b" /><aaa attr="content" attr2`);
+        this.checkValidGrammarAtBeginning(`<z><a><!-- comment --><b /></a><aaa attr="content" attr2`);
+        this.checkValidGrammarAtBeginning(`<z><a>aaa<!-- comment -->aaa<b />aaa</a><aaa attr="content" attr2`);
+    }
+
+    @test
+    public testNamesWithDashes(): void {
+        this.checkValidGrammarAtBeginning(`<aa-a a-ttr="content" attr-`);
+    }
+
+    private checkValidGrammarAtBeginning(input: string): void {
+        const completionContext = getCompletionContext(input);
+        expect(completionContext).to.shallowDeepEqual({
+            expectedToken: ExpectedTokenType.AttributeName,
+        });
+    }
+
     private assertCompletionContext(
         completionContext: undefined | CompletionContext,
         expectedToken: ExpectedTokenType,

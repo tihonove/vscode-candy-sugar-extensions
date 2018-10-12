@@ -1,4 +1,4 @@
-Document = Element
+Document = (NonElementContent / _)? Element (NonElementContent / _)?
 
 Element =
     "<" ElementName SpaceAfterElement? AttributeList? _?
@@ -11,7 +11,12 @@ Element =
     )
 
 
-Content = Text? (Element Text?)*
+
+Content = NonElementContent* (Element NonElementContent*)*
+
+NonElementContent = Comment / Text
+
+Comment = "<!--" (!"-->" .)* "-->"
 
 Text = [^<]+
 

@@ -119,4 +119,23 @@ export class SugarCodeDomBuilderTest {
         );
         expect(positionToNodeMap != undefined).to.eql(true);
     }
+
+    @test
+    public testNonMeaningfulCases(): void {
+        const codeDomBuilder = new SugarCodeDomBuilder();
+        codeDomBuilder.buildPositionToNodeMap(`<a b="value-b" /> `);
+        codeDomBuilder.buildPositionToNodeMap(`<a b="value-b" />\n`);
+        codeDomBuilder.buildPositionToNodeMap(`<a b="value-b" />\t`);
+        codeDomBuilder.buildPositionToNodeMap(`\n<a b="value-b" />`);
+        codeDomBuilder.buildPositionToNodeMap(`\r<a b="value-b" />`);
+        codeDomBuilder.buildPositionToNodeMap(` <a b="value-b" />`);
+        codeDomBuilder.buildPositionToNodeMap(`<a><!-- comment --><b /></a>`);
+        codeDomBuilder.buildPositionToNodeMap(`<a>aaa<!-- comment -->aaa<b />aaa</a>`);
+    }
+
+    @test
+    public testNamesWithDashes(): void {
+        const codeDomBuilder = new SugarCodeDomBuilder();
+        codeDomBuilder.buildPositionToNodeMap(`<a-a b-b="value-b" />`);
+    }
 }
