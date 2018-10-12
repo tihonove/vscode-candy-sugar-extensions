@@ -112,7 +112,9 @@ AttributeName = value:[a-zA-Z0-9-]+ {
     }
 }
 
-AttributeValue = "\"" value: AttributeValueContent AttributeValueClosingQuote {
+AttributeValue = AttributeStringValue / AttributeJavaScriptValue
+
+AttributeStringValue = "\"" value: AttributeValueContent AttributeValueClosingQuote {
     return {
         type: "AttributeValue",
         position: location(),
@@ -125,6 +127,23 @@ AttributeValueClosingQuote = "\"";
 AttributeValueContent = value:[^"]* {
     return value.join("");
 }
+
+AttributeJavaScriptValue = "{" _? value: JavaScriptValue _? "}" {
+    return {
+        type: "AttributeJavaScriptValue",
+        position: location(),
+        value: value,
+    }
+}
+
+// JAVASCRIPT VALUE
+
+JavaScriptValue = JSArray
+JSArray = "[" _? ( JSValue _? ("," _? JSValue _?)* )?  _? "]"
+JSValue = JSNumber / JSString / JSArray
+JSNumber = [0-9.]+
+JSString = "\"" JSDoubleQuotedStringContent "\""
+JSDoubleQuotedStringContent = ("\\\"" / [^"\n])*
 
 SpaceAfterElement = "{!{FAKE_NODE}!}"? _
 

@@ -122,20 +122,58 @@ export class SugarCodeDomBuilderTest {
 
     @test
     public testNonMeaningfulCases(): void {
-        const codeDomBuilder = new SugarCodeDomBuilder();
-        codeDomBuilder.buildPositionToNodeMap(`<a b="value-b" /> `);
-        codeDomBuilder.buildPositionToNodeMap(`<a b="value-b" />\n`);
-        codeDomBuilder.buildPositionToNodeMap(`<a b="value-b" />\t`);
-        codeDomBuilder.buildPositionToNodeMap(`\n<a b="value-b" />`);
-        codeDomBuilder.buildPositionToNodeMap(`\r<a b="value-b" />`);
-        codeDomBuilder.buildPositionToNodeMap(` <a b="value-b" />`);
-        codeDomBuilder.buildPositionToNodeMap(`<a><!-- comment --><b /></a>`);
-        codeDomBuilder.buildPositionToNodeMap(`<a>aaa<!-- comment -->aaa<b />aaa</a>`);
+        this.checkIsValidSyntax(`<a b="value-b" /> `);
+        this.checkIsValidSyntax(`<a b="value-b" />\n`);
+        this.checkIsValidSyntax(`<a b="value-b" />\t`);
+        this.checkIsValidSyntax(`\n<a b="value-b" />`);
+        this.checkIsValidSyntax(`\r<a b="value-b" />`);
+        this.checkIsValidSyntax(` <a b="value-b" />`);
+        this.checkIsValidSyntax(`<a><!-- comment --><b /></a>`);
+        this.checkIsValidSyntax(`<a>aaa<!-- comment -->aaa<b />aaa</a>`);
     }
 
     @test
     public testNamesWithDashes(): void {
+        this.checkIsValidSyntax(`<a-a b-b="value-b" />`);
+    }
+
+    @test
+    public testAttributeValueAsNumberArray(): void {
+        this.checkIsValidSyntax(`<a b={[1, 2]} />`);
+    }
+
+    @test
+    public testAttributeValueAsStringArray(): void {
+        this.checkIsValidSyntax(`<a b={["1", "2"]} />`);
+        this.checkIsValidSyntax(`<a b={["1", "\\"2"]} />`);
+        this.checkIsValidSyntax(`<a b={["1", "/2"]} />`);
+    }
+
+    @test
+    public testAttributeValueWithNestedArrays(): void {
+        this.checkIsValidSyntax(`<a b={[ ["1"], [1]]} />`);
+        this.checkIsValidSyntax(`<a b={ [ [ "1" ] , [ 1 ] ] } />`);
+    }
+
+    @test
+    public testPicklistSugarIsValid(): void {
+        this.checkIsValidSyntax(`<picklist
+            align="left"
+            kind="button"
+            gId="837"
+            title="Код вида предпринимательской деятельности"
+            width="240"
+            path="КодВД"
+            binding={ [["КодВД", "code1"], ["РасчНалВДАдр/БазДоход", "code2"]] }
+            fields={ ["code1", "code2", "name1", "name2"] }
+            headers={ ["Код", "Доходность", "Вид предпринимательской деятельности", "Физические показатели"] }
+            columnsWidth={ [50, 90, 280, 190] }
+            type="kodvd" 
+        />`);
+    }
+
+    private checkIsValidSyntax(input: string): void {
         const codeDomBuilder = new SugarCodeDomBuilder();
-        codeDomBuilder.buildPositionToNodeMap(`<a-a b-b="value-b" />`);
+        codeDomBuilder.buildPositionToNodeMap(input);
     }
 }

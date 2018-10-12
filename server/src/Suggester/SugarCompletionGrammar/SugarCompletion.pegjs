@@ -35,13 +35,27 @@ AttributeName = value:[a-zA-Z0-9-]+ {
     return value.join("");
 }
 
-AttributeValue = "\"" AttributeValueContent AttributeValueClosingQuote
+AttributeValue = AttributeStringValue / AttributeJavaScriptValue
+
+AttributeStringValue = "\"" AttributeValueContent AttributeValueClosingQuote
 
 AttributeValueClosingQuote = "\"";
 
 AttributeValueContent = value:[^"]* {
     return value.join("");
 }
+
+AttributeJavaScriptValue = "{" _? value: JavaScriptValue _? "}"
+
+// JAVASCRIPT VALUE
+
+JavaScriptValue = JSArray
+JSArray = "[" _? ( JSValue _? ("," _? JSValue _?)* )?  _? "]"
+JSValue = JSNumber / JSString / JSArray
+JSNumber = [0-9.]+
+JSString = "\"" JSDoubleQuotedStringContent "\""
+JSDoubleQuotedStringContent = ("\\\"" / [^"\n])*
+
 
 SpaceAfterElement = "{!{FAKE_NODE}!}"? _
 

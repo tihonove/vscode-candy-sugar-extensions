@@ -276,6 +276,16 @@ export class CompletionClassificatorTest {
         this.checkValidGrammarAtBeginning(`<aa-a a-ttr="content" attr-`);
     }
 
+    @test
+    public testJsValues(): void {
+        this.checkValidGrammarAtBeginning(`<z><a b={[1, 2]} /><aaa attr="content" attr2`);
+        this.checkValidGrammarAtBeginning(`<z><a b={["1", "2"]} /><aaa attr="content" attr2`);
+        this.checkValidGrammarAtBeginning(`<z><a b={["1", "\\"2"]} /><aaa attr="content" attr2`);
+        this.checkValidGrammarAtBeginning(`<z><a b={["1", "/2"]} /><aaa attr="content" attr2`);
+        this.checkValidGrammarAtBeginning(`<z><a b={[ ["1"], [1]]} /><aaa attr="content" attr2`);
+        this.checkValidGrammarAtBeginning(`<z><a b={ [ [ "1" ] , [ 1 ] ] } /><aaa attr="content" attr2`);
+    }
+
     private checkValidGrammarAtBeginning(input: string): void {
         const completionContext = getCompletionContext(input);
         expect(completionContext).to.shallowDeepEqual({
