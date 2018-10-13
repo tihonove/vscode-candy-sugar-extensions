@@ -1,6 +1,6 @@
 {
     "name": "@kontur.candy/validator",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Syntax validator for Candy.Sugar",
     "main": "index.js",
     "repository": "https://github.com/tihonove/vscode-candy-sugar-extensions",
@@ -8,7 +8,7 @@
     "license": "MIT",
     "private": false,
     "bin": {
-        "babel-node": "./bin/cli.js"
+        "sugar-validator": "./bin/cli.js"
     },
     "dependencies": {
         "command-line-args": "^5.0.2",
