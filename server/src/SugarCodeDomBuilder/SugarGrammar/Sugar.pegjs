@@ -17,6 +17,7 @@ Element =
         position: location(),
         name: name,
         attributes: attributes,
+        children: [],
     };
     result.name.parent = result;
     if (attributes != undefined) {
