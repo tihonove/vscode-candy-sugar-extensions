@@ -4,6 +4,10 @@ export enum AttributeType {
     String = "String",
     Number = "Number",
     Boolean = "Boolean",
+    FunctionName = "FunctionName",
+    CssClassName = "CssClassName",
+    PicklistId = "PicklistId",
+    JavaScriptLiteral = "JavaScriptLiteral"
 }
 
 export enum AvailableChildrenType {
@@ -18,6 +22,7 @@ export interface SugarAttributeInfo {
     valueTypes: AttributeType[];
     markdownDescription?: string;
     shortMarkdownDescription?: string;
+    optional?: boolean;
 }
 
 export type SugarElementAvailableChildrenInfo =

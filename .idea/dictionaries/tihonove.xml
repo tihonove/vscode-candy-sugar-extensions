@@ -22,15 +22,18 @@
       <w>maxunitscount</w>
       <w>mergeable</w>
       <w>nolazy</w>
+      <w>normativehelp</w>
       <w>pegjs</w>
       <w>picklist</w>
       <w>preval</w>
       <w>qxxx</w>
+      <w>radiogroup</w>
       <w>singlequoted</w>
       <w>supress</w>
       <w>tsconfig</w>
       <w>tslint</w>
       <w>typings</w>
+      <w>useincorrectvalue</w>
       <w>vscode</w>
       <w>webstorm</w>
     </words>

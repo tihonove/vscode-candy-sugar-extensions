@@ -1,33 +1,39 @@
 import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../Suggester/SugarElementInfo";
 
-const column: SugarElementInfo = {
-    name: "column",
-    attributes: [],
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-
-const row: SugarElementInfo = {
-    name: "row",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-
-const link: SugarElementInfo = {
-    name: "link",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-
-const icon: SugarElementInfo = {
-    name: "icon",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
+import { help } from "./help";
+import { icon } from "./icon";
+import { normativehelp } from "./normativehelp";
+import { combobox } from "./DataElements/combobox";
+import { date } from "./DataElements/date";
+import { fio } from "./DataElements/fio";
+import { input } from "./DataElements/input";
+import { kladr } from "./DataElements/kladr";
+import { link } from "./DataElements/link";
+import { page } from "./DataElements/page";
+import { picklist } from "./DataElements/picklist";
+import { radio } from "./DataElements/radio";
+import { radiogroup } from "./DataElements/radiogroup";
+import { text } from "./DataElements/text";
+import { grid, gridCol, gridRow } from "./GridElements/grid";
+import { block } from "./LayoutElement/block";
+import { caption } from "./LayoutElement/caption";
+import { gray } from "./LayoutElement/gray";
+import { warning } from "./LayoutElement/warning";
+import { ifElement } from "./StrangeElements/if";
+import { column } from "./TableElements/column";
+import { multiline } from "./TableElements/multiline";
+import { row } from "./TableElements/row";
+import { table } from "./TableElements/table";
+import { customValidation } from "./TypeDefinitionElements/customValidation";
+import { enumeration } from "./TypeDefinitionElements/enumeration";
+import { fractionDigits } from "./TypeDefinitionElements/fractionDigits";
+import { length } from "./TypeDefinitionElements/length";
+import { maxLength } from "./TypeDefinitionElements/maxLength";
+import { minLength } from "./TypeDefinitionElements/minLength";
+import { pattern } from "./TypeDefinitionElements/pattern";
+import { totalDigits } from "./TypeDefinitionElements/totalDigits";
+import { typeElement } from "./TypeDefinitionElements/type";
+import { types } from "./TypeDefinitionElements/types";
 
 const digestCheck: SugarElementInfo = {
     name: "digestCheck",
@@ -330,12 +336,6 @@ const Checkbox: SugarElementInfo = {
         type: AvailableChildrenType.Any,
     },
 };
-const combobox: SugarElementInfo = {
-    name: "combobox",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
 const content: SugarElementInfo = {
     name: "content",
     availableChildren: {
@@ -354,18 +354,6 @@ const cross: SugarElementInfo = {
         type: AvailableChildrenType.Any,
     },
 };
-const customValidation: SugarElementInfo = {
-    name: "customValidation",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const date: SugarElementInfo = {
-    name: "date",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
 const digest: SugarElementInfo = {
     name: "digest",
     availableChildren: {
@@ -378,56 +366,8 @@ const elseElement: SugarElementInfo = {
         type: AvailableChildrenType.Any,
     },
 };
-const enumeration: SugarElementInfo = {
-    name: "enumeration",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const fio: SugarElementInfo = {
-    name: "fio",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const fractionDigits: SugarElementInfo = {
-    name: "fractionDigits",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const gray: SugarElementInfo = {
-    name: "gray",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const grid: SugarElementInfo = {
-    name: "grid",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const gridRow: SugarElementInfo = {
-    name: "grid-row",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const gridCol: SugarElementInfo = {
-    name: "grid-col",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
 const header: SugarElementInfo = {
     name: "header",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const help: SugarElementInfo = {
-    name: "help",
     availableChildren: {
         type: AvailableChildrenType.Any,
     },
@@ -440,12 +380,6 @@ const highlight: SugarElementInfo = {
 };
 const hr: SugarElementInfo = {
     name: "hr",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const ifElement: SugarElementInfo = {
-    name: "if",
     availableChildren: {
         type: AvailableChildrenType.Any,
     },
@@ -492,20 +426,8 @@ const item: SugarElementInfo = {
         type: AvailableChildrenType.Any,
     },
 };
-const kladr: SugarElementInfo = {
-    name: "kladr",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
 const kpp: SugarElementInfo = {
     name: "kpp",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const length: SugarElementInfo = {
-    name: "length",
     availableChildren: {
         type: AvailableChildrenType.Any,
     },
@@ -528,32 +450,8 @@ const local: SugarElementInfo = {
         type: AvailableChildrenType.Any,
     },
 };
-const maxLength: SugarElementInfo = {
-    name: "maxLength",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const minLength: SugarElementInfo = {
-    name: "minLength",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const multiline: SugarElementInfo = {
-    name: "multiline",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
 const name: SugarElementInfo = {
     name: "name",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const normativehelp: SugarElementInfo = {
-    name: "normativehelp",
     availableChildren: {
         type: AvailableChildrenType.Any,
     },
@@ -570,12 +468,6 @@ const otherwise: SugarElementInfo = {
         type: AvailableChildrenType.Any,
     },
 };
-const pattern: SugarElementInfo = {
-    name: "pattern",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
 const period: SugarElementInfo = {
     name: "period",
     availableChildren: {
@@ -584,24 +476,6 @@ const period: SugarElementInfo = {
 };
 const phone: SugarElementInfo = {
     name: "phone",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const picklist: SugarElementInfo = {
-    name: "picklist",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const radio: SugarElementInfo = {
-    name: "radio",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const radiogroup: SugarElementInfo = {
-    name: "radiogroup",
     availableChildren: {
         type: AvailableChildrenType.Any,
     },
@@ -660,48 +534,13 @@ const sup: SugarElementInfo = {
         type: AvailableChildrenType.Any,
     },
 };
-const table: SugarElementInfo = {
-    name: "table",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const text: SugarElementInfo = {
-    name: "text",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
 const then: SugarElementInfo = {
     name: "then",
     availableChildren: {
         type: AvailableChildrenType.Any,
     },
 };
-const totalDigits: SugarElementInfo = {
-    name: "totalDigits",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const typeElement: SugarElementInfo = {
-    name: "type",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const types: SugarElementInfo = {
-    name: "types",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const warning: SugarElementInfo = {
-    name: "warning",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
+
 const when: SugarElementInfo = {
     name: "when",
     availableChildren: {
@@ -713,60 +552,6 @@ const year: SugarElementInfo = {
     availableChildren: {
         type: AvailableChildrenType.Any,
     },
-};
-
-const input: SugarElementInfo = {
-    name: "input",
-    attributes: [
-        {
-            name: "align",
-            valueTypes: [AttributeType.String],
-            shortMarkdownDescription: "Выравнивание текста внутри поля ввода (`left` | `right`, default: `left`)",
-            markdownDescription: `**Выравнивание текста внутри поля ввода**
-            
-Значения: \`left\` или \`right\`
-
-Значение по умолчанию: \`left\``,
-        },
-        {
-            name: "width",
-            valueTypes: [AttributeType.Number],
-        },
-        {
-            name: "formula",
-            valueTypes: [AttributeType.String],
-        },
-        {
-            name: "path",
-            valueTypes: [AttributeType.Path],
-        },
-    ],
-    availableChildren: { type: AvailableChildrenType.NoChildren },
-    markdownDescription: `Текстовое поле ввода. Используется только для редактирование текста.`,
-};
-
-const page: SugarElementInfo = {
-    name: "page",
-    attributes: [
-        {
-            name: "id",
-            valueTypes: [AttributeType.String],
-        },
-        {
-            name: "navigationName",
-            valueTypes: [AttributeType.String],
-        },
-        {
-            name: "template",
-            valueTypes: [AttributeType.String],
-        },
-        {
-            name: "path",
-            valueTypes: [AttributeType.Path],
-        },
-    ],
-    availableChildren: { type: AvailableChildrenType.NoChildren },
-    createPathScope: true,
 };
 
 const form: SugarElementInfo = {
@@ -819,17 +604,6 @@ const checkbox: SugarElementInfo = {
     availableChildren: { type: AvailableChildrenType.Any },
 };
 
-const block: SugarElementInfo = {
-    name: "block",
-    attributes: [
-        {
-            name: "visibilityPath",
-            valueTypes: [AttributeType.Path],
-        },
-    ],
-    availableChildren: { type: AvailableChildrenType.Any },
-};
-
 const bold: SugarElementInfo = {
     name: "bold",
     availableChildren: { type: AvailableChildrenType.Any },
@@ -838,11 +612,6 @@ const bold: SugarElementInfo = {
 const br: SugarElementInfo = {
     name: "br",
     availableChildren: { type: AvailableChildrenType.NoChildren },
-};
-
-const caption: SugarElementInfo = {
-    name: "caption",
-    availableChildren: { type: AvailableChildrenType.Any },
 };
 
 const choice: SugarElementInfo = {
