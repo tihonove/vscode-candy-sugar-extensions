@@ -10,6 +10,9 @@ export const multiline: SugarElementInfo = {
     createPathScope: true,
     attributes: [
         pathAttribute,
+        { name: "addType", valueTypes: [AttributeType.Enum], optional: true },
+        { name: "pageStep", valueTypes: [AttributeType.Number], optional: true },
+        { name: "focusByHotkey", valueTypes: [AttributeType.Boolean], optional: true },
         { name: "removebutton", valueTypes: [AttributeType.Boolean] },
         { name: "addbutton", valueTypes: [AttributeType.String, AttributeType.Boolean] },
         { name: "usepager", valueTypes: [AttributeType.Boolean] },

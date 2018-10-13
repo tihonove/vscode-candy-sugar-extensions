@@ -2,5 +2,6 @@ import { AttributeType, SugarAttributeInfo } from "../../Suggester/SugarElementI
 
 export const visibilityPathAttribute: SugarAttributeInfo = {
     name: "visibilityPath",
-    valueTypes: [AttributeType.Path],
+    valueTypes: [AttributeType.VisibilityPath],
+    optional: true,
 };

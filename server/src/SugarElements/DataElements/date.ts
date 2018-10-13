@@ -8,5 +8,10 @@ export const date: SugarElementInfo = {
     availableChildren: {
         type: AvailableChildrenType.Any,
     },
-    attributes: [pathAttribute, typeAttribute, { name: "width", valueTypes: [AttributeType.Number] }],
+    attributes: [
+        pathAttribute,
+        typeAttribute,
+        { name: "width", valueTypes: [AttributeType.Number] },
+        { name: "optional", valueTypes: [AttributeType.Boolean], optional: true },
+    ],
 };

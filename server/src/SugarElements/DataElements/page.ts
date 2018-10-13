@@ -22,6 +22,11 @@ export const page: SugarElementInfo = {
             optional: true,
         },
         {
+            name: "orientation",
+            valueTypes: [AttributeType.Enum],
+            optional: true,
+        },
+        {
             name: "template",
             valueTypes: [AttributeType.String],
         },

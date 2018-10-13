@@ -19,62 +19,21 @@ export const input: SugarElementInfo = {
 
 Значение по умолчанию: \`left\``,
         },
-        {
-            name: "width",
-            valueTypes: [AttributeType.Number],
-        },
-        {
-            name: "auto",
-            valueTypes: [AttributeType.Boolean],
-        },
-        {
-            name: "disabled",
-            valueTypes: [AttributeType.Boolean],
-            optional: true,
-        },
-        {
-            name: "textOverflow",
-            valueTypes: [AttributeType.Boolean],
-            optional: true,
-        },
-        {
-            name: "editable",
-            valueTypes: [AttributeType.Boolean],
-        },
-        {
-            name: "defaultValue",
-            valueTypes: [AttributeType.String],
-        },
-        {
-            name: "title",
-            valueTypes: [AttributeType.String],
-            optional: true,
-        },
-        {
-            name: "optional",
-            valueTypes: [AttributeType.Boolean],
-            optional: true,
-        },
-        {
-            name: "formula",
-            valueTypes: [AttributeType.String],
-        },
-        {
-            name: "emptydescription",
-            valueTypes: [AttributeType.String],
-        },
-        {
-            name: "requisite",
-            valueTypes: [AttributeType.Boolean],
-        },
-        {
-            name: "settings",
-            valueTypes: [AttributeType.Boolean],
-        },
-        {
-            name: "type",
-            valueTypes: [AttributeType.Type],
-        },
+        { name: "width", valueTypes: [AttributeType.Number] },
+        { name: "auto", valueTypes: [AttributeType.Boolean] },
+        { name: "disabled", valueTypes: [AttributeType.Boolean], optional: true },
+        { name: "textOverflow", valueTypes: [AttributeType.Boolean], optional: true },
+        { name: "editable", valueTypes: [AttributeType.Boolean] },
+        { name: "defaultValue", valueTypes: [AttributeType.String] },
+        { name: "title", valueTypes: [AttributeType.String], optional: true },
+        { name: "optional", valueTypes: [AttributeType.Boolean], optional: true },
+        { name: "formula", valueTypes: [AttributeType.String] },
+        { name: "emptydescription", valueTypes: [AttributeType.String] },
+        { name: "requisite", valueTypes: [AttributeType.Boolean] },
+        { name: "settings", valueTypes: [AttributeType.Boolean] },
+        { name: "type", valueTypes: [AttributeType.Type] },
+        { name: "placeholder", valueTypes: [AttributeType.String], optional: true },
+        { name: "hint", valueTypes: [AttributeType.String], optional: true },
         fetchFnAttribute,
     ],
     availableChildren: { type: AvailableChildrenType.NoChildren },

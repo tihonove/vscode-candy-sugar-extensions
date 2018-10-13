@@ -13,25 +13,14 @@ export const text: SugarElementInfo = {
         pathAttribute,
         fetchFnAttribute,
         typeAttribute,
-        {
-            name: "disabled",
-            valueTypes: [AttributeType.Boolean],
-        },
-        {
-            name: "requisite",
-            valueTypes: [AttributeType.Boolean],
-        },
-        {
-            name: "editable",
-            valueTypes: [AttributeType.Boolean],
-        },
-        {
-            name: "optional",
-            valueTypes: [AttributeType.Boolean],
-        },
-        {
-            name: "emptydescription",
-            valueTypes: [AttributeType.String],
-        },
+        { name: "disabled", valueTypes: [AttributeType.Boolean] },
+        { name: "color", valueTypes: [AttributeType.Color] },
+        { name: "requisite", valueTypes: [AttributeType.Boolean] },
+        { name: "editable", valueTypes: [AttributeType.Boolean] },
+        { name: "optional", valueTypes: [AttributeType.Boolean] },
+        { name: "defaultValue", valueTypes: [AttributeType.String], optional: true },
+        { name: "line", valueTypes: [AttributeType.Boolean], optional: true },
+        { name: "emptydescription", valueTypes: [AttributeType.String] },
+        { name: "hint", valueTypes: [AttributeType.String], optional: true },
     ],
 };

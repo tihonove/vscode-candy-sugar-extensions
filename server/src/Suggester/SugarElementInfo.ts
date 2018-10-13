@@ -1,5 +1,6 @@
 export enum AttributeType {
     Path = "Path",
+    VisibilityPath = "VisibilityPath",
     Type = "Type",
     String = "String",
     Number = "Number",
@@ -8,6 +9,8 @@ export enum AttributeType {
     CssClassName = "CssClassName",
     PicklistId = "PicklistId",
     JavaScriptLiteral = "JavaScriptLiteral",
+    Enum = "Enum",
+    Color = "Color"
 }
 
 export enum AvailableChildrenType {

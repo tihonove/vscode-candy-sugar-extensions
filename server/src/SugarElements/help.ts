@@ -9,9 +9,8 @@ export const help: SugarElementInfo = {
     },
     attributes: [
         visibilityPathAttribute,
-        {
-            name: "trigger",
-            valueTypes: [AttributeType.String],
-        },
+        { name: "trigger", valueTypes: [AttributeType.String] },
+        { name: "width", valueTypes: [AttributeType.Number], optional: true },
+        { name: "pos", valueTypes: [AttributeType.Enum], optional: true },
     ],
 };

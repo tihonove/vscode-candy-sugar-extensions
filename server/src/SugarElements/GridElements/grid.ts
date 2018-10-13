@@ -1,13 +1,6 @@
 import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
 import { classNameAttribute } from "../Commons/classNameAttribute";
 
-export const grid: SugarElementInfo = {
-    name: "grid",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-
 export const gridRow: SugarElementInfo = {
     name: "grid-row",
     availableChildren: {

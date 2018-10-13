@@ -6,6 +6,7 @@ import { normativehelp } from "./normativehelp";
 import { combobox } from "./DataElements/combobox";
 import { date } from "./DataElements/date";
 import { fio } from "./DataElements/fio";
+import { inn } from "./DataElements/inn";
 import { input } from "./DataElements/input";
 import { kladr } from "./DataElements/kladr";
 import { link } from "./DataElements/link";
@@ -14,11 +15,15 @@ import { picklist } from "./DataElements/picklist";
 import { radio } from "./DataElements/radio";
 import { radiogroup } from "./DataElements/radiogroup";
 import { text } from "./DataElements/text";
-import { grid, gridCol, gridRow } from "./GridElements/grid";
+import { gridCol, gridRow } from "./GridElements/grid";
 import { block } from "./LayoutElement/block";
 import { caption } from "./LayoutElement/caption";
 import { gray } from "./LayoutElement/gray";
+import { header } from "./LayoutElement/header";
+import { hr } from "./LayoutElement/hr";
 import { warning } from "./LayoutElement/warning";
+import { item } from "./ListElements/item";
+import { list } from "./ListElements/list";
 import { ifElement } from "./StrangeElements/if";
 import { column } from "./TableElements/column";
 import { multiline } from "./TableElements/multiline";
@@ -27,6 +32,7 @@ import { table } from "./TableElements/table";
 import { customValidation } from "./TypeDefinitionElements/customValidation";
 import { enumeration } from "./TypeDefinitionElements/enumeration";
 import { fractionDigits } from "./TypeDefinitionElements/fractionDigits";
+import { integerDigits } from "./TypeDefinitionElements/integerDigits";
 import { length } from "./TypeDefinitionElements/length";
 import { maxLength } from "./TypeDefinitionElements/maxLength";
 import { minLength } from "./TypeDefinitionElements/minLength";
@@ -366,20 +372,8 @@ const elseElement: SugarElementInfo = {
         type: AvailableChildrenType.Any,
     },
 };
-const header: SugarElementInfo = {
-    name: "header",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
 const highlight: SugarElementInfo = {
     name: "highlight",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const hr: SugarElementInfo = {
-    name: "hr",
     availableChildren: {
         type: AvailableChildrenType.Any,
     },
@@ -402,26 +396,8 @@ const infoorg: SugarElementInfo = {
         type: AvailableChildrenType.Any,
     },
 };
-const inn: SugarElementInfo = {
-    name: "inn",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const integerDigits: SugarElementInfo = {
-    name: "integerDigits",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
 const italic: SugarElementInfo = {
     name: "italic",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const item: SugarElementInfo = {
-    name: "item",
     availableChildren: {
         type: AvailableChildrenType.Any,
     },
@@ -434,12 +410,6 @@ const kpp: SugarElementInfo = {
 };
 const linetext: SugarElementInfo = {
     name: "linetext",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-};
-const list: SugarElementInfo = {
-    name: "list",
     availableChildren: {
         type: AvailableChildrenType.Any,
     },
@@ -633,7 +603,6 @@ export const allElements: SugarElementInfo[] = [
     fio,
     fractionDigits,
     gray,
-    grid,
     gridRow,
     gridCol,
     header,

@@ -7,6 +7,7 @@
       <w>clientrc</w>
       <w>ctag</w>
       <w>decl</w>
+      <w>deyt</w>
       <w>diagnosic</w>
       <w>dirname</w>
       <w>doctype</w>
@@ -14,6 +15,7 @@
       <w>doublequoted</w>
       <w>entitytype</w>
       <w>esnext</w>
+      <w>fileloader</w>
       <w>gitignore</w>
       <w>infos</w>
       <w>internalsubset</w>
@@ -23,11 +25,19 @@
       <w>mergeable</w>
       <w>nolazy</w>
       <w>normativehelp</w>
+      <w>okato</w>
+      <w>okcm</w>
+      <w>okfs</w>
+      <w>okpo</w>
+      <w>oktmo</w>
+      <w>okved</w>
       <w>pegjs</w>
       <w>picklist</w>
       <w>preval</w>
+      <w>prsek</w>
       <w>qxxx</w>
       <w>radiogroup</w>
+      <w>sektor</w>
       <w>singlequoted</w>
       <w>supress</w>
       <w>tsconfig</w>

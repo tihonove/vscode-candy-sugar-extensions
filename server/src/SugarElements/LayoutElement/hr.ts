@@ -1,11 +1,14 @@
 import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
-
 import { visibilityPathAttribute } from "../Commons/visibilityPathAttribute";
 
-export const gray: SugarElementInfo = {
-    name: "gray",
+export const hr: SugarElementInfo = {
+    name: "hr",
     availableChildren: {
         type: AvailableChildrenType.Any,
     },
-    attributes: [visibilityPathAttribute, { name: "inline", valueTypes: [AttributeType.Boolean], optional: true }],
+    attributes: [
+        { name: "kind", valueTypes: [AttributeType.Enum] },
+        { name: "width", valueTypes: [AttributeType.Enum] },
+        visibilityPathAttribute,
+    ],
 };
