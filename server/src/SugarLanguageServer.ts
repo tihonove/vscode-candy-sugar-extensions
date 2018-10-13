@@ -288,6 +288,7 @@ export class SugarLanguageServer {
                             suggestionItem: x,
                             uri: textDocumentPosition.textDocument.uri,
                         },
+                        commitCharacters: [" "],
                     };
                 }
                 if (x.type === SuggestionItemType.Attribute) {
@@ -298,6 +299,7 @@ export class SugarLanguageServer {
                             suggestionItem: x,
                             uri: textDocumentPosition.textDocument.uri,
                         },
+                        commitCharacters: ["="],
                     };
                 }
                 if (x.type === SuggestionItemType.DataElement) {
@@ -308,6 +310,7 @@ export class SugarLanguageServer {
                             suggestionItem: x,
                             uri: textDocumentPosition.textDocument.uri,
                         },
+                        commitCharacters: ["/"],
                     };
                 }
                 if (x.type === SuggestionItemType.DataAttribute) {
@@ -318,6 +321,7 @@ export class SugarLanguageServer {
                             suggestionItem: x,
                             uri: textDocumentPosition.textDocument.uri,
                         },
+                        commitCharacters: ['"'],
                     };
                 }
                 return undefined;
