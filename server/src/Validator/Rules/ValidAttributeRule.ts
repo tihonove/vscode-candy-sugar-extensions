@@ -35,4 +35,3 @@ export class ValidAttributeRule extends EmptySugarDomVisitor {
         return this.validations;
     }
 }
-

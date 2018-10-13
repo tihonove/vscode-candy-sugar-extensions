@@ -7,7 +7,7 @@ export enum AttributeType {
     FunctionName = "FunctionName",
     CssClassName = "CssClassName",
     PicklistId = "PicklistId",
-    JavaScriptLiteral = "JavaScriptLiteral"
+    JavaScriptLiteral = "JavaScriptLiteral",
 }
 
 export enum AvailableChildrenType {

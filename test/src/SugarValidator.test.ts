@@ -105,7 +105,9 @@ export class SugarValidatorTest {
     public absolutePathWithScopedElementWithRoot_CaseTwo(): void {
         const validator = new SugarValidator();
         validator.addRule(() => new ValidPathRule(testDataSchema, testSugarElementInfos));
-        expect(validator.validate(`<atag1 path="/Root"><atag><atag1 path="Children1/Child1"/></atag1></atag>`)).to.eql([]);
+        expect(validator.validate(`<atag1 path="/Root"><atag><atag1 path="Children1/Child1"/></atag1></atag>`)).to.eql(
+            []
+        );
     }
 
     @test
