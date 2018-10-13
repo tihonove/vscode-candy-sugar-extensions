@@ -1,3 +1,4 @@
+import { DataSchemaUtils } from "../DataSchema/DataSchemaUtils";
 import { SugarAttributeInfo, SugarElementInfo } from "../Suggester/SugarElementInfo";
 
 import { PositionToNodeMap } from "./SugarCodeDomBuilder";
@@ -25,7 +26,7 @@ export type CursorContext =
     | AttributeNameCursorContext
     | {
           type: "DataAttributeValue";
-          contextNode: SugarAttributeValue,
+          contextNode: SugarAttributeValue;
           currentElementInfo?: SugarElementInfo;
           currentAttributeInfo?: SugarAttributeInfo;
           currentDataContext?: string[];
@@ -53,7 +54,7 @@ export class ContextAtCursorResolver {
                 contextNode: node,
                 currentElementInfo: currentElementInfo,
                 elementStack: elementStack,
-                dataContext: this.resolveDataContext(this.withoutLast(elementStack)),
+                dataContext: DataSchemaUtils.normalizeDataPath(this.resolveDataContext(this.withoutLast(elementStack))),
             };
         }
         if (node.type === "AttributeName") {
@@ -69,7 +70,7 @@ export class ContextAtCursorResolver {
                 currentElementInfo: currentElementInfo,
                 currentAttributeInfo: currentAttributeInfo,
                 elementStack: elementStack,
-                dataContext: this.resolveDataContext(this.withoutLast(elementStack)),
+                dataContext: DataSchemaUtils.normalizeDataPath(this.resolveDataContext(this.withoutLast(elementStack))),
             };
         }
         if (node.type === "AttributeValue") {
@@ -85,9 +86,11 @@ export class ContextAtCursorResolver {
                 contextNode: node,
                 currentElementInfo: currentElementInfo,
                 currentAttributeInfo: currentAttributeInfo,
-                currentDataContext: [...dataContext, ...this.parseDataAttributeValue(node.value)],
+                currentDataContext: DataSchemaUtils.normalizeDataPath(
+                    DataSchemaUtils.joinDataPaths(dataContext, this.parseDataAttributeValue(node.value))
+                ),
                 elementStack: elementStack,
-                dataContext: dataContext,
+                dataContext: DataSchemaUtils.normalizeDataPath(dataContext),
             };
         }
         return undefined;
@@ -106,7 +109,7 @@ export class ContextAtCursorResolver {
     }
 
     private resolveDataContext(elementStack: SugarElement[]): string[] {
-        const result = [];
+        let result: string[] = [];
         for (let i = 0; i < elementStack.length; i++) {
             const sugarElementInfo = this.resolveSugarElementInfo(elementStack.slice(0, i + 1));
             if (sugarElementInfo == undefined || !sugarElementInfo.createPathScope) {
@@ -120,13 +123,13 @@ export class ContextAtCursorResolver {
             if (pathAttribute == undefined || pathAttribute.value == undefined) {
                 continue;
             }
-            result.push(...this.parseDataAttributeValue(pathAttribute.value.value));
+            result = DataSchemaUtils.joinDataPaths(result, this.parseDataAttributeValue(pathAttribute.value.value));
         }
         return result;
     }
 
     private parseDataAttributeValue(pathAttributeValue: string): string[] {
-        return pathAttributeValue.split("/");
+        return DataSchemaUtils.parseDataAttributeValue(pathAttributeValue);
     }
 
     private buildElementStack(node: undefined | SugarElement): SugarElement[] {

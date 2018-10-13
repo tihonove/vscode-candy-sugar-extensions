@@ -40,7 +40,7 @@ export class SugarLanguageServer {
     private readonly schemaDocuments: { [uri: string]: string };
     private readonly parsedSchemaDocuments: { [uri: string]: DataSchemaElementNode };
     private readonly documentServices: { [uri: string]: SugarDocumentServices };
-    private readonly validator: SugarValidator;
+    private validator?: SugarValidator;
 
     public constructor() {
         this.connection = createConnection(ProposedFeatures.all);
@@ -55,7 +55,6 @@ export class SugarLanguageServer {
         this.connection.onDefinition(this.handleResolveDefinition);
         this.connection.onCompletion(this.handleResolveCompletion);
         this.connection.onCompletionResolve(this.handleEnrichCompletionItem);
-        this.validator = createDefaultValidator();
     }
 
     public listen(): void {
@@ -64,6 +63,9 @@ export class SugarLanguageServer {
     }
 
     private async validateTextDocument(textDocument: TextDocument): Promise<void> {
+        if (this.validator == undefined) {
+            return;
+        }
         const validationResults = this.validator.validate(textDocument.getText());
         this.connection.sendDiagnostics({
             uri: textDocument.uri,
@@ -72,6 +74,7 @@ export class SugarLanguageServer {
                 range: this.pegjsPositionToVsCodeRange(x.position),
                 severity: DiagnosticSeverity.Error,
                 source: "sugar-validator",
+                code: x.ruleName,
             })),
         });
     }
@@ -118,6 +121,7 @@ export class SugarLanguageServer {
             );
         }
         this.documentServices[change.document.uri].sugarDocumentDom.processDocumentChange(change.document.getText());
+        this.validator = createDefaultValidator(this.parsedSchemaDocuments[change.document.uri]);
         this.validateTextDocument(change.document);
     };
 

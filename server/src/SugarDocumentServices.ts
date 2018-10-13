@@ -54,9 +54,7 @@ class SugarDocumentDom {
     }
 
     public getDataElementOrAttributeByPath(path: string[]): undefined | DataSchemaNode {
-        const element = DataSchemaUtils.findElementByPath(this.dataSchemaRootNode, path);
-        const attribute = DataSchemaUtils.findAttributeByPath(this.dataSchemaRootNode, path);
-        return element || attribute;
+        return DataSchemaUtils.findSchemaNodeByPath(this.dataSchemaRootNode, path);
     }
 
     public getDataSchemaUri(): undefined | string {

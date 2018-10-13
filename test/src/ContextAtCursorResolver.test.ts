@@ -69,6 +69,34 @@ export class ContextAtCursorResolverTest {
     }
 
     @test
+    public testNestedTagsContextWithAbsolutePath(): void {
+        expect(this.getCursorContext(`<ctag3 path="/Root"><atag|1 ab="value" /></ctag3>`)).to.shallowDeepEqual({
+            type: "ElementName",
+            currentElementInfo: {
+                name: "atag1",
+            },
+            dataContext: ["Root"],
+            elementStack: [
+                {
+                    type: "Element",
+                    name: { value: "ctag3" },
+                },
+                {
+                    type: "Element",
+                    name: { value: "atag1" },
+                },
+            ],
+        });
+    }
+
+    @test
+    public testNestedTagsContextWithAbsolutePath_AttributeValue(): void {
+        expect(this.getCursorContext(`<ctag3 path="/Root"><atag1 ab="v|alue" /></ctag3>`)).to.shallowDeepEqual({
+            dataContext: ["Root"],
+        });
+    }
+
+    @test
     public testMultipleNestedTagsContext(): void {
         expect(
             this.getCursorContext(
@@ -153,6 +181,30 @@ export class ContextAtCursorResolverTest {
                     name: { value: "atag1" },
                 },
             ],
+        });
+    }
+
+    @test
+    public testDataAttributeValueContextWithAbsolutePathInRoot(): void {
+        expect(
+            this.getCursorContext(
+                `<ctag3 path="/Root/Child1"><ctag3 path="Child2/Child3"><atag1 path="Chil|d4/Child5" /></ctag3></ctag3>`
+            )
+        ).to.shallowDeepEqual({
+            dataContext: ["Root", "Child1", "Child2", "Child3"],
+            currentDataContext: { length: 6, ...["Root", "Child1", "Child2", "Child3", "Child4", "Child5"] },
+        });
+    }
+
+    @test
+    public testDataAttributeValueContextWithAbsolutePathInChild(): void {
+        expect(
+            this.getCursorContext(
+                `<ctag3 path="/Root/Child2"><ctag3 path="/Root/Child1/Child2/Child3"><atag1 path="Chil|d4/Child5" /></ctag3></ctag3>`
+            )
+        ).to.shallowDeepEqual({
+            dataContext: ["Root", "Child1", "Child2", "Child3"],
+            currentDataContext: { length: 6, ...["Root", "Child1", "Child2", "Child3", "Child4", "Child5"] },
         });
     }
 

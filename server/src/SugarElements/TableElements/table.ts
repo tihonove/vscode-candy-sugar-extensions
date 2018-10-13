@@ -8,6 +8,7 @@ export const table: SugarElementInfo = {
         type: AvailableChildrenType.List,
         list: ["row", "multiline"],
     },
+    createPathScope: true,
     attributes: [
         pathAttribute,
         {

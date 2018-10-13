@@ -1,3 +1,3 @@
 <component name="DependencyValidationManager">
-  <scope name="Code" pattern="(file[sugar-editor]:client//*||file[sugar-editor]:server//*||file[sugar-editor]:syntaxes//*||file[sugar-editor]:test//*||file:.editorconfig||file:.gitignore||file:.prettierrc.json||file:babel.config.js||file:package.json||file:tsconfig.base.json||file:tslint.json)&amp;&amp;!(file:**/yarn.lock||file:**/package-lock.json)||file:TODO.txt" />
+  <scope name="Code" pattern="(file[sugar-editor]:client//*||file[sugar-editor]:server//*||file[sugar-editor]:syntaxes//*||file[sugar-editor]:test//*||file[sugar-editor]:validator//*&amp;&amp;!file:validator//dist/**||file:.editorconfig||file:.gitignore||file:.prettierrc.json||file:babel.config.js||file:package.json||file:tsconfig.base.json||file:tslint.json)&amp;&amp;!(file:**/yarn.lock||file:**/package-lock.json)||file:TODO.txt" />
 </component>

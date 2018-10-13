@@ -2,10 +2,11 @@ import { suite, test } from "mocha-typescript";
 
 import { ValidAttributeRule } from "../../server/src/Validator/Rules/ValidAttributeRule";
 import { ValidElementRule } from "../../server/src/Validator/Rules/ValidElementRule";
+import { ValidPathRule } from "../../server/src/Validator/Rules/ValidPathRule";
 import { SugarValidator } from "../../server/src/Validator/Validator/SugarValidator";
 
 import { expect } from "./Utils/Expect";
-import { testSugarElementInfos } from "./Utils/TestInfos";
+import { testDataSchema, testSugarElementInfos } from "./Utils/TestInfos";
 
 @suite
 export class SugarValidatorTest {
@@ -47,6 +48,64 @@ export class SugarValidatorTest {
                 message: `Элемент atag1 не может имееть атрибута 'invalidAttr'`,
             },
         ]);
+    }
+
+    @test
+    public validPathRule(): void {
+        const validator = new SugarValidator();
+        validator.addRule(() => new ValidPathRule(testDataSchema, testSugarElementInfos));
+        expect(validator.validate(`<atag1 path="Root"/>`)).to.eql([]);
+    }
+
+    @test
+    public inValidPathRule(): void {
+        const validator = new SugarValidator();
+        validator.addRule(() => new ValidPathRule(testDataSchema, testSugarElementInfos));
+        expect(validator.validate(`<atag1 path="InvalidPath"/>`)).to.shallowDeepEqual([
+            {
+                position: {
+                    start: { offset: 12 },
+                    end: { offset: 25 },
+                },
+                message: `Элемент или атрибут 'InvalidPath' не найден в схеме данных`,
+            },
+        ]);
+    }
+
+    @test
+    public invalidPathWithScopedElement(): void {
+        const validator = new SugarValidator();
+        validator.addRule(() => new ValidPathRule(testDataSchema, testSugarElementInfos));
+        expect(validator.validate(`<atag1 path="Root"><atag1 path="Root"/></atag1>`)).to.shallowDeepEqual([
+            {
+                position: {
+                    start: { offset: 31 },
+                    end: { offset: 37 },
+                },
+                message: `Элемент или атрибут 'Root/Root' не найден в схеме данных`,
+            },
+        ]);
+    }
+
+    @test
+    public absolutePathWithScopedElement(): void {
+        const validator = new SugarValidator();
+        validator.addRule(() => new ValidPathRule(testDataSchema, testSugarElementInfos));
+        expect(validator.validate(`<atag1 path="Root"><atag1 path="/Root"/></atag1>`)).to.eql([]);
+    }
+
+    @test
+    public absolutePathWithScopedElementWithRoot(): void {
+        const validator = new SugarValidator();
+        validator.addRule(() => new ValidPathRule(testDataSchema, testSugarElementInfos));
+        expect(validator.validate(`<atag1 path="/Root/Children1"><btag2 path="Child1"/></atag1>`)).to.eql([]);
+    }
+
+    @test
+    public absolutePathWithScopedElementWithRoot_CaseTwo(): void {
+        const validator = new SugarValidator();
+        validator.addRule(() => new ValidPathRule(testDataSchema, testSugarElementInfos));
+        expect(validator.validate(`<atag1 path="/Root"><atag><atag1 path="Children1/Child1"/></atag1></atag>`)).to.eql([]);
     }
 
     @test

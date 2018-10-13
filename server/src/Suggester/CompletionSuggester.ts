@@ -125,12 +125,11 @@ export class CompletionSuggester {
         }
         let result: SuggestionItem[] = [];
         if (attribute.valueTypes.includes(AttributeType.Path)) {
-            const scopingPath = this.dataAttributeSuggester.getScopePathByContext(this.dataSchemaRoot, context);
-            const contextualRoot = this.dataAttributeSuggester.findCurrentRootByContext(this.dataSchemaRoot, context);
+            const scopingPath = this.dataAttributeSuggester.getScopePathByContext(context);
             result = result.concat(
                 this.dataAttributeSuggester.suggest(
                     scopingPath,
-                    valueOrDefault(contextualRoot, this.dataSchemaRoot),
+                    this.dataSchemaRoot,
                     valueOrDefault<string>(
                         context.attributeContext != undefined ? context.attributeContext.attributeValue : undefined,
                         ""

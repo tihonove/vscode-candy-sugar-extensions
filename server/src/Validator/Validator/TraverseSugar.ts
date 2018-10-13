@@ -8,6 +8,7 @@ import {
 
 export function traverseSugar(node: SugarSyntaxNode, visitor: ISugarDomVisitor): void {
     if (node.type === "Element") {
+        visitor.enterElement(node);
         visitor.visitElement(node);
         traverseSugar(node.name, visitor);
         for (const attribute of node.attributes || []) {
@@ -16,6 +17,7 @@ export function traverseSugar(node: SugarSyntaxNode, visitor: ISugarDomVisitor):
         for (const child of node.children) {
             traverseSugar(child, visitor);
         }
+        visitor.exitElement(node);
     } else if (node.type === "ElementName") {
         visitor.visitElementName(node);
     } else if (node.type === "Attribute") {
@@ -29,6 +31,8 @@ export function traverseSugar(node: SugarSyntaxNode, visitor: ISugarDomVisitor):
 }
 
 export interface ISugarDomVisitor {
+    enterElement(element: SugarElement): void;
+    exitElement(element: SugarElement): void;
     visitElementName(elementName: SugarElementName): void;
     visitAttribute(attribute: SugarAttribute): void;
     visitAttributeName(attributeName: SugarAttributeName): void;
@@ -49,6 +53,14 @@ export class EmptySugarDomVisitor implements ISugarDomVisitor {
     }
 
     public visitElementName(_elementName: SugarElementName): void {
+        // empty implementation
+    }
+
+    public enterElement(_element: SugarElement): void {
+        // empty implementation
+    }
+
+    public exitElement(_element: SugarElement): void {
         // empty implementation
     }
 }

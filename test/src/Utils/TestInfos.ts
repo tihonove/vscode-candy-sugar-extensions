@@ -30,6 +30,10 @@ export const testSugarElementInfos: SugarElementInfo[] = [
         createPathScope: false,
         attributes: [
             {
+                name: "path",
+                valueTypes: [AttributeType.Path],
+            },
+            {
                 name: "type",
                 valueTypes: [AttributeType.Type],
             },

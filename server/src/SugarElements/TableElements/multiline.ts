@@ -7,6 +7,7 @@ export const multiline: SugarElementInfo = {
     availableChildren: {
         type: AvailableChildrenType.Any,
     },
+    createPathScope: true,
     attributes: [
         pathAttribute,
         { name: "removebutton", valueTypes: [AttributeType.Boolean] },

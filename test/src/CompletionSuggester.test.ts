@@ -136,6 +136,32 @@ export class CompletionSuggesterTest {
     }
 
     @test
+    public "Непустой аттрибут path у первого открывающегося тэга. Абсолютный путь"(): void {
+        const fileSuggester = this.createTestCompletionSuggester();
+        const suggestions = fileSuggester.suggest('<atag1 path="/Root/');
+        expect(suggestions).to.shallowDeepEqual({
+            items: [
+                {
+                    name: "Children1",
+                    fullPath: ["Root", "Children1"],
+                },
+                {
+                    name: "Child2",
+                    fullPath: ["Root", "Child2"],
+                },
+                {
+                    name: "attr1",
+                    fullPath: ["Root", "attr1"],
+                },
+                {
+                    name: "attr2",
+                    fullPath: ["Root", "attr2"],
+                },
+            ],
+        });
+    }
+
+    @test
     public "Непустой аттрибут path у первого открывающегося тэга. Полный путь до элемента"(): void {
         const fileSuggester = this.createTestCompletionSuggester();
         const suggestions = fileSuggester.suggest('<atag1 path="Root"><ctag3 path="');
@@ -160,6 +186,50 @@ export class CompletionSuggesterTest {
                     type: SuggestionItemType.DataAttribute,
                     name: "attr2",
                     fullPath: ["Root", "attr2"],
+                },
+            ],
+        });
+    }
+
+    @test
+    public "Непустой аттрибут path у первого открывающегося тэга. Полный путь до элемента с абсолютным путём."(): void {
+        const fileSuggester = this.createTestCompletionSuggester();
+        const suggestions = fileSuggester.suggest('<atag1 path="/Root"><ctag3 path="');
+        expect(suggestions).to.shallowDeepEqual({
+            items: [
+                {
+                    name: "Children1",
+                },
+                {
+                    name: "Child2",
+                },
+                {
+                    name: "attr1",
+                },
+                {
+                    name: "attr2",
+                },
+            ],
+        });
+    }
+
+    @test
+    public "Непустой аттрибут path у первого открывающегося тэга. Полный путь до элемента с абсолютным путём. Перекрывает предыдуший скоуп."(): void {
+        const fileSuggester = this.createTestCompletionSuggester();
+        const suggestions = fileSuggester.suggest('<atag1 path="/Root/Child1"><atag1 path="/Root"><ctag3 path="');
+        expect(suggestions).to.shallowDeepEqual({
+            items: [
+                {
+                    name: "Children1",
+                },
+                {
+                    name: "Child2",
+                },
+                {
+                    name: "attr1",
+                },
+                {
+                    name: "attr2",
                 },
             ],
         });
