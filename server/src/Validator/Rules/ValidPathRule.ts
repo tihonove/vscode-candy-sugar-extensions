@@ -1,3 +1,4 @@
+import { DataPathUtils } from "../../DataSchema/DataPathUtils";
 import { DataSchemaElementNode } from "../../DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "../../DataSchema/DataSchemaUtils";
 import { SugarAttribute, SugarElement } from "../../SugarCodeDomBuilder/SugarGrammar/SugarParser";
@@ -54,8 +55,8 @@ export class ValidPathRule extends EmptySugarDomVisitor {
                 return;
             }
             const rawPathValue = attribute.value.value;
-            const pathValue = DataSchemaUtils.parseDataAttributeValue(rawPathValue);
-            const fullPath = DataSchemaUtils.joinDataPaths(
+            const pathValue = DataPathUtils.parseDataAttributeValue(rawPathValue);
+            const fullPath = DataPathUtils.joinDataPaths(
                 this.getCurrentPathScope(elementInfo.createPathScope ? 1 : 0),
                 pathValue
             );
@@ -76,7 +77,7 @@ export class ValidPathRule extends EmptySugarDomVisitor {
     private getCurrentPathScope(skipFromTail: number): string[] {
         return this.pathScopeStack
             .slice(0, skipFromTail === 0 ? undefined : -skipFromTail)
-            .reduce((x, y) => DataSchemaUtils.joinDataPaths(x, y), []);
+            .reduce((x, y) => DataPathUtils.joinDataPaths(x, y), []);
     }
 
     private getPathScope(element: SugarElement): undefined | string[] {
@@ -88,6 +89,6 @@ export class ValidPathRule extends EmptySugarDomVisitor {
         if (pathAttribute == undefined || pathAttribute.value == undefined) {
             return undefined;
         }
-        return DataSchemaUtils.parseDataAttributeValue(pathAttribute.value.value);
+        return DataPathUtils.parseDataAttributeValue(pathAttribute.value.value);
     }
 }

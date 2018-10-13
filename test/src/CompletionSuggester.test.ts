@@ -261,6 +261,58 @@ export class CompletionSuggesterTest {
         });
     }
 
+    @test
+    public "Непустой аттрибут path у тэга с суженным мутём к данным. Переход на верхний уровеь"(): void {
+        const fileSuggester = this.createTestCompletionSuggester();
+        const suggestions = fileSuggester.suggest('<atag1 path="Root/Child1/.."><ctag3 path="');
+        expect(suggestions).to.shallowDeepEqual({
+            items: [
+                {
+                    type: SuggestionItemType.DataElement,
+                    name: "Children1",
+                },
+                {
+                    type: SuggestionItemType.DataElement,
+                    name: "Child2",
+                },
+                {
+                    type: SuggestionItemType.DataAttribute,
+                    name: "attr1",
+                },
+                {
+                    type: SuggestionItemType.DataAttribute,
+                    name: "attr2",
+                },
+            ],
+        });
+    }
+
+    @test
+    public "Непустой аттрибут path у тэга с суженным мутём к данным. Переход на верхний уровеь в текущем элементе"(): void {
+        const fileSuggester = this.createTestCompletionSuggester();
+        const suggestions = fileSuggester.suggest('<atag1 path="Root/Child1"><ctag3 path="../');
+        expect(suggestions).to.shallowDeepEqual({
+            items: [
+                {
+                    type: SuggestionItemType.DataElement,
+                    name: "Children1",
+                },
+                {
+                    type: SuggestionItemType.DataElement,
+                    name: "Child2",
+                },
+                {
+                    type: SuggestionItemType.DataAttribute,
+                    name: "attr1",
+                },
+                {
+                    type: SuggestionItemType.DataAttribute,
+                    name: "attr2",
+                },
+            ],
+        });
+    }
+
     private createTestCompletionSuggester(): CompletionSuggester {
         return new CompletionSuggester(testSugarTypes, testSugarElementInfos, testDataSchema);
     }

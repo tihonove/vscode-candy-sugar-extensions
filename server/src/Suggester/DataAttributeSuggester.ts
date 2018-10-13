@@ -1,3 +1,4 @@
+import { DataPathUtils } from "../DataSchema/DataPathUtils";
 import { DataSchemaAttribute, DataSchemaElementNode } from "../DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "../DataSchema/DataSchemaUtils";
 import { isNotNullOrUndefined, valueOrDefault } from "../Utils/TypingUtils";
@@ -32,15 +33,15 @@ export class DataAttributeSuggester {
         for (const [elementInfo, elementContext] of elementInfosStack) {
             const scopingPath = this.getScopingPath(elementInfo, elementContext);
             if (scopingPath != undefined) {
-                result = DataSchemaUtils.joinDataPaths(result, DataSchemaUtils.parseDataAttributeValue(scopingPath));
+                result = DataPathUtils.joinDataPaths(result, DataPathUtils.parseDataAttributeValue(scopingPath));
             }
         }
         return result;
     }
 
     public suggest(scopedPath: string[], root: DataSchemaElementNode, dataPathToCursor: string): SuggestionItem[] {
-        const pathItems = DataSchemaUtils.parseDataAttributeValue(dataPathToCursor);
-        const itemsWithoutLastItem = DataSchemaUtils.joinDataPaths(scopedPath, pathItems.slice(0, -1));
+        const pathItems = DataPathUtils.parseDataAttributeValue(dataPathToCursor);
+        const itemsWithoutLastItem = DataPathUtils.joinDataPaths(scopedPath, pathItems.slice(0, -1));
         const element = this.findElementByPath(root, itemsWithoutLastItem);
         if (element == undefined) {
             return [];
@@ -49,16 +50,12 @@ export class DataAttributeSuggester {
             ...valueOrDefault<DataSchemaElementNode[]>(element.children, []).map<SuggestionItem>(x => ({
                 type: SuggestionItemType.DataElement,
                 name: x.name,
-                fullPath: DataSchemaUtils.normalizeDataPath(
-                    DataSchemaUtils.joinDataPaths(itemsWithoutLastItem, [x.name])
-                ),
+                fullPath: DataPathUtils.normalizeDataPath(DataPathUtils.joinDataPaths(itemsWithoutLastItem, [x.name])),
             })),
             ...valueOrDefault<DataSchemaAttribute[]>(element.attributes, []).map<SuggestionItem>(x => ({
                 type: SuggestionItemType.DataAttribute,
                 name: x.name,
-                fullPath: DataSchemaUtils.normalizeDataPath(
-                    DataSchemaUtils.joinDataPaths(itemsWithoutLastItem, [x.name])
-                ),
+                fullPath: DataPathUtils.normalizeDataPath(DataPathUtils.joinDataPaths(itemsWithoutLastItem, [x.name])),
             })),
         ];
     }

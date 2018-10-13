@@ -185,6 +185,36 @@ export class ContextAtCursorResolverTest {
     }
 
     @test
+    public "Дата-атрибуты с переходом на верхний уровень"(): void {
+        expect(
+            this.getCursorContext(
+                `<ctag3 path="Root/Child2"><ctag3 path="../Child1/Child2/Child3"><atag1 path="Chil|d4/Child5" /></ctag3></ctag3>`
+            )
+        ).to.shallowDeepEqual({
+            type: "DataAttributeValue",
+            currentElementInfo: {
+                name: "atag1",
+            },
+            dataContext: ["Root", "Child1", "Child2", "Child3"],
+            currentDataContext: { length: 6, ...["Root", "Child1", "Child2", "Child3", "Child4", "Child5"] },
+            elementStack: [
+                {
+                    type: "Element",
+                    name: { value: "ctag3" },
+                },
+                {
+                    type: "Element",
+                    name: { value: "ctag3" },
+                },
+                {
+                    type: "Element",
+                    name: { value: "atag1" },
+                },
+            ],
+        });
+    }
+
+    @test
     public testDataAttributeValueContextWithAbsolutePathInRoot(): void {
         expect(
             this.getCursorContext(
