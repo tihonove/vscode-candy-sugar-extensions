@@ -18,6 +18,8 @@ export const table: SugarElementInfo = {
         { name: "stickyHeader", valueTypes: [AttributeType.Boolean] },
         { name: "addbutton", valueTypes: [AttributeType.Boolean] },
         { name: "crossfit", valueTypes: [AttributeType.Boolean], optional: true },
+        { name: "sticky", valueTypes: [AttributeType.Boolean], optional: true },
+        { name: "side", valueTypes: [AttributeType.Number], optional: true },
         { name: "rowmenu", valueTypes: [AttributeType.Boolean], optional: true },
         { name: "removebutton", valueTypes: [AttributeType.Boolean] },
         { name: "usepager", valueTypes: [AttributeType.Boolean] },

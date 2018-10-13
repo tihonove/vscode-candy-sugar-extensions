@@ -1,4 +1,5 @@
 import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
+import { pathAttribute } from "../Commons/pathAttribute";
 
 export const row: SugarElementInfo = {
     name: "row",
@@ -6,21 +7,12 @@ export const row: SugarElementInfo = {
         type: AvailableChildrenType.List,
         list: ["column"],
     },
+    createPathScope: true,
     attributes: [
-        {
-            name: "kind",
-            valueTypes: [AttributeType.String],
-            optional: true,
-        },
-        {
-            name: "subkind",
-            valueTypes: [AttributeType.String],
-            optional: true,
-        },
-        {
-            name: "borderBottom",
-            valueTypes: [AttributeType.Boolean],
-            optional: true,
-        },
+        pathAttribute,
+        { name: "kind", valueTypes: [AttributeType.String], optional: true },
+        { name: "subkind", valueTypes: [AttributeType.String], optional: true },
+        { name: "borderBottom", valueTypes: [AttributeType.Boolean], optional: true },
+        { name: "optional", valueTypes: [AttributeType.Boolean], optional: true },
     ],
 };

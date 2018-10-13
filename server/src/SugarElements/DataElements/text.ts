@@ -22,5 +22,6 @@ export const text: SugarElementInfo = {
         { name: "line", valueTypes: [AttributeType.Boolean], optional: true },
         { name: "emptydescription", valueTypes: [AttributeType.String] },
         { name: "hint", valueTypes: [AttributeType.String], optional: true },
+        { name: "width", valueTypes: [AttributeType.Number], optional: true },
     ],
 };
