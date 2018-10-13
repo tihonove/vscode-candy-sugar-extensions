@@ -4,3 +4,4 @@ coverage
 out
 node_modules
 .vscode-test
+dist

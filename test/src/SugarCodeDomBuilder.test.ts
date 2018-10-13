@@ -6,6 +6,8 @@ import { SugarCodeDomBuilder } from "../../server/src/SugarCodeDomBuilder/SugarC
 
 import { expect } from "./Utils/Expect";
 
+const xmlPreamble = `<?xml version="1.0" encoding="utf-8"?>`;
+
 @suite
 export class SugarCodeDomBuilderTest {
     @test
@@ -130,11 +132,19 @@ export class SugarCodeDomBuilderTest {
         this.checkIsValidSyntax(` <a b="value-b" />`);
         this.checkIsValidSyntax(`<a><!-- comment --><b /></a>`);
         this.checkIsValidSyntax(`<a>aaa<!-- comment -->aaa<b />aaa</a>`);
+        this.checkIsValidSyntax(`   <!-- comment -->  <b />`);
+        this.checkIsValidSyntax(`${xmlPreamble}<!-- comment --><b />`);
     }
 
     @test
     public testNamesWithDashes(): void {
         this.checkIsValidSyntax(`<a-a b-b="value-b" />`);
+        this.checkIsValidSyntax(`<a_a b_b="value-b" />`);
+    }
+
+    @test
+    public testAttributeNamespaces(): void {
+        this.checkIsValidSyntax(`<a-a b:b="value-b" />`);
     }
 
     @test
@@ -156,6 +166,39 @@ export class SugarCodeDomBuilderTest {
     }
 
     @test
+    public testJavascriptObject(): void {
+        this.checkIsValidSyntax(`<a b={ { "a": 1, b: "2" } } />`);
+        this.checkIsValidSyntax(`<a b={ { "a": 1, b: "2", c: 1, "d": "2" } } />`);
+    }
+
+    @test
+    public testSingleQuotedString(): void {
+        this.checkIsValidSyntax(`<a b={ '\\'a' } />`);
+    }
+
+    @test
+    public testBooleanValue(): void {
+        this.checkIsValidSyntax(`<a b={ true } />`);
+        this.checkIsValidSyntax(`<a b={true} />`);
+    }
+
+    @test
+    public testNoSpaceAfterValue(): void {
+        this.checkIsValidSyntax(`<a b={ true }z="1" />`);
+        this.checkIsValidSyntax(`<a z="1"b={true} />`);
+    }
+
+    @test
+    public testSingleQuotedStringValue(): void {
+        this.checkIsValidSyntax(`<a b='1' />`);
+    }
+
+    @test
+    public testRussianTagName(): void {
+        this.checkIsValidSyntax(`<a b='1' />`);
+    }
+
+    @test
     public testPicklistSugarIsValid(): void {
         this.checkIsValidSyntax(`<picklist
             align="left"
@@ -169,6 +212,26 @@ export class SugarCodeDomBuilderTest {
             headers={ ["Код", "Доходность", "Вид предпринимательской деятельности", "Физические показатели"] }
             columnsWidth={ [50, 90, 280, 190] }
             type="kodvd" 
+        />`);
+    }
+
+    @test
+    public testTableColumnsIsValid(): void {
+        this.checkIsValidSyntax(`<table
+        visibilityPath="../Таблица"
+        crossfit="true"
+        rowmenu="true"
+        removebutton="false"
+        doNotCopyPaths="НомерПор"
+        columnGrouping={ [
+          {"start": "4", "end": "5", "text": ["Испр. с-ф", "040 и 050","pencil" ]},
+          {"start": "6", "end": "7", "text": ["Кор. с-ф", "060 и 070","pencil" ]},
+          {"start": "8", "end": "9", "text": ["Испр. кор. с-ф", "080 и 090","pencil" ]},
+          {"start": "15", "end": "16", "text": ["Посредник", "140","pencil" ]},
+          {"start": "17", "end": "18", "text": ["Номер тамож.декл.", "150","pencil" ]},
+          { start: 4, end: 11, showText: "Свернуть столбцы 040-110", hideText: "Столбцы 040-110" },
+          { start: 15, end: 19, showText: "Свернуть столбцы 140-160", hideText: "Столбцы 140-160"  }
+        ] }
         />`);
     }
 

@@ -1,6 +1,7 @@
 import { ISugarDomVisitor } from "../../Validator/TraverseSugar";
-import { ValidationItem } from "../../Validator/ValidationItem";
+import { ValidationItem } from "./ValidationItem";
 
 export interface ISugarValidatorRule extends ISugarDomVisitor {
+    readonly name: string;
     getValidations(): ValidationItem[];
 }

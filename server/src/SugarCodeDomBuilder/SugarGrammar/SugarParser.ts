@@ -6,7 +6,11 @@ import source from "./SugarParserSource";
 // tslint:disable-next-line no-eval no-unsafe-any
 const evalParse: (input: string, options: { tracer?: IPegJSTracer }) => SugarElement = eval(source).parse;
 
-export const parseSugar = evalParse;
+export function parseSugar(input: string, options: { tracer?: IPegJSTracer }): SugarElement {
+    // TODO придумать вальный способ убрать bom
+    const inputWithoutBom = input.replace(/^\uFEFF/, "");
+    return evalParse(inputWithoutBom, options);
+}
 
 export type SugarSyntaxNode =
     | SugarElement

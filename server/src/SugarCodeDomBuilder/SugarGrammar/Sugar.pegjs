@@ -1,6 +1,8 @@
-Document = _? element: Element _? {
+Document = XmlPreamble? (NonElementContent / _)* element: Element (NonElementContent / _)* {
     return element;
 }
+
+XmlPreamble = "<?xml" _ AttributeList? _? "?>"
 
 Element =
     "<" name: ElementName SpaceAfterElement? attributes: AttributeList? _?
@@ -71,7 +73,7 @@ Text = value: [^<]+ {
     };
 }
 
-ElementName = value:[a-zA-Z0-9-]+ {
+ElementName = value:[a-zA-Z0-9-_]+ {
     return {
         type: "ElementName",
         value: value.join(""),
@@ -79,7 +81,7 @@ ElementName = value:[a-zA-Z0-9-]+ {
     };
 }
 
-AttributeList = attribute: Attribute attributes: (_ Attribute)* {
+AttributeList = attribute: Attribute attributes: (_? Attribute)* {
     const list = [attribute].concat(attributes.map(x => x[1]));
     var result = [];
     for (var i = 0; i < list.length; i++) {
@@ -105,7 +107,7 @@ Attribute =
 
 EqualsAfterAttributeName = "{!{FAKE_NODE}!}"? "="
 
-AttributeName = value:[a-zA-Z0-9-]+ {
+AttributeName = value:[a-zA-Z0-9-:_]+ {
     return {
         type: "AttributeName",
         position: location(),
@@ -113,7 +115,7 @@ AttributeName = value:[a-zA-Z0-9-]+ {
     }
 }
 
-AttributeValue = AttributeStringValue / AttributeJavaScriptValue
+AttributeValue = AttributeStringValue / AttributeSingleQuotedStringValue / AttributeJavaScriptValue
 
 AttributeStringValue = "\"" value: AttributeValueContent AttributeValueClosingQuote {
     return {
@@ -123,13 +125,25 @@ AttributeStringValue = "\"" value: AttributeValueContent AttributeValueClosingQu
     }
 }
 
+AttributeSingleQuotedStringValue = "'" value: AttributeSingleQuotedValueContent "'" {
+    return {
+        type: "AttributeValue",
+        position: location(),
+        value: value,
+    }
+}
+
+AttributeSingleQuotedValueContent = value:[^']* {
+    return value.join("");
+}
+
 AttributeValueClosingQuote = "\"";
 
 AttributeValueContent = value:[^"]* {
     return value.join("");
 }
 
-AttributeJavaScriptValue = "{" _? value: JavaScriptValue _? "}" {
+AttributeJavaScriptValue = "{" _? value: JSValue _? "}" {
     return {
         type: "AttributeJavaScriptValue",
         position: location(),
@@ -139,12 +153,16 @@ AttributeJavaScriptValue = "{" _? value: JavaScriptValue _? "}" {
 
 // JAVASCRIPT VALUE
 
-JavaScriptValue = JSArray
+JSValue = JSNumber / JSString / JSArray / JSObjectLiteral / JSBooleanLiteral
+JSBooleanLiteral = "true" / "false"
 JSArray = "[" _? ( JSValue _? ("," _? JSValue _?)* )?  _? "]"
-JSValue = JSNumber / JSString / JSArray
 JSNumber = [0-9.]+
-JSString = "\"" JSDoubleQuotedStringContent "\""
+JSString = ("\"" JSDoubleQuotedStringContent "\"") / ("'" JSSingleQuotedStringContent "'")
 JSDoubleQuotedStringContent = ("\\\"" / [^"\n])*
+JSSingleQuotedStringContent = ("\\'" / [^'\n])*
+JSObjectLiteral = "{" _? JSObjectLiteralProperty? (_? "," _? JSObjectLiteralProperty)* _? ","? _? "}"
+JSObjectLiteralProperty = (JSString / JSPropertyName) _? ":" _? JSValue
+JSPropertyName = [a-zA-Z0-9-]+
 
 SpaceAfterElement = "{!{FAKE_NODE}!}"? _
 

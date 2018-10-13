@@ -11,7 +11,14 @@ import {
     TextDocumentPositionParams,
     TextDocuments,
 } from "vscode-languageserver";
-import { Definition, Hover, Range, TextDocumentChangeEvent } from "vscode-languageserver-types";
+import {
+    Definition,
+    DiagnosticSeverity,
+    Hover,
+    Range,
+    TextDocument,
+    TextDocumentChangeEvent,
+} from "vscode-languageserver-types";
 
 import { DataSchemaElementNode } from "./DataSchema/DataSchemaNode";
 import { ILogger, VsCodeServerLogger } from "./Logger/Logger";
@@ -23,6 +30,8 @@ import { allElements } from "./SugarElements/DefaultSugarElements";
 import { SuggestionItemType } from "./Suggester/CompletionSuggester";
 import { UriUtils } from "./UriUtils";
 import { isNotNullOrUndefined, valueOrDefault } from "./Utils/TypingUtils";
+import { SugarValidator } from "./Validator/Validator/SugarValidator";
+import { createDefaultValidator } from "./Validator/ValidatorFactory";
 
 export class SugarLanguageServer {
     private readonly connection: Connection;
@@ -31,6 +40,8 @@ export class SugarLanguageServer {
     private readonly schemaDocuments: { [uri: string]: string };
     private readonly parsedSchemaDocuments: { [uri: string]: DataSchemaElementNode };
     private readonly documentServices: { [uri: string]: SugarDocumentServices };
+    private readonly validator: SugarValidator;
+
     public constructor() {
         this.connection = createConnection(ProposedFeatures.all);
         this.logger = new VsCodeServerLogger(this.connection.console);
@@ -44,11 +55,25 @@ export class SugarLanguageServer {
         this.connection.onDefinition(this.handleResolveDefinition);
         this.connection.onCompletion(this.handleResolveCompletion);
         this.connection.onCompletionResolve(this.handleEnrichCompletionItem);
+        this.validator = createDefaultValidator();
     }
 
     public listen(): void {
         this.documents.listen(this.connection);
         this.connection.listen();
+    }
+
+    private async validateTextDocument(textDocument: TextDocument): Promise<void> {
+        const validationResults = this.validator.validate(textDocument.getText());
+        this.connection.sendDiagnostics({
+            uri: textDocument.uri,
+            diagnostics: validationResults.map(x => ({
+                message: x.message,
+                range: this.pegjsPositionToVsCodeRange(x.position),
+                severity: DiagnosticSeverity.Error,
+                source: "sugar-validator",
+            })),
+        });
     }
 
     private readonly handleInitialize = (_params: InitializeParams) => ({
@@ -93,6 +118,7 @@ export class SugarLanguageServer {
             );
         }
         this.documentServices[change.document.uri].sugarDocumentDom.processDocumentChange(change.document.getText());
+        this.validateTextDocument(change.document);
     };
 
     private getDocumentServices(uri: string): undefined | SugarDocumentServices {

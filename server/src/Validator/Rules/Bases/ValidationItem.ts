@@ -1,4 +1,4 @@
-import { CodePosition } from "../../../server/src/PegJSUtils/Types";
+import { CodePosition } from "../../../PegJSUtils/Types";
 
 export interface ValidationItem {
     position: CodePosition;

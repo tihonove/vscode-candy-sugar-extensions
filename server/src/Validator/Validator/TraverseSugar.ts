@@ -1,4 +1,4 @@
-import { SugarElementName, SugarSyntaxNode } from "../../../server/src/SugarCodeDomBuilder/SugarGrammar/SugarParser";
+import { SugarElementName, SugarSyntaxNode } from "../../SugarCodeDomBuilder/SugarGrammar/SugarParser";
 
 export function traverseSugar(node: SugarSyntaxNode, visitor: ISugarDomVisitor): void {
     if (node.type === "Element") {

@@ -1,4 +1,6 @@
-Document = (NonElementContent / _)? Element (NonElementContent / _)?
+Document = XmlPreamble? (NonElementContent / _)* Element (NonElementContent / _)*
+
+XmlPreamble = "<?xml" _ AttributeList? _? "?>"
 
 Element =
     "<" ElementName SpaceAfterElement? AttributeList? _?
@@ -20,18 +22,18 @@ Comment = "<!--" (!"-->" .)* "-->"
 
 Text = [^<]+
 
-ElementName = value:[a-zA-Z0-9-]+ {
+ElementName = value:[a-zA-Z0-9-_]+ {
     return value.join("");
 }
 
-AttributeList = Attribute (_ Attribute)*
+AttributeList = Attribute (_? Attribute)*
 
 Attribute =
     AttributeName (EqualsAfterAttributeName AttributeValue)?
 
 EqualsAfterAttributeName = "{!{FAKE_NODE}!}"? "="
 
-AttributeName = value:[a-zA-Z0-9-]+ {
+AttributeName = value:[a-zA-Z0-9-:_]+ {
     return value.join("");
 }
 
@@ -45,16 +47,20 @@ AttributeValueContent = value:[^"]* {
     return value.join("");
 }
 
-AttributeJavaScriptValue = "{" _? value: JavaScriptValue _? "}"
+AttributeJavaScriptValue = "{" _? value: JSValue _? "}"
 
 // JAVASCRIPT VALUE
 
-JavaScriptValue = JSArray
+JSValue = JSNumber / JSString / JSArray / JSObjectLiteral / JSBooleanLiteral
+JSBooleanLiteral = "true" / "false"
 JSArray = "[" _? ( JSValue _? ("," _? JSValue _?)* )?  _? "]"
-JSValue = JSNumber / JSString / JSArray
 JSNumber = [0-9.]+
-JSString = "\"" JSDoubleQuotedStringContent "\""
+JSString = ("\"" JSDoubleQuotedStringContent "\"") / ("'" JSSingleQuotedStringContent "'")
 JSDoubleQuotedStringContent = ("\\\"" / [^"\n])*
+JSSingleQuotedStringContent = ("\\'" / [^'\n])*
+JSObjectLiteral = "{" _? JSObjectLiteralProperty (_? "," _? JSObjectLiteralProperty)* _? ","? _? "}"
+JSObjectLiteralProperty = (JSString / JSPropertyName) _? ":" _? JSValue
+JSPropertyName = [a-zA-Z0-9-]+
 
 
 SpaceAfterElement = "{!{FAKE_NODE}!}"? _
