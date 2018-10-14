@@ -4,7 +4,8 @@ import { CompletionItemDescriptionResolver } from "./CompletionItemDescriptionRe
 import { DataSchemaElementNode, DataSchemaNode } from "./DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "./DataSchema/DataSchemaUtils";
 import { ILogger } from "./Logger/Logger";
-import { ContextAtCursorResolver, CursorContext } from "./SugarCodeDomBuilder/ContextAtCursorResolver";
+import { CodeContext } from "./SugarCodeDomBuilder/CodeContext";
+import { CodeContextByNodeResolver } from "./SugarCodeDomBuilder/CodeContextByNodeResolver";
 import { PositionToNodeMap, SugarCodeDomBuilder } from "./SugarCodeDomBuilder/SugarCodeDomBuilder";
 import { allElements } from "./SugarElements/DefaultSugarElements";
 import { CompletionSuggester } from "./Suggester/CompletionSuggester";
@@ -61,12 +62,16 @@ class SugarDocumentDom {
         return this.schemaFileUri;
     }
 
-    public resolveContextAsOffset(offset: number): undefined | CursorContext {
+    public resolveContextAsOffset(offset: number): undefined | CodeContext {
         if (this.map == undefined) {
             return undefined;
         }
-        const contextAtCursorResolver = new ContextAtCursorResolver(this.sugarElements);
-        return contextAtCursorResolver.resolveContext(this.map, offset);
+        const contextAtCursorResolver = new CodeContextByNodeResolver(this.sugarElements);
+        const node = this.map.getNodeByOffset(offset);
+        if (node == undefined) {
+            return undefined;
+        }
+        return contextAtCursorResolver.resolveContext(node);
     }
 
     private updateDom(text: string): void {

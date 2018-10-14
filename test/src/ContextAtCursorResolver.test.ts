@@ -1,6 +1,7 @@
 import { suite, test } from "mocha-typescript";
 
-import { ContextAtCursorResolver, CursorContext } from "../../server/src/SugarCodeDomBuilder/ContextAtCursorResolver";
+import { CodeContext } from "../../server/src/SugarCodeDomBuilder/CodeContext";
+import { CodeContextByNodeResolver } from "../../server/src/SugarCodeDomBuilder/CodeContextByNodeResolver";
 import { SugarCodeDomBuilder } from "../../server/src/SugarCodeDomBuilder/SugarCodeDomBuilder";
 import { SugarElementInfo } from "../../server/src/Suggester/SugarElementInfo";
 
@@ -266,12 +267,16 @@ export class ContextAtCursorResolverTest {
         });
     }
 
-    private getCursorContext(inputWithCursor: string, sugarElements?: SugarElementInfo[]): undefined | CursorContext {
+    private getCursorContext(inputWithCursor: string, sugarElements?: SugarElementInfo[]): undefined | CodeContext {
         const cursorOffset = inputWithCursor.indexOf("|");
         const input = inputWithCursor.replace("|", "");
-        const contextAtCursorResolver = new ContextAtCursorResolver(sugarElements || testSugarElementInfos);
+        const contextAtCursorResolver = new CodeContextByNodeResolver(sugarElements || testSugarElementInfos);
         const codeDomBuilder = new SugarCodeDomBuilder();
         const positionToNodeMap = codeDomBuilder.buildPositionToNodeMap(input);
-        return contextAtCursorResolver.resolveContext(positionToNodeMap, cursorOffset);
+        const node = positionToNodeMap.getNodeByOffset(cursorOffset);
+        if (node == undefined) {
+            return undefined;
+        }
+        return contextAtCursorResolver.resolveContext(node);
     }
 }

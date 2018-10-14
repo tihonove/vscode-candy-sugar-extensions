@@ -1,48 +1,18 @@
 import { DataPathUtils } from "../DataSchema/DataPathUtils";
-import { SugarAttributeInfo, SugarElementInfo } from "../Suggester/SugarElementInfo";
+import { SugarElementInfo } from "../Suggester/SugarElementInfo";
 
-import { PositionToNodeMap } from "./SugarCodeDomBuilder";
-import { SugarAttributeName, SugarAttributeValue, SugarElement, SugarElementName } from "./SugarGrammar/SugarParser";
+import { CodeContext } from "./CodeContext";
+import { NodeWithDefinition } from "./SugarCodeDomBuilder";
+import { SugarElement } from "./SugarGrammar/SugarParser";
 
-export interface ElementCursorContext {
-    type: "ElementName";
-    contextNode: SugarElementName;
-    currentElementInfo?: SugarElementInfo;
-    elementStack: SugarElement[];
-    dataContext: string[];
-}
-
-interface AttributeNameCursorContext {
-    type: "AttributeName";
-    contextNode: SugarAttributeName;
-    currentElementInfo?: SugarElementInfo;
-    currentAttributeInfo?: SugarAttributeInfo;
-    elementStack: SugarElement[];
-    dataContext: string[];
-}
-
-export type CursorContext =
-    | ElementCursorContext
-    | AttributeNameCursorContext
-    | {
-          type: "DataAttributeValue";
-          contextNode: SugarAttributeValue;
-          currentElementInfo?: SugarElementInfo;
-          currentAttributeInfo?: SugarAttributeInfo;
-          currentDataContext?: string[];
-          elementStack: SugarElement[];
-          dataContext: string[];
-      };
-
-export class ContextAtCursorResolver {
+export class CodeContextByNodeResolver {
     private readonly sugarElementInfos: SugarElementInfo[];
 
     public constructor(sugarElementInfos: SugarElementInfo[]) {
         this.sugarElementInfos = sugarElementInfos;
     }
 
-    public resolveContext(positionToNodeMap: PositionToNodeMap, cursorOffset: number): undefined | CursorContext {
-        const node = positionToNodeMap.getNodeByOffset(cursorOffset);
+    public resolveContext(node: NodeWithDefinition): undefined | CodeContext {
         if (node == undefined) {
             return undefined;
         }

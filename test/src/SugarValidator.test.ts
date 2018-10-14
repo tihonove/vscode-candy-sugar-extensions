@@ -99,7 +99,8 @@ export class SugarValidatorTest {
                     start: { offset: 19 },
                     end: { offset: 25 },
                 },
-                message: "Значение атрибута 'aaa1' не может быть преобразовано к допустимым типам (boolean).",
+                message:
+                    "Значение 'aaa1' атрибута number-attr не может быть преобразовано к допустимым типам (boolean).",
             },
         ]);
     }

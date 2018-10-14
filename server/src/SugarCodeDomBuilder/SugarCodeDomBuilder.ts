@@ -9,7 +9,7 @@ import {
     SugarSyntaxNode,
 } from "./SugarGrammar/SugarParser";
 
-type NodeWithDefinition = SugarElementName | SugarAttributeName | SugarAttributeValue;
+export type NodeWithDefinition = SugarElementName | SugarAttributeName | SugarAttributeValue;
 
 export class SugarCodeDomBuilder {
     public buildPositionToNodeMap(input: string): PositionToNodeMap {

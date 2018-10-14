@@ -11,7 +11,7 @@ export enum AttributeType {
     JavaScriptLiteral = "JavaScriptLiteral",
     Enum = "Enum",
     Color = "Color",
-    PathList = "PathList"
+    PathList = "PathList",
 }
 
 export enum AvailableChildrenType {

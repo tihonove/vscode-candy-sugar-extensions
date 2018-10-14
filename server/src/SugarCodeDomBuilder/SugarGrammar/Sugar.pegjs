@@ -97,6 +97,7 @@ Attribute =
         name: name,
         position: location(),
         value: value && value[1],
+        x: 1,
     }
     result.name.parent = result;
     if (result.value != undefined) {
@@ -125,7 +126,7 @@ AttributeStringValue = "\"" value: AttributeValueContent AttributeValueClosingQu
     }
 }
 
-AttributeSingleQuotedStringValue = "'" value: AttributeSingleQuotedValueContent "'" {
+AttributeSingleQuotedStringValue = "'" value: AttributeSingleQuotedValueContent AttributeValueSingleClosingQuote {
     return {
         type: "AttributeValue",
         position: location(),
@@ -138,6 +139,7 @@ AttributeSingleQuotedValueContent = value:[^']* {
 }
 
 AttributeValueClosingQuote = "\"";
+AttributeValueSingleClosingQuote = "'";
 
 AttributeValueContent = value:[^"]* {
     return value.join("");

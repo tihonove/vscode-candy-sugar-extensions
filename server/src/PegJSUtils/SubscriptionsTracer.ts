@@ -3,7 +3,7 @@ import { CodePosition, IPegJSTracer, RuleAction, TraceContext } from "./Types";
 export type RuleHandler<TResult> = (result: TResult, location: CodePosition, action: RuleAction) => void;
 
 export class SubscriptionsTracer implements IPegJSTracer {
-    private readonly handlers: {
+    private handlers: {
         [ruleName: string]: undefined | { [value in RuleAction]?: RuleHandler<any> };
     } = {};
 
@@ -14,6 +14,10 @@ export class SubscriptionsTracer implements IPegJSTracer {
             this.handlers[ruleName] = handlerMap;
         }
         handlerMap[action] = handler;
+    }
+
+    protected unregisterAllHandlers(): void {
+        this.handlers = {};
     }
 
     public trace(context: TraceContext): void {

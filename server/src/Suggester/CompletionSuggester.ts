@@ -1,10 +1,11 @@
 import { DataSchemaElementNode } from "../DataSchema/DataSchemaNode";
-import { valueOrDefault } from "../Utils/TypingUtils";
+import { CodeContext } from "../SugarCodeDomBuilder/CodeContext";
+import { CodeContextByNodeResolver } from "../SugarCodeDomBuilder/CodeContextByNodeResolver";
 
 import { CompletionContext, getCompletionContext } from "./CompletionClassificator/CompletionClassificator";
 import { ExpectedTokenType } from "./CompletionClassificator/ExpectedTokenType";
 import { DataAttributeSuggester } from "./DataAttributeSuggester";
-import { AttributeType, SugarAttributeInfo, SugarElementInfo } from "./SugarElementInfo";
+import { SugarElementInfo } from "./SugarElementInfo";
 import { SugarTypeInfo } from "./SugarTypeInfo";
 
 export interface Suggestions {
@@ -45,6 +46,7 @@ export class CompletionSuggester {
     private readonly sugarTypes: SugarTypeInfo[];
     private readonly dataSchemaRoot: DataSchemaElementNode;
     private readonly dataAttributeSuggester: DataAttributeSuggester;
+    private readonly contextResolver: CodeContextByNodeResolver;
 
     public constructor(
         sugarTypes: SugarTypeInfo[],
@@ -54,16 +56,25 @@ export class CompletionSuggester {
         this.sugarTypes = sugarTypes;
         this.sugarElementInfos = sugarElementInfos;
         this.dataSchemaRoot = dataSchemaRoot;
-        this.dataAttributeSuggester = new DataAttributeSuggester(sugarElementInfos);
+        this.dataAttributeSuggester = new DataAttributeSuggester();
+        this.contextResolver = new CodeContextByNodeResolver(this.sugarElementInfos);
     }
 
     public suggest(codeBeforeCursor: string): Suggestions {
-        const context = getCompletionContext(codeBeforeCursor);
         const emptyResult: Suggestions = { items: [] };
-        if (context == undefined) {
+        const completionContext = getCompletionContext(codeBeforeCursor);
+        if (completionContext == undefined) {
             return emptyResult;
         }
-        if (context.expectedToken === ExpectedTokenType.ElementName) {
+        const codeContext = this.contextResolver.resolveContext(completionContext.node);
+        if (codeContext == undefined) {
+            return emptyResult;
+        }
+
+        if (completionContext == undefined) {
+            return emptyResult;
+        }
+        if (completionContext.expectedToken === ExpectedTokenType.ElementName) {
             return {
                 items: this.sugarElementInfos.map<SuggestionItem>(x => ({
                     type: SuggestionItemType.Element,
@@ -71,8 +82,8 @@ export class CompletionSuggester {
                 })),
             };
         }
-        if (context.expectedToken === ExpectedTokenType.AttributeName) {
-            const currentElementInfo = this.getElementInfoByContext(context);
+        if (completionContext.expectedToken === ExpectedTokenType.AttributeName) {
+            const currentElementInfo = codeContext.currentElementInfo;
             if (currentElementInfo == undefined || currentElementInfo.attributes == undefined) {
                 return emptyResult;
             }
@@ -84,59 +95,46 @@ export class CompletionSuggester {
                 })),
             };
         }
-        if (context.expectedToken === ExpectedTokenType.AttributeValueContent) {
+        if (completionContext.expectedToken === ExpectedTokenType.AttributeValueContent) {
             return {
-                items: this.suggestAttributeValue(context),
+                items: this.suggestAttributeValue(completionContext, codeContext),
             };
         }
         return emptyResult;
     }
 
-    private getElementInfoByContext(context: CompletionContext): undefined | SugarElementInfo {
-        const elementContext = context.elementContext;
-        if (elementContext == undefined) {
-            return undefined;
-        }
-        return this.sugarElementInfos.find(x => x.name === elementContext.elementName);
-    }
-
-    private getAttributeInfoByContext(
-        context: CompletionContext
-    ): [undefined, undefined] | [SugarElementInfo, SugarAttributeInfo] {
-        const element = this.getElementInfoByContext(context);
-        if (element == undefined || element.attributes == undefined) {
-            return [undefined, undefined];
-        }
-        const attributeContext = context.attributeContext;
-        if (attributeContext == undefined) {
-            return [undefined, undefined];
-        }
-        const attribute = element.attributes.find(x => x.name === attributeContext.attributeName);
-        if (attribute == undefined) {
-            return [undefined, undefined];
-        }
-        return [element, attribute];
-    }
-
-    private suggestAttributeValue(context: CompletionContext): SuggestionItem[] {
-        const [element, attribute] = this.getAttributeInfoByContext(context);
-        if (element == undefined || attribute == undefined || context.attributeContext == undefined) {
+    private suggestAttributeValue(completionContext: CompletionContext, codeContext: CodeContext): SuggestionItem[] {
+        if (codeContext === undefined) {
             return [];
         }
-        let result: SuggestionItem[] = [];
-        if (attribute.valueTypes.includes(AttributeType.Path)) {
-            const scopingPath = this.dataAttributeSuggester.getScopePathByContext(context);
-            result = result.concat(
-                this.dataAttributeSuggester.suggest(
-                    scopingPath,
-                    this.dataSchemaRoot,
-                    valueOrDefault<string>(
-                        context.attributeContext != undefined ? context.attributeContext.attributeValue : undefined,
-                        ""
-                    )
-                )
+        if (
+            codeContext.type === "DataAttributeValue" &&
+            completionContext.expectedToken === ExpectedTokenType.AttributeValueContent
+        ) {
+            return this.dataAttributeSuggester.suggest(
+                codeContext.dataContext,
+                this.dataSchemaRoot,
+                completionContext.node.value
             );
         }
-        return result;
+        return [];
+
+        // let result: SuggestionItem[] = [];
+        // if (attribute.valueTypes.includes(AttributeType.Path)) {
+        //     const scopingPath = this.dataAttributeSuggester.getScopePathByContext(completionContext);
+        //     result = result.concat(
+        //         this.dataAttributeSuggester.suggest(
+        //             scopingPath,
+        //             this.dataSchemaRoot,
+        //             valueOrDefault<string>(
+        //                 completionContext.attributeContext != undefined
+        //                     ? completionContext.attributeContext.attributeValue
+        //                     : undefined,
+        //                 ""
+        //             )
+        //         )
+        //     );
+        // }
+        // return result;
     }
 }
