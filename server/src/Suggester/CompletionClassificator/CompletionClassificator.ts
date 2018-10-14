@@ -70,7 +70,10 @@ class ElementContextTracer extends SubscriptionsTracer {
                 topElement.attributes[topElement.attributes.length - 1].attributeName = context.result;
             }
         }
-        if (context.type === "rule.match" && context.rule === "AttributeValueContent") {
+        if (
+            (context.type === "rule.match" && context.rule === "AttributeValueContent") ||
+            context.rule === "AttributeSingleQuotedValueContent"
+        ) {
             const topElement = this.peekElement();
             if (topElement != undefined && topElement.attributes != undefined && topElement.attributes.length > 0) {
                 // tslint:disable-next-line no-unsafe-any
@@ -118,6 +121,7 @@ export function getCompletionContext(input: string): undefined | CompletionConte
             "EqualsAfterAttributeName",
             "AttributeValue",
             "AttributeValueClosingQuote",
+            "AttributeValueSingleClosingQuote",
         ],
         input.length
     );
@@ -164,7 +168,10 @@ export function getCompletionContext(input: string): undefined | CompletionConte
                 elementContextStack: tracer.getElementStackSnapshot(),
             };
         }
-        if (tracer.failedRule === "AttributeValueClosingQuote") {
+        if (
+            tracer.failedRule === "AttributeValueClosingQuote" ||
+            tracer.failedRule === "AttributeValueSingleClosingQuote"
+        ) {
             const attribute = tracer.peekAttribute();
             if (attribute != undefined && attribute.attributeValue != undefined) {
                 return {

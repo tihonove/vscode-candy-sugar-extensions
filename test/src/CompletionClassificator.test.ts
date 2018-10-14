@@ -127,6 +127,28 @@ export class CompletionClassificatorTest {
     }
 
     @test
+    public testCompleteAttributeValueContentInsideSingleQuotedString(): void {
+        const completionContext = getCompletionContext('<aaa attr="');
+        this.assertCompletionContext(
+            completionContext,
+            ExpectedTokenType.AttributeValueContent,
+            {
+                elementName: "aaa",
+                attributes: [
+                    {
+                        attributeName: "attr",
+                        attributeValue: "",
+                    },
+                ],
+            },
+            {
+                attributeName: "attr",
+                attributeValue: "",
+            }
+        );
+    }
+
+    @test
     public testCompleteAttributeValueContentWithNotEmptyContent(): void {
         const completionContext = getCompletionContext('<aaa attr="cont');
         this.assertCompletionContext(
@@ -151,6 +173,28 @@ export class CompletionClassificatorTest {
     @test
     public testGetElementStack(): void {
         const completionContext = getCompletionContext('<aaa attr="content" attr2');
+        expect(completionContext != undefined).to.eql(true);
+        if (completionContext != undefined) {
+            expect(completionContext.elementContextStack).to.shallowDeepEqual([
+                {
+                    elementName: "aaa",
+                    attributes: [
+                        {
+                            attributeName: "attr",
+                            attributeValue: "content",
+                        },
+                        {
+                            attributeName: "attr2",
+                        },
+                    ],
+                },
+            ]);
+        }
+    }
+
+    @test
+    public testGetElementStackWithSingleQuotedString(): void {
+        const completionContext = getCompletionContext("<aaa attr='content' attr2");
         expect(completionContext != undefined).to.eql(true);
         if (completionContext != undefined) {
             expect(completionContext.elementContextStack).to.shallowDeepEqual([

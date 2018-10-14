@@ -37,11 +37,24 @@ AttributeName = value:[a-zA-Z0-9-:_]+ {
     return value.join("");
 }
 
-AttributeValue = AttributeStringValue / AttributeJavaScriptValue
+AttributeValue = AttributeStringValue / AttributeSingleQuotedStringValue / AttributeJavaScriptValue
+
+AttributeSingleQuotedStringValue = "'" value: AttributeSingleQuotedValueContent AttributeValueSingleClosingQuote {
+    return {
+        type: "AttributeValue",
+        position: location(),
+        value: value,
+    }
+}
+
+AttributeSingleQuotedValueContent = value:[^']* {
+    return value.join("");
+}
 
 AttributeStringValue = "\"" AttributeValueContent AttributeValueClosingQuote
 
 AttributeValueClosingQuote = "\"";
+AttributeValueSingleClosingQuote = "'";
 
 AttributeValueContent = value:[^"]* {
     return value.join("");
