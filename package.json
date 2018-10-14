@@ -1,25 +1,31 @@
 {
 	"name": "vscode-candy-sugar",
-	"description": "Editor extensions for Candy.Sugar",
-	"author": "tihonove",
+	"displayName": "Candy.Sugar - IntelliSense for sugar.xml",
+    "description": "VSCode extensions for Candy.Sugar",
+    "author": "tihonove",
 	"license": "MIT",
 	"version": "0.1.0",
+    "icon": "icon.png",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/tihonove/vscode-candy-sugar-extensions"
 	},
+    "bugs": {
+        "url": "https://github.com/tihonove/vscode-candy-sugar-extensions/issues"
+    },
 	"engines": {
 		"vscode": "^1.23.0"
 	},
 	"publisher": "tihonove",
-	"categories": [],
+	"categories": [
+        "Programming Languages"
+    ],
 	"keywords": [
 		"SKBKontur",
 		"vscode",
 		"candy.sugar",
 		"candy",
-		"extension",
-		"vscode-extension"
+		"extension"
 	],
 	"activationEvents": [
 		"onLanguage:sugar-xml"
