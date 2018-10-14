@@ -1,10 +1,10 @@
 import { suite, test } from "mocha-typescript";
 import { CompletionItem } from "vscode-languageserver-types";
 
-import { CompletionItemDescriptionResolver } from "../../server/src/CompletionItemDescriptionResolver";
 import { DataSchemaElementNode } from "../../server/src/DataSchema/DataSchemaNode";
-import { CompletionSuggester } from "../../server/src/Suggester/CompletionSuggester";
-import { AttributeType, AvailableChildrenType } from "../../server/src/Suggester/SugarElementInfo";
+import { CompletionItemDescriptionResolver } from "../../server/src/LanguageServer/CompletionItemDescriptionResolver";
+import { CompletionSuggester } from "../../server/src/SugarAnalyzing/CompletionSuggester";
+import { AttributeType, AvailableChildrenType } from "../../server/src/SugarElements/SugarElementInfo";
 
 import { expect } from "./Utils/Expect";
 

@@ -3,7 +3,7 @@ import * as glob from "glob";
 import * as path from "path";
 
 import { DataSchemaElementNode } from "../../server/src/DataSchema/DataSchemaNode";
-import { SchemaRngConverter } from "../../server/src/SchemaParser/SchemaRngConverter";
+import { SchemaRngConverter } from "../../server/src/DataSchema/DataSchemaParser/SchemaRngConverter";
 import { createDefaultValidator } from "../../server/src/Validator/ValidatorFactory";
 
 import { runCommandLineApp } from "./CommandLineUtils/CommandLineRunner";

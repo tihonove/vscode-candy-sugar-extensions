@@ -2,7 +2,7 @@ import fs from "fs";
 import { suite, test } from "mocha-typescript";
 import path from "path";
 
-import { SugarCodeDomBuilder } from "../../server/src/SugarCodeDomBuilder/SugarCodeDomBuilder";
+import { OffsetToNodeMapBuilder } from "../../server/src/SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
 
 import { expect } from "./Utils/Expect";
 
@@ -12,15 +12,15 @@ const xmlPreamble = `<?xml version="1.0" encoding="utf-8"?>`;
 export class SugarCodeDomBuilderTest {
     @test
     public testNoElementAtPosition(): void {
-        const codeDomBuilder = new SugarCodeDomBuilder();
-        const positionToNodeMap = codeDomBuilder.buildPositionToNodeMap(`<a b="value-b" />`);
+        const codeDomBuilder = new OffsetToNodeMapBuilder();
+        const positionToNodeMap = codeDomBuilder.buildOffsetToNodeMap(`<a b="value-b" />`);
         expect(positionToNodeMap.getNodeByOffset(0)).to.eql(undefined);
     }
 
     @test
     public testElementParentAtPosition(): void {
-        const codeDomBuilder = new SugarCodeDomBuilder();
-        const positionToNodeMap = codeDomBuilder.buildPositionToNodeMap(`<o><a b="value-b" /></o>`);
+        const codeDomBuilder = new OffsetToNodeMapBuilder();
+        const positionToNodeMap = codeDomBuilder.buildOffsetToNodeMap(`<o><a b="value-b" /></o>`);
         expect(positionToNodeMap.getNodeByOffset(4)).to.shallowDeepEqual({
             type: "ElementName",
             value: "a",
@@ -38,8 +38,8 @@ export class SugarCodeDomBuilderTest {
 
     @test
     public testElementNameAtPosition(): void {
-        const codeDomBuilder = new SugarCodeDomBuilder();
-        const positionToNodeMap = codeDomBuilder.buildPositionToNodeMap(`<a b="value-b" />`);
+        const codeDomBuilder = new OffsetToNodeMapBuilder();
+        const positionToNodeMap = codeDomBuilder.buildOffsetToNodeMap(`<a b="value-b" />`);
         const elementName = positionToNodeMap.getNodeByOffset(1);
         expect(elementName != undefined).to.eql(true);
         if (elementName != undefined) {
@@ -52,8 +52,8 @@ export class SugarCodeDomBuilderTest {
 
     @test
     public testElementNameParentAtPosition(): void {
-        const codeDomBuilder = new SugarCodeDomBuilder();
-        const positionToNodeMap = codeDomBuilder.buildPositionToNodeMap(`<a b="value-b" />`);
+        const codeDomBuilder = new OffsetToNodeMapBuilder();
+        const positionToNodeMap = codeDomBuilder.buildOffsetToNodeMap(`<a b="value-b" />`);
         const elementName = positionToNodeMap.getNodeByOffset(1);
         expect(elementName != undefined).to.eql(true);
         if (elementName != undefined) {
@@ -69,8 +69,8 @@ export class SugarCodeDomBuilderTest {
 
     @test
     public testAttributeNameAtPosition(): void {
-        const codeDomBuilder = new SugarCodeDomBuilder();
-        const positionToNodeMap = codeDomBuilder.buildPositionToNodeMap(`<a ab="value-b" />`);
+        const codeDomBuilder = new OffsetToNodeMapBuilder();
+        const positionToNodeMap = codeDomBuilder.buildOffsetToNodeMap(`<a ab="value-b" />`);
         const elementName = positionToNodeMap.getNodeByOffset(3);
         expect(elementName != undefined).to.eql(true);
         if (elementName != undefined) {
@@ -92,8 +92,8 @@ export class SugarCodeDomBuilderTest {
 
     @test
     public testAttributeValueAtPosition(): void {
-        const codeDomBuilder = new SugarCodeDomBuilder();
-        const positionToNodeMap = codeDomBuilder.buildPositionToNodeMap(`<a ab="value-b" />`);
+        const codeDomBuilder = new OffsetToNodeMapBuilder();
+        const positionToNodeMap = codeDomBuilder.buildOffsetToNodeMap(`<a ab="value-b" />`);
         const elementName = positionToNodeMap.getNodeByOffset(7);
         expect(elementName != undefined).to.eql(true);
         if (elementName != undefined) {
@@ -115,8 +115,8 @@ export class SugarCodeDomBuilderTest {
 
     @test
     public testParseRealSugar(): void {
-        const codeDomBuilder = new SugarCodeDomBuilder();
-        const positionToNodeMap = codeDomBuilder.buildPositionToNodeMap(
+        const codeDomBuilder = new OffsetToNodeMapBuilder();
+        const positionToNodeMap = codeDomBuilder.buildOffsetToNodeMap(
             fs.readFileSync(path.join(__dirname, "RealData", "104812.sugar.xml"), "utf8")
         );
         expect(positionToNodeMap != undefined).to.eql(true);
@@ -236,7 +236,7 @@ export class SugarCodeDomBuilderTest {
     }
 
     private checkIsValidSyntax(input: string): void {
-        const codeDomBuilder = new SugarCodeDomBuilder();
-        codeDomBuilder.buildPositionToNodeMap(input);
+        const codeDomBuilder = new OffsetToNodeMapBuilder();
+        codeDomBuilder.buildOffsetToNodeMap(input);
     }
 }

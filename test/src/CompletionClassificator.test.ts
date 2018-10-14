@@ -1,7 +1,7 @@
 import { suite, test } from "mocha-typescript";
 
-import { getCompletionContext } from "../../server/src/Suggester/CompletionClassificator/CompletionClassificator";
-import { ExpectedTokenType } from "../../server/src/Suggester/CompletionClassificator/ExpectedTokenType";
+import { getCompletionContext } from "../../server/src/SugarParsing/CompletionClassificator/CompletionClassificator";
+import { ExpectedTokenType } from "../../server/src/SugarParsing/CompletionClassificator/ExpectedTokenType";
 
 import { expect } from "./Utils/Expect";
 

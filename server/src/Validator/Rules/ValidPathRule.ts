@@ -1,8 +1,8 @@
 import { DataPathUtils } from "../../DataSchema/DataPathUtils";
 import { DataSchemaElementNode } from "../../DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "../../DataSchema/DataSchemaUtils";
-import { SugarAttribute, SugarElement } from "../../SugarCodeDomBuilder/SugarGrammar/SugarParser";
-import { AttributeType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
+import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
+import { SugarAttribute, SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
 import { EmptySugarDomVisitor } from "../Validator/TraverseSugar";
 
 import { ValidationItem } from "./Bases/ValidationItem";

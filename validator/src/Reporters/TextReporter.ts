@@ -1,4 +1,5 @@
 import { ValidationReportItem } from "../../../server/src/Validator/Validator/SugarValidator";
+
 import { IReporter } from "./IReporter";
 
 export class TextReporter implements IReporter {

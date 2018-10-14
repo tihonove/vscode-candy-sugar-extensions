@@ -1,6 +1,10 @@
 import { DataSchemaElementNode } from "../../../server/src/DataSchema/DataSchemaNode";
-import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../../../server/src/Suggester/SugarElementInfo";
-import { SugarTypeInfo } from "../../../server/src/Suggester/SugarTypeInfo";
+import {
+    AttributeType,
+    AvailableChildrenType,
+    SugarElementInfo,
+} from "../../../server/src/SugarElements/SugarElementInfo";
+import { SugarTypeInfo } from "../../../server/src/SugarElements/SugarTypeInfo";
 
 export const testSugarTypes: SugarTypeInfo[] = [
     {

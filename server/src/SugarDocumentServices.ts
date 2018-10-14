@@ -1,15 +1,16 @@
 import * as _ from "lodash";
 
-import { CompletionItemDescriptionResolver } from "./CompletionItemDescriptionResolver";
 import { DataSchemaElementNode, DataSchemaNode } from "./DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "./DataSchema/DataSchemaUtils";
-import { ILogger } from "./Logger/Logger";
-import { CodeContext } from "./SugarCodeDomBuilder/CodeContext";
-import { CodeContextByNodeResolver } from "./SugarCodeDomBuilder/CodeContextByNodeResolver";
-import { PositionToNodeMap, SugarCodeDomBuilder } from "./SugarCodeDomBuilder/SugarCodeDomBuilder";
-import { allElements } from "./SugarElements/DefaultSugarElements";
-import { CompletionSuggester } from "./Suggester/CompletionSuggester";
-import { SugarElementInfo } from "./Suggester/SugarElementInfo";
+import { CompletionItemDescriptionResolver } from "./LanguageServer/CompletionItemDescriptionResolver";
+import { ILogger } from "./LanguageServer/Logger";
+import { CodeContext } from "./SugarAnalyzing/CodeContext";
+import { CodeContextByNodeResolver } from "./SugarAnalyzing/CodeContextByNodeResolver";
+import { CompletionSuggester } from "./SugarAnalyzing/CompletionSuggester";
+import { OffsetToNodeMap } from "./SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMap";
+import { OffsetToNodeMapBuilder } from "./SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
+import { allElements } from "./SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
+import { SugarElementInfo } from "./SugarElements/SugarElementInfo";
 
 export class SugarDocumentServices {
     public suggester: CompletionSuggester;
@@ -31,8 +32,8 @@ export class SugarDocumentServices {
 class SugarDocumentDom {
     private readonly logger: ILogger;
     private readonly updateDomDebounced = _.debounce((text: string) => this.updateDom(text), 50, { trailing: true });
-    private readonly builder: SugarCodeDomBuilder;
-    public map?: PositionToNodeMap;
+    private readonly builder: OffsetToNodeMapBuilder;
+    public map?: OffsetToNodeMap;
     private readonly sugarElements: SugarElementInfo[];
     private readonly dataSchemaRootNode: DataSchemaElementNode;
     private readonly schemaFileUri: string;
@@ -45,7 +46,7 @@ class SugarDocumentDom {
     ) {
         this.schemaFileUri = schemaFileUri;
         this.logger = logger;
-        this.builder = new SugarCodeDomBuilder();
+        this.builder = new OffsetToNodeMapBuilder();
         this.sugarElements = sugarElements;
         this.dataSchemaRootNode = dataSchemaRootNode;
     }
@@ -77,7 +78,7 @@ class SugarDocumentDom {
     private updateDom(text: string): void {
         this.logger.info("Begin update");
         try {
-            this.map = this.builder.buildPositionToNodeMap(text);
+            this.map = this.builder.buildOffsetToNodeMap(text);
         } catch (ignoreError) {
             // По всей вимдости код невалиден. Просто оставим последний валидный map
         }

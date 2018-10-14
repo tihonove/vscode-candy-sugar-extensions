@@ -1,9 +1,9 @@
 import { suite, test } from "mocha-typescript";
 
-import { CodeContext } from "../../server/src/SugarCodeDomBuilder/CodeContext";
-import { CodeContextByNodeResolver } from "../../server/src/SugarCodeDomBuilder/CodeContextByNodeResolver";
-import { SugarCodeDomBuilder } from "../../server/src/SugarCodeDomBuilder/SugarCodeDomBuilder";
-import { SugarElementInfo } from "../../server/src/Suggester/SugarElementInfo";
+import { CodeContext } from "../../server/src/SugarAnalyzing/CodeContext";
+import { CodeContextByNodeResolver } from "../../server/src/SugarAnalyzing/CodeContextByNodeResolver";
+import { OffsetToNodeMapBuilder } from "../../server/src/SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
+import { SugarElementInfo } from "../../server/src/SugarElements/SugarElementInfo";
 
 import { expect } from "./Utils/Expect";
 import { testSugarElementInfos } from "./Utils/TestInfos";
@@ -271,8 +271,8 @@ export class ContextAtCursorResolverTest {
         const cursorOffset = inputWithCursor.indexOf("|");
         const input = inputWithCursor.replace("|", "");
         const contextAtCursorResolver = new CodeContextByNodeResolver(sugarElements || testSugarElementInfos);
-        const codeDomBuilder = new SugarCodeDomBuilder();
-        const positionToNodeMap = codeDomBuilder.buildPositionToNodeMap(input);
+        const codeDomBuilder = new OffsetToNodeMapBuilder();
+        const positionToNodeMap = codeDomBuilder.buildOffsetToNodeMap(input);
         const node = positionToNodeMap.getNodeByOffset(cursorOffset);
         if (node == undefined) {
             return undefined;

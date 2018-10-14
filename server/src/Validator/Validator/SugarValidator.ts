@@ -1,5 +1,5 @@
-import { NullTracer } from "../../PegJSUtils/NullTracer";
-import { parseSugar, SugarElement } from "../../SugarCodeDomBuilder/SugarGrammar/SugarParser";
+import { parseSugar, SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
+import { NullTracer } from "../../Utils/PegJSUtils/NullTracer";
 import { ISugarValidatorRule } from "../Rules/Bases/ISugarValidatorRule";
 import { ValidationItem } from "../Rules/Bases/ValidationItem";
 

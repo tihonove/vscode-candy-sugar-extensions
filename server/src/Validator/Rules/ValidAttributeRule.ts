@@ -1,5 +1,5 @@
-import { SugarAttributeName } from "../../SugarCodeDomBuilder/SugarGrammar/SugarParser";
-import { SugarElementInfo } from "../../Suggester/SugarElementInfo";
+import { SugarElementInfo } from "../../SugarElements/SugarElementInfo";
+import { SugarAttributeName } from "../../SugarParsing/SugarGrammar/SugarParser";
 import { EmptySugarDomVisitor } from "../Validator/TraverseSugar";
 
 import { ValidationItem } from "./Bases/ValidationItem";

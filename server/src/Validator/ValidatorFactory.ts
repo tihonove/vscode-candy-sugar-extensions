@@ -1,5 +1,5 @@
 import { DataSchemaElementNode } from "../DataSchema/DataSchemaNode";
-import { allElements } from "../SugarElements/DefaultSugarElements";
+import { allElements } from "../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
 
 import { RequiredAttributesRule } from "./Rules/RequiredAttributesRule";
 import { ValidAttributeRule } from "./Rules/ValidAttributeRule";
