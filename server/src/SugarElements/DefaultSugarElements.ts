@@ -1,8 +1,5 @@
 import { SugarElementInfo } from "../Suggester/SugarElementInfo";
 
-import { choice } from "./ChoiceElements/choice";
-import { otherwise } from "./ChoiceElements/otherwise";
-import { when } from "./ChoiceElements/when";
 import { build } from "./ContentElements/build";
 import { content } from "./ContentElements/content";
 import { deyt } from "./ContentElements/deyt";
@@ -52,7 +49,10 @@ import { togs } from "./ContentElements/togs";
 import { typl } from "./ContentElements/typl";
 import { vid } from "./ContentElements/vid";
 import { year } from "./ContentElements/year";
+import { choice } from "./ControlFlowElements/choice";
 import { elseElement, ifElement, then } from "./ControlFlowElements/if";
+import { otherwise } from "./ControlFlowElements/otherwise";
+import { when } from "./ControlFlowElements/when";
 import { attachments } from "./DataElements/attachments";
 import { checkbox } from "./DataElements/checkbox";
 import { combobox } from "./DataElements/combobox";
