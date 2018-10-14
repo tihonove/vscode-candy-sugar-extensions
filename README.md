@@ -12,7 +12,7 @@
 Также можно использовать консоль vscode:
 
 ```
-ext install prettier-vscode
+ext install vscode-candy-sugar
 ```
 
 ## Список функциональности
