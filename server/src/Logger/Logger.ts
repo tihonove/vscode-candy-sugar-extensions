@@ -6,12 +6,16 @@ export interface ILogger {
 
 export class VsCodeServerLogger implements ILogger {
     private readonly remoteConsole: RemoteConsole;
+    private readonly showLogs: boolean;
 
     public constructor(remoteConsole: RemoteConsole) {
         this.remoteConsole = remoteConsole;
+        this.showLogs = false;
     }
 
     public info(message: string): void {
-        this.remoteConsole.log(message);
+        if (this.showLogs) {
+            this.remoteConsole.log(message);
+        }
     }
 }
