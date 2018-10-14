@@ -19,6 +19,27 @@ export const testSugarElementInfos: SugarElementInfo[] = [
             {
                 name: "path",
                 valueTypes: [AttributeType.Path],
+                optional: true,
+            },
+            {
+                name: "optional-attr",
+                valueTypes: [AttributeType.String],
+                optional: true,
+            },
+            {
+                name: "required-attr",
+                valueTypes: [AttributeType.Number],
+                optional: false,
+            },
+            {
+                name: "number-attr",
+                valueTypes: [AttributeType.Boolean],
+                optional: false,
+            },
+            {
+                name: "boolean-attr",
+                valueTypes: [AttributeType.Boolean],
+                optional: false,
             },
         ],
         availableChildren: {

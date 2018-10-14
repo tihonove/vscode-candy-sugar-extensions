@@ -1,6 +1,7 @@
 import { MarkupContent, MarkupKind } from "vscode-languageserver-types";
 
 import { DataSchemaAttribute, DataSchemaElementNode } from "./DataSchema/DataSchemaNode";
+import { AttributeTypeUtils } from "./Suggester/AttributeTypeUtils";
 import { AttributeType, SugarAttributeInfo, SugarElementInfo } from "./Suggester/SugarElementInfo";
 import { isNotNullOrUndefined } from "./Utils/TypingUtils";
 
@@ -88,25 +89,6 @@ export class MarkdownUtils {
     }
 
     public static valueTypeToString(attributeType: AttributeType): string {
-        switch (attributeType) {
-            case AttributeType.Boolean:
-                return "boolean";
-                break;
-            case AttributeType.Number:
-                return "number";
-                break;
-            case AttributeType.Path:
-                return "DataPath";
-                break;
-            case AttributeType.String:
-                return "string";
-                break;
-            case AttributeType.Type:
-                return "Type";
-                break;
-            default:
-                return "any";
-                break;
-        }
+        return AttributeTypeUtils.valueTypeToString(attributeType);
     }
 }

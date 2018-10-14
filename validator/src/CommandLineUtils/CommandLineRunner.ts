@@ -6,13 +6,13 @@ export async function runCommandLineApp(entryPoint: () => void | Promise<void>):
         await entryPoint();
     } catch (error) {
         if (error instanceof CommandLineArgError) {
-            console.log(error.message);
-            console.log(error.commandLineUsage);
+            console.error(error.message);
+            console.error(error.commandLineUsage);
         } else if (error instanceof Error) {
-            console.log("Fatal error");
-            console.log(error.message);
+            console.error("Fatal error");
+            console.error(error.message);
         } else {
-            console.log(error);
+            console.error(error);
         }
     }
 }

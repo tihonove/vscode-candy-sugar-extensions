@@ -19,7 +19,7 @@ export const table: SugarElementInfo = {
         { name: "align", valueTypes: [AttributeType.Enum], optional: true },
         { name: "width", valueTypes: [AttributeType.Number] },
         { name: "stickyHeader", valueTypes: [AttributeType.Boolean] },
-        { name: "addbutton", valueTypes: [AttributeType.Boolean] },
+        { name: "addbutton", valueTypes: [AttributeType.Boolean, AttributeType.String] },
         { name: "crossfit", valueTypes: [AttributeType.Boolean], optional: true },
         { name: "sticky", valueTypes: [AttributeType.Boolean], optional: true },
         { name: "side", valueTypes: [AttributeType.Number], optional: true },

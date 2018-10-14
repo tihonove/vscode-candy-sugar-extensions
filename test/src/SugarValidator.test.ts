@@ -1,6 +1,8 @@
 import { suite, test } from "mocha-typescript";
 
+import { RequiredAttributesRule } from "../../server/src/Validator/Rules/RequiredAttributesRule";
 import { ValidAttributeRule } from "../../server/src/Validator/Rules/ValidAttributeRule";
+import { ValidAttributeValueType } from "../../server/src/Validator/Rules/ValidAttributeValueType";
 import { ValidElementRule } from "../../server/src/Validator/Rules/ValidElementRule";
 import { ValidPathRule } from "../../server/src/Validator/Rules/ValidPathRule";
 import { SugarValidator } from "../../server/src/Validator/Validator/SugarValidator";
@@ -68,6 +70,36 @@ export class SugarValidatorTest {
                     end: { offset: 25 },
                 },
                 message: `Элемент или атрибут 'InvalidPath' не найден в схеме данных`,
+            },
+        ]);
+    }
+
+    @test
+    public requiredAttributesRule(): void {
+        const validator = new SugarValidator();
+        validator.addRule(() => new RequiredAttributesRule(testSugarElementInfos));
+        expect(validator.validate(`<atag1 />`)).to.shallowDeepEqual([
+            {
+                position: {
+                    start: { offset: 0 },
+                    end: { offset: 9 },
+                },
+                message: "Элемент atag1 должен содержать обязательный атрибут 'required-attr'",
+            },
+        ]);
+    }
+
+    @test
+    public attributeValueTypeRule(): void {
+        const validator = new SugarValidator();
+        validator.addRule(() => new ValidAttributeValueType(testSugarElementInfos));
+        expect(validator.validate(`<atag1 number-attr="aaa1" />`)).to.shallowDeepEqual([
+            {
+                position: {
+                    start: { offset: 19 },
+                    end: { offset: 25 },
+                },
+                message: "Значение атрибута 'aaa1' не может быть преобразовано к допустимым типам (boolean).",
             },
         ]);
     }

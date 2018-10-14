@@ -12,7 +12,7 @@ export const textarea: SugarElementInfo = {
         visibilityPathAttribute,
         visibilityPathValueAttribute,
         { name: "autoResize", valueTypes: [AttributeType.Boolean], optional: true },
-        { name: "resize", valueTypes: [AttributeType.Boolean], optional: true },
+        { name: "resize", valueTypes: [AttributeType.Enum], optional: true },
         { name: "width", valueTypes: [AttributeType.Number], optional: true },
         { name: "optional", valueTypes: [AttributeType.Boolean], optional: true },
         { name: "placeholder", valueTypes: [AttributeType.String], optional: true },
