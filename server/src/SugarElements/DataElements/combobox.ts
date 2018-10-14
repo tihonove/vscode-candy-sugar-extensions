@@ -25,7 +25,7 @@ export const combobox: SugarElementInfo = {
         { name: "optional", valueTypes: [AttributeType.Boolean] },
         { name: "width", valueTypes: [AttributeType.Number], optional: true },
         { name: "title", valueTypes: [AttributeType.String], optional: true },
-        { name: "gPath", valueTypes: [AttributeType.Path], optional: true },
+        { name: "gPath", valueTypes: [AttributeType.String], optional: true },
         { name: "disabled", valueTypes: [AttributeType.Boolean], optional: true },
         { name: "rngAttribute", valueTypes: [AttributeType.Boolean], optional: true },
         { name: "openbutton", valueTypes: [AttributeType.Boolean], optional: true },

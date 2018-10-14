@@ -1,9 +1,9 @@
-import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../Suggester/SugarElementInfo";
+import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
 
-import { pathAttribute } from "./Commons/pathAttribute";
-import { typeAttribute } from "./Commons/typeAttribute";
-import { fetchFnAttribute } from "./Commons/fetchFnAttribute";
-import { visibilityPathAttribute } from "./Commons/visibilityPathAttribute";
+import { fetchFnAttribute } from "../Commons/fetchFnAttribute";
+import { pathAttribute } from "../Commons/pathAttribute";
+import { typeAttribute } from "../Commons/typeAttribute";
+import { visibilityPathAttribute } from "../Commons/visibilityPathAttribute";
 
 export const digest: SugarElementInfo = {
     name: "digest",

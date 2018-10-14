@@ -1,6 +1,6 @@
-import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../Suggester/SugarElementInfo";
+import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
 
-import { visibilityPathAttribute } from "./Commons/visibilityPathAttribute";
+import { visibilityPathAttribute } from "../Commons/visibilityPathAttribute";
 
 export const help: SugarElementInfo = {
     name: "help",

@@ -4,7 +4,7 @@ import {
     invisibilityPathAttribute,
     invisibilityPathValuettribute,
     visibilityPathAttribute,
-    visibilityPathValueAttribute
+    visibilityPathValueAttribute,
 } from "../Commons/visibilityPathAttribute";
 
 export const linetext: SugarElementInfo = {

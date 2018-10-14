@@ -1,9 +1,9 @@
 // Data
 import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
-import { pathAttribute } from "../Commons/pathAttribute";
-import { visibilityPathAttribute } from "../Commons/visibilityPathAttribute";
-import { typeAttribute } from "../Commons/typeAttribute";
 import { fetchFnAttribute } from "../Commons/fetchFnAttribute";
+import { pathAttribute } from "../Commons/pathAttribute";
+import { typeAttribute } from "../Commons/typeAttribute";
+import { visibilityPathAttribute } from "../Commons/visibilityPathAttribute";
 
 export const select: SugarElementInfo = {
     name: "select",

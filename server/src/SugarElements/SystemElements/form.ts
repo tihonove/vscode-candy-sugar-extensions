@@ -1,4 +1,4 @@
-import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../Suggester/SugarElementInfo";
+import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
 
 export const form: SugarElementInfo = {
     name: "form",

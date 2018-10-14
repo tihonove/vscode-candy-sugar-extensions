@@ -1,8 +1,8 @@
 import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
 
+import { fetchFnAttribute } from "../Commons/fetchFnAttribute";
 import { pathAttribute } from "../Commons/pathAttribute";
 import { typeAttribute } from "../Commons/typeAttribute";
-import { fetchFnAttribute } from "../Commons/fetchFnAttribute";
 
 export const date: SugarElementInfo = {
     name: "date",

@@ -1,42 +1,67 @@
-import {
-    AttributeType,
-    AvailableChildrenType,
-    SugarAttributeInfo,
-    SugarElementInfo,
-} from "../Suggester/SugarElementInfo";
+import { SugarElementInfo } from "../Suggester/SugarElementInfo";
 
-import { attachments } from "./attachments";
-import { digest } from "./digest";
-import { form } from "./form";
-import { help } from "./help";
-import { icon } from "./icon";
-import { normativehelp } from "./normativehelp";
-import { sugar } from "./sugar";
 import { choice } from "./ChoiceElements/choice";
 import { otherwise } from "./ChoiceElements/otherwise";
 import { when } from "./ChoiceElements/when";
-import { pathAttribute } from "./Commons/pathAttribute";
+import { build } from "./ContentElements/build";
 import { content } from "./ContentElements/content";
 import { deyt } from "./ContentElements/deyt";
 import { document_cretaion_date } from "./ContentElements/document_cretaion_date";
 import { email } from "./ContentElements/email";
+import { e_mail } from "./ContentElements/e_mail";
+import { inv } from "./ContentElements/inv";
+import { kat } from "./ContentElements/kat";
+import { katpos } from "./ContentElements/katpos";
+import { kokpo } from "./ContentElements/kokpo";
 import { kpp } from "./ContentElements/kpp";
 import { leader_fio } from "./ContentElements/leader_fio";
 import { local } from "./ContentElements/local";
+import { mail } from "./ContentElements/mail";
+import { mal_vb_j } from "./ContentElements/mal_vb_j";
+import { mest } from "./ContentElements/mest";
+import { min_okpo1 } from "./ContentElements/min_okpo1";
 import { name } from "./ContentElements/name";
+import { nom } from "./ContentElements/nom";
+import { okato } from "./ContentElements/okato";
+import { okcm } from "./ContentElements/okcm";
+import { okfs } from "./ContentElements/okfs";
+import { okogu } from "./ContentElements/okogu";
 import { okpo } from "./ContentElements/okpo";
+import { okpo1t } from "./ContentElements/okpo1t";
+import { okpo_2 } from "./ContentElements/okpo_2";
+import { oktmo } from "./ContentElements/oktmo";
+import { okved } from "./ContentElements/okved";
+import { okved_out } from "./ContentElements/okved_out";
+import { org_adress } from "./ContentElements/org_adress";
+import { org_type } from "./ContentElements/org_type";
+import { perfedzelpr } from "./ContentElements/perfedzelpr";
 import { period } from "./ContentElements/period";
 import { phone } from "./ContentElements/phone";
+import { pos } from "./ContentElements/pos";
+import { prd } from "./ContentElements/prd";
+import { prsek } from "./ContentElements/prsek";
 import { responsible_fio } from "./ContentElements/responsible_fio";
 import { responsible_post } from "./ContentElements/responsible_post";
+import { sd } from "./ContentElements/sd";
+import { sekdel } from "./ContentElements/sekdel";
+import { sektor } from "./ContentElements/sektor";
+import { sred } from "./ContentElements/sred";
+import { stroyka } from "./ContentElements/stroyka";
+import { struk } from "./ContentElements/struk";
 import { togs } from "./ContentElements/togs";
+import { typl } from "./ContentElements/typl";
+import { vid } from "./ContentElements/vid";
 import { year } from "./ContentElements/year";
+import { elseElement, ifElement, then } from "./ControlFlowElements/if";
+import { attachments } from "./DataElements/attachments";
 import { checkbox } from "./DataElements/checkbox";
 import { combobox } from "./DataElements/combobox";
 import { date } from "./DataElements/date";
 import { diadocSuggestComboBox } from "./DataElements/diadocSuggestComboBox";
+import { digest } from "./DataElements/digest";
 import { fileloader } from "./DataElements/fileloader";
 import { fio } from "./DataElements/fio";
+import { highlight } from "./DataElements/highlight";
 import { inn } from "./DataElements/inn";
 import { input } from "./DataElements/input";
 import { kladr } from "./DataElements/kladr";
@@ -49,21 +74,41 @@ import { select } from "./DataElements/select";
 import { text } from "./DataElements/text";
 import { textarea } from "./DataElements/textarea";
 import { gridCol, gridRow } from "./GridElements/grid";
+import { Checkbox, Column, Row } from "./InvalidElementCaseWorkaround";
 import { block } from "./LayoutElement/block";
+import { bold } from "./LayoutElement/bold";
+import { br } from "./LayoutElement/br";
 import { caption } from "./LayoutElement/caption";
 import { entity } from "./LayoutElement/entity";
 import { gray } from "./LayoutElement/gray";
 import { header } from "./LayoutElement/header";
+import { help } from "./LayoutElement/help";
 import { hr } from "./LayoutElement/hr";
+import { icon } from "./LayoutElement/icon";
+import { italic } from "./LayoutElement/italic";
 import { linetext } from "./LayoutElement/linetext";
+import { strong } from "./LayoutElement/strong";
+import { sub } from "./LayoutElement/sub";
+import { subheader } from "./LayoutElement/subheader";
+import { sup } from "./LayoutElement/sup";
 import { warning } from "./LayoutElement/warning";
 import { item } from "./ListElements/item";
 import { list } from "./ListElements/list";
-import { elseElement, ifElement, then } from "./StrangeElements/if";
+import { infoip } from "./StrangeElements/infoip";
+import { infoorg } from "./StrangeElements/infoorg";
+import { sign } from "./StrangeElements/sign";
+import { form } from "./SystemElements/form";
+import { normativehelp } from "./SystemElements/normativehelp";
+import { sugar } from "./SystemElements/sugar";
 import { column } from "./TableElements/column";
 import { multiline } from "./TableElements/multiline";
 import { row } from "./TableElements/row";
 import { table } from "./TableElements/table";
+import { addRowButton } from "./TourElements/addRowButton";
+import { enterEvent } from "./TourElements/enterEvent";
+import { startTour } from "./TourElements/startTour";
+import { totalAmount } from "./TourElements/totalAmount";
+import { tour } from "./TourElements/tour";
 import { customValidation } from "./TypeDefinitionElements/customValidation";
 import { digestCheck } from "./TypeDefinitionElements/digestCheck";
 import { enumeration } from "./TypeDefinitionElements/enumeration";
@@ -78,254 +123,7 @@ import { pattern } from "./TypeDefinitionElements/pattern";
 import { totalDigits } from "./TypeDefinitionElements/totalDigits";
 import { typeElement } from "./TypeDefinitionElements/type";
 import { types } from "./TypeDefinitionElements/types";
-
-// Just elements
-const force: SugarElementInfo = { name: "force", availableChildren: { type: AvailableChildrenType.Any } };
-const ferm_vb_j: SugarElementInfo = { name: "ferm_vb_j", availableChildren: { type: AvailableChildrenType.Any } };
-const address: SugarElementInfo = { name: "address", availableChildren: { type: AvailableChildrenType.Any } };
-const corrnumber: SugarElementInfo = { name: "corrnumber", availableChildren: { type: AvailableChildrenType.Any } };
-const cross: SugarElementInfo = { name: "cross", availableChildren: { type: AvailableChildrenType.Any } };
-const ifns: SugarElementInfo = { name: "ifns", availableChildren: { type: AvailableChildrenType.Any } };
-const reorganization: SugarElementInfo = {
-    name: "reorganization",
-    availableChildren: { type: AvailableChildrenType.Any },
-};
-const signer: SugarElementInfo = { name: "signer", availableChildren: { type: AvailableChildrenType.Any } };
-
-// buggy =============================================================
-const Row: SugarElementInfo = { ...row, name: "Row" };
-const Column: SugarElementInfo = { ...column, name: "Column" };
-const Checkbox: SugarElementInfo = { ...checkbox, name: "Checkbox" };
-
-// Tour options =============================================================
-const tour: SugarElementInfo = { name: "tour", availableChildren: { type: AvailableChildrenType.Any } };
-const startTour: SugarElementInfo = { name: "startTour", availableChildren: { type: AvailableChildrenType.Any } };
-const addRowButton: SugarElementInfo = { name: "addRowButton", availableChildren: { type: AvailableChildrenType.Any } };
-const enterEvent: SugarElementInfo = { name: "enterEvent", availableChildren: { type: AvailableChildrenType.Any } };
-const totalAmount: SugarElementInfo = { name: "totalAmount", availableChildren: { type: AvailableChildrenType.Any } };
-
-// Lyaout =============================================================
-const italic: SugarElementInfo = { name: "italic", availableChildren: { type: AvailableChildrenType.Any } };
-const bold: SugarElementInfo = { name: "bold", availableChildren: { type: AvailableChildrenType.Any } };
-const br: SugarElementInfo = { name: "br", availableChildren: { type: AvailableChildrenType.NoChildren } };
-const sub: SugarElementInfo = { name: "sub", availableChildren: { type: AvailableChildrenType.Any } };
-const strong: SugarElementInfo = { name: "strong", availableChildren: { type: AvailableChildrenType.Any } };
-const subheader: SugarElementInfo = { name: "subheader", availableChildren: { type: AvailableChildrenType.Any } };
-const sup: SugarElementInfo = { name: "sup", availableChildren: { type: AvailableChildrenType.Any } };
-
-// Strange mans =============================================================
-const infoip: SugarElementInfo = {
-    name: "infoip",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: [{ name: "include", valueTypes: [AttributeType.Enum] }],
-};
-
-const infoorg: SugarElementInfo = {
-    name: "infoorg",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: [{ name: "include", valueTypes: [AttributeType.Enum] }],
-};
-
-const sign: SugarElementInfo = {
-    name: "sign",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: [{ name: "include", valueTypes: [AttributeType.Enum] }],
-};
-
-// content =============================================================
-const commonContentAttributes: SugarAttributeInfo[] = [
-    { name: "caption", valueTypes: [AttributeType.String], optional: true },
-    { name: "gId", valueTypes: [AttributeType.PicklistId], optional: true },
-];
-
-const okfs: SugarElementInfo = {
-    name: "okfs",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-
-const kat: SugarElementInfo = {
-    name: "kat",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-
-const build: SugarElementInfo = {
-    name: "build",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-
-const okved: SugarElementInfo = {
-    name: "okved",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const e_mail: SugarElementInfo = {
-    name: "e_mail",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const inv: SugarElementInfo = {
-    name: "inv",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const katpos: SugarElementInfo = {
-    name: "katpos",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const kokpo: SugarElementInfo = {
-    name: "kokpo",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const mal_vb_j: SugarElementInfo = {
-    name: "mal_vb_j",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const mest: SugarElementInfo = {
-    name: "mest",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const min_okpo1: SugarElementInfo = {
-    name: "min_okpo1",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const nom: SugarElementInfo = {
-    name: "nom",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const okato: SugarElementInfo = {
-    name: "okato",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const okcm: SugarElementInfo = {
-    name: "okcm",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: [...commonContentAttributes, { name: "name", valueTypes: [AttributeType.String] }],
-};
-const okogu: SugarElementInfo = {
-    name: "okogu",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const okpo_2: SugarElementInfo = {
-    name: "okpo_2",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const okpo1t: SugarElementInfo = {
-    name: "okpo1t",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const oktmo: SugarElementInfo = {
-    name: "oktmo",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const okved_out: SugarElementInfo = {
-    name: "okved_out",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const org_adress: SugarElementInfo = {
-    name: "org_adress",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const org_type: SugarElementInfo = {
-    name: "org_type",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const perfedzelpr: SugarElementInfo = {
-    name: "perfedzelpr",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const pos: SugarElementInfo = {
-    name: "pos",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const prd: SugarElementInfo = {
-    name: "prd",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: [
-        ...commonContentAttributes,
-        { name: "defaultValue", valueTypes: [AttributeType.String], optional: true },
-    ],
-};
-const prsek: SugarElementInfo = {
-    name: "prsek",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const sd: SugarElementInfo = {
-    name: "sd",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const sekdel: SugarElementInfo = {
-    name: "sekdel",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const sektor: SugarElementInfo = {
-    name: "sektor",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const sred: SugarElementInfo = {
-    name: "sred",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const stroyka: SugarElementInfo = {
-    name: "stroyka",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const struk: SugarElementInfo = {
-    name: "struk",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const typl: SugarElementInfo = {
-    name: "typl",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-const vid: SugarElementInfo = {
-    name: "vid",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: commonContentAttributes,
-};
-
-const highlight: SugarElementInfo = {
-    name: "highlight",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: [
-        pathAttribute,
-        { name: "paths", valueTypes: [AttributeType.PathList] },
-        { name: "change", valueTypes: [AttributeType.Enum] },
-        { name: "tooltip", valueTypes: [AttributeType.String] },
-    ],
-};
-
-const mail: SugarElementInfo = {
-    name: "mail",
-    availableChildren: { type: AvailableChildrenType.Any },
-    attributes: [{ name: "caption", valueTypes: [AttributeType.String] }],
-};
+import { address, corrnumber, cross, ferm_vb_j, force, ifns, reorganization, signer } from "./UnclassifiedElements";
 
 export const allElements: SugarElementInfo[] = [
     Checkbox,

@@ -2,5 +2,5 @@ import { AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarEl
 
 export const otherwise: SugarElementInfo = {
     name: "otherwise",
-    availableChildren: { type: AvailableChildrenType.Any }
+    availableChildren: { type: AvailableChildrenType.Any },
 };

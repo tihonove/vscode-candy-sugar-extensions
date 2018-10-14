@@ -1,6 +1,6 @@
 import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
-import { typeAttribute } from "../Commons/typeAttribute";
 import { fetchFnAttribute } from "../Commons/fetchFnAttribute";
+import { typeAttribute } from "../Commons/typeAttribute";
 
 export const local: SugarElementInfo = {
     name: "local",

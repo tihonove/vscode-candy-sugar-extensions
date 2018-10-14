@@ -1,10 +1,11 @@
 import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
-import { pathAttribute } from "../Commons/pathAttribute";
 import { fetchFnAttribute } from "../Commons/fetchFnAttribute";
+import { pathAttribute } from "../Commons/pathAttribute";
 
 export const choice: SugarElementInfo = {
     name: "choice",
     availableChildren: { type: AvailableChildrenType.Any },
+    createPathScope: true,
     attributes: [
         pathAttribute,
         fetchFnAttribute,

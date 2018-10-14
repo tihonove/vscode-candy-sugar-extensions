@@ -1,4 +1,5 @@
 import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
+import { pathAttribute } from "../Commons/pathAttribute";
 import {
     invisibilityPathAttribute,
     invisibilityPathValuettribute,
@@ -23,7 +24,9 @@ export const content: SugarElementInfo = {
             "email",
         ],
     },
+    createPathScope: true,
     attributes: [
+        pathAttribute,
         visibilityPathAttribute,
         visibilityPathValueAttribute,
         invisibilityPathAttribute,

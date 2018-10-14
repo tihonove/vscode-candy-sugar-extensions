@@ -1,6 +1,6 @@
 import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
-import { typeAttribute } from "../Commons/typeAttribute";
 import { pathAttribute } from "../Commons/pathAttribute";
+import { typeAttribute } from "../Commons/typeAttribute";
 import { visibilityPathAttribute, visibilityPathValueAttribute } from "../Commons/visibilityPathAttribute";
 
 export const textarea: SugarElementInfo = {

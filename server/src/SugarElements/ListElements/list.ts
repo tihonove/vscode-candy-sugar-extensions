@@ -13,6 +13,7 @@ export const list: SugarElementInfo = {
         type: AvailableChildrenType.List,
         list: ["item"],
     },
+    createPathScope: true,
     attributes: [
         pathAttribute,
         visibilityPathAttribute,

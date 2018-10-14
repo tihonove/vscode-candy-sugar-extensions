@@ -1,7 +1,6 @@
-// types
 import { AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
 
-export const digestCheck: SugarElementInfo = {
-    name: "digestCheck",
+export const totalAmount: SugarElementInfo = {
+    name: "totalAmount",
     availableChildren: { type: AvailableChildrenType.Any },
 };

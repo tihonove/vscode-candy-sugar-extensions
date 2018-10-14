@@ -22,10 +22,6 @@ export class ValidAttributeRule extends EmptySugarDomVisitor {
         if (elementInfo == undefined) {
             return;
         }
-        // if (elementInfo.attributes == undefined) {
-        //     // TODO Временно, пока нет определений для других файлов
-        //     return;
-        // }
         const attributeInfo = (elementInfo.attributes || []).find(x => x.name === attributeName.value);
         if (attributeInfo == undefined) {
             this.validations.push({
