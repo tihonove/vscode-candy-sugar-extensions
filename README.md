@@ -54,3 +54,7 @@ ext install vscode-candy-sugar
 
 
 ## Как помочь
+
+* Использовать расширение и [сообщать о багах](https://github.com/tihonove/vscode-candy-sugar-extensions/issues/new?template=------------.md), [вносить предложения](https://github.com/tihonove/vscode-candy-sugar-extensions/issues/new).
+* Помочь расширить и улучшить информацию о элементах сахара, внося исправления в [каталог с элементами](https://github.com/tihonove/vscode-candy-sugar-extensions/tree/master/server/src/SugarElements/DefaultSugarElementInfos) и создавая pull-request-ы.
+ 
