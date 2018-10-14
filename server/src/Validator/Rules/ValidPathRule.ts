@@ -18,7 +18,7 @@ export class ValidPathRule extends EmptySugarDomVisitor {
         super();
         this.dataSchema = dataSchema;
         this.elementInfos = elementInfos;
-        this.name = "valid-attribute";
+        this.name = "valid-path";
     }
 
     public enterElement(element: SugarElement): void {

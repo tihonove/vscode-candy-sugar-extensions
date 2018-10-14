@@ -56,7 +56,7 @@ export class ValidAttributeValueType extends EmptySugarDomVisitor {
             if (attributeValue === undefined) {
                 return false;
             }
-            return /^#([\da-f]{3})|([\da-f]{6)$/.test(attributeValue);
+            return /^#([\da-f]{3})|([\da-f]{6)$/i.test(attributeValue);
         }
         if (attributeType === AttributeType.Boolean) {
             if (attributeValue === undefined) {
