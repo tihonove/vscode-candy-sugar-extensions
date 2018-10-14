@@ -15,6 +15,8 @@ export const page: SugarElementInfo = {
         { name: "modalIE8", valueTypes: [AttributeType.Boolean] },
         { name: "templates", valueTypes: [AttributeType.Boolean] },
         { name: "height", valueTypes: [AttributeType.Number], optional: true },
+        { name: "formName", valueTypes: [AttributeType.String], optional: true },
+        { name: "optional", valueTypes: [AttributeType.Boolean], optional: true },
     ],
     availableChildren: { type: AvailableChildrenType.NoChildren },
     createPathScope: true,

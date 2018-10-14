@@ -6,9 +6,8 @@ export const enumeration: SugarElementInfo = {
         type: AvailableChildrenType.Any,
     },
     attributes: [
-        {
-            name: "value",
-            valueTypes: [AttributeType.String],
-        },
+        { name: "value", valueTypes: [AttributeType.String] },
+        { name: "name", valueTypes: [AttributeType.String], optional: true },
+        { name: "hint", valueTypes: [AttributeType.String], optional: true },
     ],
 };

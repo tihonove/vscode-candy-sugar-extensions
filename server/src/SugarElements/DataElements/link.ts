@@ -8,16 +8,10 @@ export const link: SugarElementInfo = {
         type: AvailableChildrenType.Any,
     },
     attributes: [
-        {
-            name: "href",
-            valueTypes: [AttributeType.String],
-            optional: true,
-        },
+        { name: "href", valueTypes: [AttributeType.String], optional: true },
+        { name: "defaultValue", valueTypes: [AttributeType.String], optional: true },
         pathAttribute,
-        {
-            name: "onClick",
-            valueTypes: [AttributeType.FunctionName],
-            optional: true,
-        },
+        { name: "onClick", valueTypes: [AttributeType.FunctionName], optional: true },
+        { name: "optional", valueTypes: [AttributeType.Boolean], optional: true },
     ],
 };

@@ -1,4 +1,10 @@
-import { AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
+import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../../Suggester/SugarElementInfo";
+import {
+    invisibilityPathAttribute,
+    invisibilityPathValuettribute,
+    visibilityPathAttribute,
+    visibilityPathValueAttribute,
+} from "../Commons/visibilityPathAttribute";
 
 export const content: SugarElementInfo = {
     name: "content",
@@ -17,4 +23,11 @@ export const content: SugarElementInfo = {
             "email",
         ],
     },
+    attributes: [
+        visibilityPathAttribute,
+        visibilityPathValueAttribute,
+        invisibilityPathAttribute,
+        invisibilityPathValuettribute,
+        { name: "style", valueTypes: [AttributeType.JavaScriptLiteral], optional: true },
+    ],
 };

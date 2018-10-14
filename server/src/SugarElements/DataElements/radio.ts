@@ -6,13 +6,8 @@ export const radio: SugarElementInfo = {
         type: AvailableChildrenType.Any,
     },
     attributes: [
-        {
-            name: "value",
-            valueTypes: [AttributeType.String],
-        },
-        {
-            name: "name",
-            valueTypes: [AttributeType.String],
-        },
+        { name: "value", valueTypes: [AttributeType.String] },
+        { name: "name", valueTypes: [AttributeType.String] },
+        { name: "width", valueTypes: [AttributeType.Number], optional: true },
     ],
 };

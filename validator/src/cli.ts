@@ -36,8 +36,12 @@ function findAndParseDataSchema(sugarFilePath: string): undefined | DataSchemaEl
     const formDirName = path.basename(path.dirname(path.dirname(filename)));
     const schemaFile = path.join(path.dirname(filename), "..", "schemas", formDirName + ".rng.xml");
     const schemaParser = new SchemaRngConverter();
-    const schemaFileContent = fs.readFileSync(schemaFile, "utf8");
-    return schemaParser.toDataSchema(schemaFileContent);
+    try {
+        const schemaFileContent = fs.readFileSync(schemaFile, "utf8");
+        return schemaParser.toDataSchema(schemaFileContent);
+    } catch (e) {
+        return undefined;
+    }
 }
 
 runCommandLineApp(sugarValidatorEntryPoint);

@@ -34,6 +34,8 @@ export const input: SugarElementInfo = {
         { name: "type", valueTypes: [AttributeType.Type] },
         { name: "placeholder", valueTypes: [AttributeType.String], optional: true },
         { name: "hint", valueTypes: [AttributeType.String], optional: true },
+        { name: "rngAttribute", valueTypes: [AttributeType.Boolean], optional: true },
+        { name: "gId", valueTypes: [AttributeType.PicklistId], optional: true },
         fetchFnAttribute,
     ],
     availableChildren: { type: AvailableChildrenType.NoChildren },

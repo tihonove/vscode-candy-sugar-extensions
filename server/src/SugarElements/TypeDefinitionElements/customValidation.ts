@@ -6,9 +6,7 @@ export const customValidation: SugarElementInfo = {
         type: AvailableChildrenType.Any,
     },
     attributes: [
-        {
-            name: "value",
-            valueTypes: [AttributeType.FunctionName],
-        },
+        { name: "value", valueTypes: [AttributeType.FunctionName] },
+        { name: "force", valueTypes: [AttributeType.Boolean], optional: true },
     ],
 };

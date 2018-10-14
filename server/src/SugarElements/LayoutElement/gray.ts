@@ -7,5 +7,9 @@ export const gray: SugarElementInfo = {
     availableChildren: {
         type: AvailableChildrenType.Any,
     },
-    attributes: [visibilityPathAttribute, { name: "inline", valueTypes: [AttributeType.Boolean], optional: true }],
+    attributes: [
+        visibilityPathAttribute,
+        { name: "inline", valueTypes: [AttributeType.Boolean], optional: true },
+        { name: "width", valueTypes: [AttributeType.Number], optional: true },
+    ],
 };

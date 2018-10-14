@@ -11,9 +11,8 @@ export const kladr: SugarElementInfo = {
     attributes: [
         pathAttribute,
         fetchFnAttribute,
-        {
-            name: "title",
-            valueTypes: [AttributeType.String],
-        },
+        { name: "title", valueTypes: [AttributeType.String] },
+        { name: "kind", valueTypes: [AttributeType.Enum], optional: true },
+        { name: "optional", valueTypes: [AttributeType.Boolean], optional: true },
     ],
 };

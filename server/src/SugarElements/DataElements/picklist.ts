@@ -25,6 +25,13 @@ export const picklist: SugarElementInfo = {
         { name: "normativehelp", valueTypes: [AttributeType.JavaScriptLiteral], optional: true },
         { name: "placeholder", valueTypes: [AttributeType.String], optional: true },
         { name: "optional", valueTypes: [AttributeType.Boolean], optional: true },
+        { name: "limit", valueTypes: [AttributeType.Number], optional: true },
+        { name: "overwriteOnInit", valueTypes: [AttributeType.Boolean], optional: true },
+        { name: "gPath", valueTypes: [AttributeType.Path], optional: true },
+        { name: "field", valueTypes: [AttributeType.String], optional: true },
+        { name: "valueField", valueTypes: [AttributeType.String], optional: true },
+        { name: "display", valueTypes: [AttributeType.Enum], optional: true },
+        { name: "savedescription", valueTypes: [AttributeType.Boolean], optional: true },
         typeAttribute,
     ],
 };

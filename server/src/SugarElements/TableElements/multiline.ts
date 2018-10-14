@@ -16,6 +16,7 @@ export const multiline: SugarElementInfo = {
         { name: "removebutton", valueTypes: [AttributeType.Boolean] },
         { name: "addbutton", valueTypes: [AttributeType.String, AttributeType.Boolean] },
         { name: "usepager", valueTypes: [AttributeType.Boolean] },
-        { name: "optional", valueTypes: [AttributeType.Boolean] },
+        { name: "optional", valueTypes: [AttributeType.Boolean], optional: true },
+        { name: "rowmenu", valueTypes: [AttributeType.Boolean], optional: true },
     ],
 };

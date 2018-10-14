@@ -10,9 +10,8 @@ export const radiogroup: SugarElementInfo = {
     },
     attributes: [
         pathAttribute,
-        {
-            name: "defaultValue",
-            valueTypes: [AttributeType.String],
-        },
+        { name: "defaultValue", valueTypes: [AttributeType.String] },
+        { name: "width", valueTypes: [AttributeType.Number], optional: true },
+        { name: "optional", valueTypes: [AttributeType.Boolean], optional: true },
     ],
 };

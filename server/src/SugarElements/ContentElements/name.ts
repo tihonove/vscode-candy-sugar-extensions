@@ -5,5 +5,8 @@ export const name: SugarElementInfo = {
     availableChildren: {
         type: AvailableChildrenType.Any,
     },
-    attributes: [{ name: "caption", valueTypes: [AttributeType.String] }],
+    attributes: [
+        { name: "caption", valueTypes: [AttributeType.String] },
+        { name: "editable", valueTypes: [AttributeType.Boolean], optional: true },
+    ],
 };

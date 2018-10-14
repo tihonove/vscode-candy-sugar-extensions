@@ -10,7 +10,8 @@ export enum AttributeType {
     PicklistId = "PicklistId",
     JavaScriptLiteral = "JavaScriptLiteral",
     Enum = "Enum",
-    Color = "Color"
+    Color = "Color",
+    PathList = "PathList"
 }
 
 export enum AvailableChildrenType {
@@ -26,6 +27,7 @@ export interface SugarAttributeInfo {
     markdownDescription?: string;
     shortMarkdownDescription?: string;
     optional?: boolean;
+    deprecated?: boolean;
 }
 
 export type SugarElementAvailableChildrenInfo =
