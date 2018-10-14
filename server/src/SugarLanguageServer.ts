@@ -37,20 +37,19 @@ export class SugarLanguageServer {
     private readonly connection: Connection;
     private readonly logger: ILogger;
     private readonly documents: TextDocuments;
-    private readonly schemaDocuments: { [uri: string]: string };
-    private readonly parsedSchemaDocuments: { [uri: string]: DataSchemaElementNode };
-    private readonly documentServices: { [uri: string]: SugarDocumentServices };
+    private readonly parsedSchemaDocuments: { [uri: string]: undefined | DataSchemaElementNode };
+    private readonly documentServices: { [uri: string]: undefined | SugarDocumentServices };
     private validator?: SugarValidator;
 
     public constructor() {
         this.connection = createConnection(ProposedFeatures.all);
         this.logger = new VsCodeServerLogger(this.connection.console);
         this.documents = new TextDocuments();
-        this.schemaDocuments = {};
         this.parsedSchemaDocuments = {};
         this.documentServices = {};
         this.connection.onInitialize(this.handleInitialize);
         this.documents.onDidChangeContent(this.handleChangeDocumentContent);
+        this.documents.onDidClose(this.handleCloseTextDocument);
         this.connection.onHover(this.handleHover);
         this.connection.onDefinition(this.handleResolveDefinition);
         this.connection.onCompletion(this.handleResolveCompletion);
@@ -62,10 +61,25 @@ export class SugarLanguageServer {
         this.connection.listen();
     }
 
+    private readonly handleCloseTextDocument = ({ document }: TextDocumentChangeEvent): void => {
+        this.logger.info(`Send empty diagnostics for closed file. (${document.uri})`);
+        this.connection.sendDiagnostics({
+            uri: document.uri,
+            diagnostics: [],
+        });
+        if (this.parsedSchemaDocuments[document.uri] != undefined) {
+            this.parsedSchemaDocuments[document.uri] = undefined;
+        }
+        if (this.documentServices[document.uri] != undefined) {
+            this.documentServices[document.uri] = undefined;
+        }
+    };
+
     private async validateTextDocument(textDocument: TextDocument): Promise<void> {
         if (this.validator == undefined) {
             return;
         }
+        this.logger.info(`Begin document validation. (${textDocument.uri})`);
         const validationResults = this.validator.validate(textDocument.getText());
         this.connection.sendDiagnostics({
             uri: textDocument.uri,
@@ -77,6 +91,7 @@ export class SugarLanguageServer {
                 code: x.ruleName,
             })),
         });
+        this.logger.info(`End document validation. (${textDocument.uri})`);
     }
 
     private readonly handleInitialize = (_params: InitializeParams) => ({
@@ -92,38 +107,49 @@ export class SugarLanguageServer {
     });
 
     private readonly handleChangeDocumentContent = (change: TextDocumentChangeEvent) => {
+        const documentUri = change.document.uri;
+        this.logger.info(`Begin handle document change. (${documentUri})`);
         if (change.document.languageId !== "sugar-xml") {
             return;
         }
-        this.documents[change.document.uri] = change.document.getText();
-        const filename = UriUtils.toFileName(change.document.uri);
-        const formDirName = path.basename(path.dirname(path.dirname(filename)));
-        const schemaFile = path.join(path.dirname(filename), "..", "schemas", formDirName + ".rng.xml");
+        this.documents[documentUri] = change.document.getText();
+        const schemaFile = this.findSchemaFile(documentUri);
         const schemaFileUri = UriUtils.fileNameToUri(schemaFile);
         const schemaParser = new SchemaRngConverter();
-        if (this.schemaDocuments[schemaFileUri] == undefined) {
+        if (this.parsedSchemaDocuments[documentUri] == undefined) {
+            this.logger.info(`Schema is not loaded. Loading. (${documentUri})`);
             try {
-                this.schemaDocuments[schemaFileUri] = fs.readFileSync(schemaFile, "utf8");
-                this.parsedSchemaDocuments[change.document.uri] = schemaParser.toDataSchema(
-                    this.schemaDocuments[schemaFileUri]
-                );
+                const schemaFileContent = fs.readFileSync(schemaFile, "utf8");
+                this.parsedSchemaDocuments[documentUri] = schemaParser.toDataSchema(schemaFileContent);
             } catch (e) {
+                this.logger.info(`Failed to load schema. (${documentUri})`);
                 // ignore read error
             }
         }
 
-        if (this.documentServices[change.document.uri] == undefined) {
-            this.documentServices[change.document.uri] = new SugarDocumentServices(
+        let documentService = this.documentServices[documentUri];
+        if (documentService == undefined) {
+            this.logger.info(`Create services for document. (${documentUri})`);
+            documentService = new SugarDocumentServices(
                 schemaFileUri,
-                valueOrDefault(this.parsedSchemaDocuments[change.document.uri], emptyDataSchema),
+                valueOrDefault(this.parsedSchemaDocuments[documentUri], emptyDataSchema),
                 allElements,
                 this.logger
             );
+            this.documentServices[documentUri] = documentService;
         }
-        this.documentServices[change.document.uri].sugarDocumentDom.processDocumentChange(change.document.getText());
-        this.validator = createDefaultValidator(this.parsedSchemaDocuments[change.document.uri]);
+        documentService.sugarDocumentDom.processDocumentChange(change.document.getText());
+        this.validator = createDefaultValidator(this.parsedSchemaDocuments[documentUri]);
         this.validateTextDocument(change.document);
+        this.logger.info(`End handle document change. (${documentUri})`);
     };
+
+    private findSchemaFile(uri: string): string {
+        const filename = UriUtils.toFileName(uri);
+        const formDirName = path.basename(path.dirname(path.dirname(filename)));
+        const schemaFile = path.join(path.dirname(filename), "..", "schemas", formDirName + ".rng.xml");
+        return schemaFile;
+    }
 
     private getDocumentServices(uri: string): undefined | SugarDocumentServices {
         if (this.documentServices[uri] != undefined) {
@@ -269,7 +295,11 @@ export class SugarLanguageServer {
             return [];
         }
         const textToCursor = text.getText({ start: text.positionAt(0), end: textDocumentPosition.position });
-        const suggester = this.documentServices[textDocumentPosition.textDocument.uri].suggester;
+        const documentService = this.documentServices[textDocumentPosition.textDocument.uri];
+        if (documentService == undefined) {
+            return [];
+        }
+        const suggester = documentService.suggester;
 
         if (suggester == undefined) {
             return [];
@@ -333,6 +363,9 @@ export class SugarLanguageServer {
         // tslint:disable-next-line no-unsafe-any
         const { suggestionItem, uri } = item.data;
         const services = this.documentServices[uri];
+        if (services == undefined) {
+            return item;
+        }
         // tslint:disable-next-line no-unsafe-any
         services.descriptionResolver.enrichCompletionItem(item, suggestionItem);
         return item;
