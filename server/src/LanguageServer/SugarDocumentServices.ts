@@ -1,16 +1,17 @@
 import * as _ from "lodash";
 
-import { DataSchemaElementNode, DataSchemaNode } from "./DataSchema/DataSchemaNode";
-import { DataSchemaUtils } from "./DataSchema/DataSchemaUtils";
-import { CompletionItemDescriptionResolver } from "./LanguageServer/CompletionItemDescriptionResolver";
-import { ILogger } from "./LanguageServer/Logger";
-import { CodeContext } from "./SugarAnalyzing/CodeContext";
-import { CodeContextByNodeResolver } from "./SugarAnalyzing/CodeContextByNodeResolver";
-import { CompletionSuggester } from "./SugarAnalyzing/CompletionSuggester";
-import { OffsetToNodeMap } from "./SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMap";
-import { OffsetToNodeMapBuilder } from "./SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
-import { allElements } from "./SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
-import { SugarElementInfo } from "./SugarElements/SugarElementInfo";
+import { DataSchemaElementNode, DataSchemaNode } from "../DataSchema/DataSchemaNode";
+import { DataSchemaUtils } from "../DataSchema/DataSchemaUtils";
+import { CodeContext } from "../SugarAnalyzing/CodeContext";
+import { CodeContextByNodeResolver } from "../SugarAnalyzing/CodeContextByNodeResolver";
+import { CompletionSuggester } from "../SugarAnalyzing/CompletionSuggester";
+import { OffsetToNodeMap } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMap";
+import { OffsetToNodeMapBuilder } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
+import { allElements } from "../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
+import { SugarElementInfo } from "../SugarElements/SugarElementInfo";
+
+import { CompletionItemDescriptionResolver } from "./CompletionItemDescriptionResolver";
+import { ILogger } from "./Logger";
 
 export class SugarDocumentServices {
     public suggester: CompletionSuggester;

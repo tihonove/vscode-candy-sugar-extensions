@@ -1,4 +1,4 @@
-import { ISugarDomVisitor } from "../../Validator/TraverseSugar";
+import { ISugarDomVisitor } from "../../../SugarAnalyzing/Traversing/ISugarDomVisitor";
 
 import { ValidationItem } from "./ValidationItem";
 

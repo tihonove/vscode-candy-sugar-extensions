@@ -3,7 +3,7 @@ import { NullTracer } from "../../Utils/PegJSUtils/NullTracer";
 import { ISugarValidatorRule } from "../Rules/Bases/ISugarValidatorRule";
 import { ValidationItem } from "../Rules/Bases/ValidationItem";
 
-import { traverseSugar } from "./TraverseSugar";
+import { traverseSugar } from "../../SugarAnalyzing/Traversing/TraverseSugar";
 
 enum ValidationSeverity {
     Error = "Error",

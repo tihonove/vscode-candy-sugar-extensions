@@ -38,13 +38,10 @@ Element =
 
 
 Content = text: NonElementContent* rest: (Element NonElementContent*)* {
-    const list = [text]
-        .concat(
-            (rest || []).reduce((result, x) => {
-                result.push(x[0], x[1]);
-                return result;
-            }, [])
-        );
+    const list = (rest || []).reduce((result, x) => {
+        result.push(x[0]);
+        return result;
+    }, [])
     var result = [];
     for (var i = 0; i < list.length; i++) {
         if (list[i] != undefined) {

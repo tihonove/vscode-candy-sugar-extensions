@@ -4,14 +4,23 @@ import {
     AvailableChildrenType,
     SugarElementInfo,
 } from "../../../server/src/SugarElements/SugarElementInfo";
-import { SugarTypeInfo } from "../../../server/src/SugarElements/SugarTypeInfo";
+import { UsedDefinedSugarTypeInfo } from "../../../server/src/SugarElements/UsedDefinedSugarTypeInfo";
 
-export const testSugarTypes: SugarTypeInfo[] = [
+const fakePosition = {
+    start: { column: 0, line: 0, offset: 0 },
+    end: { column: 0, line: 0, offset: 0 },
+};
+
+export const testSugarTypes: UsedDefinedSugarTypeInfo[] = [
     {
         name: "a-type1",
+        constraintStrings: [],
+        position: fakePosition,
     },
     {
         name: "b-type2",
+        constraintStrings: [],
+        position: fakePosition,
     },
 ];
 
@@ -82,11 +91,6 @@ export const testSugarElementInfos: SugarElementInfo[] = [
         },
     },
 ];
-
-const fakePosition = {
-    start: { column: 0, line: 0, offset: 0 },
-    end: { column: 0, line: 0, offset: 0 },
-};
 
 export const testDataSchema: DataSchemaElementNode = {
     name: "",

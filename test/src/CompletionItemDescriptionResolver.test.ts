@@ -7,6 +7,7 @@ import { CompletionSuggester } from "../../server/src/SugarAnalyzing/CompletionS
 import { AttributeType, AvailableChildrenType } from "../../server/src/SugarElements/SugarElementInfo";
 
 import { expect } from "./Utils/Expect";
+import { testSugarTypes } from "./Utils/TestInfos";
 
 @suite
 export class CompletionItemDescriptionResolverTest {
@@ -67,14 +68,7 @@ export class CompletionItemDescriptionResolverTest {
     private createTestCompletionSuggester(): CompletionSuggester {
         const dataSchema = this.createTestDataSchema();
         return new CompletionSuggester(
-            [
-                {
-                    name: "a-type1",
-                },
-                {
-                    name: "b-type2",
-                },
-            ],
+            testSugarTypes,
             [
                 {
                     name: "atag1",

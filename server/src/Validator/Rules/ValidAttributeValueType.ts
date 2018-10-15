@@ -1,7 +1,7 @@
+import { EmptySugarDomVisitor } from "../../SugarAnalyzing/Traversing/EmptySugarDomVisitor";
 import { AttributeTypeUtils } from "../../SugarElements/AttributeTypeUtils";
 import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { SugarAttribute } from "../../SugarParsing/SugarGrammar/SugarParser";
-import { EmptySugarDomVisitor } from "../Validator/TraverseSugar";
 
 import { ValidationItem } from "./Bases/ValidationItem";
 

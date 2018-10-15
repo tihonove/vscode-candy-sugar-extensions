@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import path from "path";
 import { CancellationToken } from "vscode-jsonrpc";
 import {
@@ -22,16 +23,16 @@ import {
 import { DataSchemaElementNode } from "../DataSchema/DataSchemaNode";
 import { SchemaRngConverter } from "../DataSchema/DataSchemaParser/SchemaRngConverter";
 import { SuggestionItemType } from "../SugarAnalyzing/CompletionSuggester";
-import { SugarDocumentServices } from "../SugarDocumentServices";
 import { allElements } from "../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
-import { UriUtils } from "../UriUtils";
 import { CodePosition } from "../Utils/PegJSUtils/Types";
 import { isNotNullOrUndefined, valueOrDefault } from "../Utils/TypingUtils";
+import { UriUtils } from "../Utils/UriUtils";
 import { SugarValidator } from "../Validator/Validator/SugarValidator";
 import { createDefaultValidator } from "../Validator/ValidatorFactory";
 
 import { ILogger, VsCodeServerLogger } from "./Logger";
 import { MarkdownUtils } from "./MarkdownUtils";
+import { SugarDocumentServices } from "./SugarDocumentServices";
 
 export class SugarLanguageServer {
     private readonly connection: Connection;

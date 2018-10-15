@@ -1,6 +1,6 @@
+import { EmptySugarDomVisitor } from "../../SugarAnalyzing/Traversing/EmptySugarDomVisitor";
 import { SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
-import { EmptySugarDomVisitor } from "../Validator/TraverseSugar";
 
 import { ValidationItem } from "./Bases/ValidationItem";
 

@@ -2,7 +2,7 @@ import { DataPathUtils } from "../DataSchema/DataPathUtils";
 import { DataSchemaAttribute, DataSchemaElementNode } from "../DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "../DataSchema/DataSchemaUtils";
 import { SugarElementInfo } from "../SugarElements/SugarElementInfo";
-import { SugarTypeInfo } from "../SugarElements/SugarTypeInfo";
+import { UsedDefinedSugarTypeInfo } from "../SugarElements/UsedDefinedSugarTypeInfo";
 import {
     CompletionContext,
     getCompletionContext,
@@ -48,12 +48,12 @@ export type SuggestionItem =
 export class CompletionSuggester {
     private readonly sugarElementInfos: SugarElementInfo[];
     // @ts-ignore
-    private readonly sugarTypes: SugarTypeInfo[];
+    private readonly sugarTypes: UsedDefinedSugarTypeInfo[];
     private readonly dataSchemaRoot: DataSchemaElementNode;
     private readonly contextResolver: CodeContextByNodeResolver;
 
     public constructor(
-        sugarTypes: SugarTypeInfo[],
+        sugarTypes: UsedDefinedSugarTypeInfo[],
         sugarElementInfos: SugarElementInfo[],
         dataSchemaRoot: DataSchemaElementNode
     ) {

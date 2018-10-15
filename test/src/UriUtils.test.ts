@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { suite, test } from "mocha-typescript";
 
-import { UriUtils } from "../../server/src/UriUtils";
+import { UriUtils } from "../../server/src/Utils/UriUtils";
 
 @suite
 export class UriUtilsTest {
