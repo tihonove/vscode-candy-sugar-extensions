@@ -60,6 +60,20 @@ export class SugarValidatorTest {
     }
 
     @test
+    public validPathRuleWithComplexPath(): void {
+        const validator = new SugarValidator();
+        validator.addRule(() => new ValidPathRule(testDataSchema, testSugarElementInfos));
+        expect(validator.validate(`<atag1 path="Root/Children1"/>`)).to.eql([]);
+    }
+
+    @test
+    public validPathRuleWithNesting(): void {
+        const validator = new SugarValidator();
+        validator.addRule(() => new ValidPathRule(testDataSchema, testSugarElementInfos));
+        expect(validator.validate(`<atag1 path="Root"><atag1 path="Children1"/></atag1>`)).to.eql([]);
+    }
+
+    @test
     public inValidPathRule(): void {
         const validator = new SugarValidator();
         validator.addRule(() => new ValidPathRule(testDataSchema, testSugarElementInfos));
