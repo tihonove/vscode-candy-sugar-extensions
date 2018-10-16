@@ -32,6 +32,9 @@ ext install vscode-candy-sugar
 #### Автокоплит элементов сахара: тэгов и атритутов
 ![Auto close tag example](https://raw.githubusercontent.com/tihonove/vscode-candy-sugar-extensions/master/docs/images/element-and-attr-completion.gif)
 
+#### Автокоплит элементов сахара: тэгов и атритутов
+![User Defined Sugar Type Completion](https://raw.githubusercontent.com/tihonove/vscode-candy-sugar-extensions/master/docs/images/user-defined-sugar-type-completion.png)
+
 
 #### Автокоплит путей к данным по соответствующей схеме данных
 ![Auto close tag example](https://raw.githubusercontent.com/tihonove/vscode-candy-sugar-extensions/master/docs/images/data-completion.gif)
