@@ -52,27 +52,27 @@ export class CodeContextByNodeResolver {
                     : currentElementInfo.attributes.find(x => x.name === node.parent.name.value);
             const dataContext = this.resolveDataContext(this.withoutLast(elementStack));
             if (
-                currentAttributeInfo == undefined ||
-                currentAttributeInfo.valueTypes == undefined ||
-                !currentAttributeInfo.valueTypes.includes(AttributeType.Path)
+                currentAttributeInfo != undefined &&
+                currentAttributeInfo.valueTypes != undefined &&
+                currentAttributeInfo.valueTypes.includes(AttributeType.Path)
             ) {
                 return {
-                    type: "AttributeValue",
+                    type: "DataAttributeValue",
                     contextNode: node,
                     currentElementInfo: currentElementInfo,
                     currentAttributeInfo: currentAttributeInfo,
+                    currentDataContext: DataPathUtils.normalizeDataPath(
+                        DataPathUtils.joinDataPaths(dataContext, this.parseDataAttributeValue(node.value))
+                    ),
                     elementStack: elementStack,
                     dataContext: DataPathUtils.normalizeDataPath(dataContext),
                 };
             }
             return {
-                type: "DataAttributeValue",
+                type: "AttributeValue",
                 contextNode: node,
                 currentElementInfo: currentElementInfo,
                 currentAttributeInfo: currentAttributeInfo,
-                currentDataContext: DataPathUtils.normalizeDataPath(
-                    DataPathUtils.joinDataPaths(dataContext, this.parseDataAttributeValue(node.value))
-                ),
                 elementStack: elementStack,
                 dataContext: DataPathUtils.normalizeDataPath(dataContext),
             };

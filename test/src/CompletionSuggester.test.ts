@@ -1,6 +1,10 @@
 import { suite, test } from "mocha-typescript";
 
-import { CompletionSuggester, SuggestionItemType } from "../../server/src/SugarAnalyzing/CompletionSuggester";
+import {
+    CompletionSuggester,
+    SuggestionItem,
+    SuggestionItemType,
+} from "../../server/src/SugarAnalyzing/CompletionSuggester";
 
 import { expect } from "./Utils/Expect";
 import { testDataSchema, testSugarElementInfos, testSugarTypes } from "./Utils/TestInfos";
@@ -346,6 +350,26 @@ export class CompletionSuggesterTest {
                 },
             ],
         });
+    }
+
+    @test
+    public "Подсказка для атрибута type"(): void {
+        this.assertSuggestions('<atag1 type="', [
+            {
+                type: SuggestionItemType.Type,
+                name: "a-type1",
+            },
+            {
+                type: SuggestionItemType.Type,
+                name: "b-type2",
+            },
+        ]);
+    }
+
+    private assertSuggestions(textToCursor: string, items: Array<Partial<SuggestionItem>>): void {
+        const fileSuggester = this.createTestCompletionSuggester();
+        const suggestions = fileSuggester.suggest(textToCursor);
+        expect(suggestions.items).to.shallowDeepEqual(items);
     }
 
     private createTestCompletionSuggester(): CompletionSuggester {

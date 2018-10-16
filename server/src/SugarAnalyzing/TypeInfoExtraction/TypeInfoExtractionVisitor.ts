@@ -1,14 +1,14 @@
-import { UsedDefinedSugarTypeInfo } from "../../SugarElements/UsedDefinedSugarTypeInfo";
+import { UserDefinedSugarTypeInfo } from "../../SugarElements/UserDefinedSugarTypeInfo";
 import { SugarElement, SugarText } from "../../SugarParsing/SugarGrammar/SugarParser";
 import { oc } from "../../Utils/ChainWrapper";
 import { isNotNullOrUndefined } from "../../Utils/TypingUtils";
 import { EmptySugarDomVisitor } from "../Traversing/EmptySugarDomVisitor";
 
 export class TypeInfoExtractionVisitor extends EmptySugarDomVisitor {
-    private readonly typeInfos: UsedDefinedSugarTypeInfo[] = [];
+    private readonly typeInfos: UserDefinedSugarTypeInfo[] = [];
     private isInsideTypesElement = false;
 
-    public getTypeInfos(): UsedDefinedSugarTypeInfo[] {
+    public getTypeInfos(): UserDefinedSugarTypeInfo[] {
         return this.typeInfos;
     }
 
@@ -35,7 +35,7 @@ export class TypeInfoExtractionVisitor extends EmptySugarDomVisitor {
         }
     }
 
-    private extractTypeInfoFromElement(element: SugarElement): undefined | UsedDefinedSugarTypeInfo {
+    private extractTypeInfoFromElement(element: SugarElement): undefined | UserDefinedSugarTypeInfo {
         const typeName = this.getAttributeValue(element, "name");
         if (typeName == undefined) {
             return undefined;

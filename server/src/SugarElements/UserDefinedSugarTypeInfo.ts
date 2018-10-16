@@ -1,6 +1,11 @@
 import { CodePosition } from "../Utils/PegJSUtils/Types";
 
-export interface UsedDefinedSugarTypeInfo {
+export enum TypeKind {
+    UserDefined,
+    BuiltIn,
+}
+
+export interface UserDefinedSugarTypeInfo {
     name: string;
     baseName?: string;
     description?: string;

@@ -2,6 +2,7 @@ import {
     parseSugar,
     SugarAttributeName,
     SugarAttributeValue,
+    SugarElement,
     SugarElementName,
     SugarSyntaxNode,
 } from "../../SugarParsing/SugarGrammar/SugarParser";
@@ -13,11 +14,18 @@ export type NodeWithDefinition = SugarElementName | SugarAttributeName | SugarAt
 
 export class OffsetToNodeMapBuilder {
     public buildOffsetToNodeMap(input: string): OffsetToNodeMap {
-        const parseResult = parseSugar(input, {
+        return this.buildOffsetToNodeMapFromDom(this.buildCodeDom(input));
+    }
+
+    public buildCodeDom(input: string): SugarElement {
+        return parseSugar(input, {
             tracer: new NullTracer(),
         });
+    }
+
+    public buildOffsetToNodeMapFromDom(sugarDocument: SugarElement): OffsetToNodeMap {
         const foundElements: NodeWithDefinition[] = [];
-        this.traverseSugarAstAndGetNodes(parseResult, foundElements);
+        this.traverseSugarAstAndGetNodes(sugarDocument, foundElements);
         return new OffsetToNodeMap(foundElements);
     }
 

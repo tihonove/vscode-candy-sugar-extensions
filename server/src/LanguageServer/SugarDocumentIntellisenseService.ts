@@ -18,11 +18,13 @@ import { SchemaRngConverter } from "../DataSchema/DataSchemaParser/SchemaRngConv
 import { DataSchemaUtils } from "../DataSchema/DataSchemaUtils";
 import { CodeContext } from "../SugarAnalyzing/CodeContext";
 import { CodeContextByNodeResolver } from "../SugarAnalyzing/CodeContextByNodeResolver";
-import { CompletionSuggester, SuggestionItemType } from "../SugarAnalyzing/CompletionSuggester";
+import { CompletionSuggester, SuggestionItem, SuggestionItemType } from "../SugarAnalyzing/CompletionSuggester";
 import { OffsetToNodeMap } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMap";
 import { OffsetToNodeMapBuilder } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
+import { TypeInfoExtractor } from "../SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
 import { allElements } from "../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
 import { SugarElementInfo } from "../SugarElements/SugarElementInfo";
+import { UserDefinedSugarTypeInfo } from "../SugarElements/UserDefinedSugarTypeInfo";
 import { createEvent } from "../Utils/Event";
 import { CodePosition } from "../Utils/PegJSUtils/Types";
 import { isNotNullOrUndefined } from "../Utils/TypingUtils";
@@ -30,7 +32,6 @@ import { UriUtils } from "../Utils/UriUtils";
 import { SugarValidator } from "../Validator/Validator/SugarValidator";
 import { createDefaultValidator } from "../Validator/ValidatorFactory";
 
-import { CompletionItemDescriptionResolver } from "./CompletionItemDescriptionResolver";
 import { ILogger } from "./Logging/Logger";
 import { MarkdownUtils } from "./MarkdownUtils";
 
@@ -47,10 +48,11 @@ export class SugarDocumentIntellisenseService {
     private readonly schemaFileUri: string;
     private readonly offsetPositionResolver: IDocumentOffsetPositionResolver;
     private readonly suggester: CompletionSuggester;
-    private readonly descriptionResolver: CompletionItemDescriptionResolver;
     private readonly updateDomDebounced = _.debounce((text: string) => this.updateDom(text), 50, { trailing: true });
+    private readonly typeInfoExtractor: TypeInfoExtractor;
     private readonly builder: OffsetToNodeMapBuilder;
     private offsetToNodeMap?: OffsetToNodeMap;
+    private userDefinedTypes?: UserDefinedSugarTypeInfo[];
     private readonly sugarElements: SugarElementInfo[];
 
     public sendValidationsEvent = createEvent<[Diagnostic[]]>();
@@ -62,10 +64,10 @@ export class SugarDocumentIntellisenseService {
         this.schemaFileUri = UriUtils.fileNameToUri(this.findSchemaFile(this.documentUri));
         this.parsedSchemaDocuments = this.loadDataSchema();
         this.suggester = new CompletionSuggester([], allElements, this.parsedSchemaDocuments);
-        this.descriptionResolver = new CompletionItemDescriptionResolver(this.parsedSchemaDocuments);
         this.sugarElements = allElements;
         this.validator = createDefaultValidator(this.parsedSchemaDocuments);
         this.builder = new OffsetToNodeMapBuilder();
+        this.typeInfoExtractor = new TypeInfoExtractor();
     }
 
     public handleCloseTextDocument({ document }: TextDocumentChangeEvent): void {
@@ -238,6 +240,17 @@ export class SugarDocumentIntellisenseService {
                         commitCharacters: ['"'],
                     };
                 }
+                if (x.type === SuggestionItemType.Type) {
+                    return {
+                        label: x.name,
+                        kind: CompletionItemKind.Class,
+                        data: {
+                            suggestionItem: x,
+                            uri: this.documentUri,
+                        },
+                        commitCharacters: ['"'],
+                    };
+                }
                 return undefined;
             })
             .filter(isNotNullOrUndefined);
@@ -245,16 +258,109 @@ export class SugarDocumentIntellisenseService {
 
     public enrichCompletionItem(item: CompletionItem): CompletionItem {
         // tslint:disable-next-line no-unsafe-any
-        const { suggestionItem } = item.data;
-        // tslint:disable-next-line no-unsafe-any
-        this.descriptionResolver.enrichCompletionItem(item, suggestionItem);
-        return item;
+        const suggestionItem: SuggestionItem = item.data.suggestionItem;
+        const vsCodeCompletionItem = item;
+
+        if (suggestionItem.type === SuggestionItemType.Element) {
+            const elementInfo = allElements.find(x => x.name === suggestionItem.name);
+
+            if (elementInfo != undefined) {
+                if (elementInfo.attributes != undefined && elementInfo.attributes.length > 0) {
+                    vsCodeCompletionItem.detail = `<${elementInfo.name} ... />`;
+                } else {
+                    vsCodeCompletionItem.detail = `<${elementInfo.name} />`;
+                }
+                const documentation = MarkdownUtils.buildElementDetails(elementInfo, { appendHeader: false });
+                if (documentation != undefined) {
+                    vsCodeCompletionItem.documentation = documentation;
+                }
+            }
+        }
+
+        if (suggestionItem.type === SuggestionItemType.Attribute) {
+            const elementInfo = allElements.find(x => x.name === suggestionItem.parentElementName);
+            if (elementInfo != undefined) {
+                if (elementInfo.attributes != undefined && elementInfo.attributes.length > 0) {
+                    const attributeInfo = elementInfo.attributes.find(x => x.name === suggestionItem.name);
+                    if (attributeInfo != undefined) {
+                        vsCodeCompletionItem.detail = MarkdownUtils.buildAttributeHeader(attributeInfo);
+                        vsCodeCompletionItem.documentation = MarkdownUtils.buildAttributeDetails(
+                            elementInfo,
+                            attributeInfo,
+                            { appendHeader: false }
+                        );
+                    }
+                }
+            }
+        }
+
+        if (suggestionItem.type === SuggestionItemType.DataElement) {
+            const dataSchemaNode = DataSchemaUtils.findElementByPath(
+                this.parsedSchemaDocuments,
+                suggestionItem.fullPath
+            );
+            if (dataSchemaNode == undefined) {
+                return vsCodeCompletionItem;
+            }
+            vsCodeCompletionItem.detail = `<element name="${dataSchemaNode.name}">`;
+            if (dataSchemaNode.description != undefined) {
+                vsCodeCompletionItem.documentation = MarkdownUtils.buildDataSchemaElementDetail(
+                    undefined,
+                    undefined,
+                    dataSchemaNode,
+                    { appendHeader: false }
+                );
+            }
+        }
+
+        if (suggestionItem.type === SuggestionItemType.DataAttribute) {
+            const dataSchemaAttribute = DataSchemaUtils.findAttributeByPath(
+                this.parsedSchemaDocuments,
+                suggestionItem.fullPath
+            );
+            if (dataSchemaAttribute == undefined) {
+                return vsCodeCompletionItem;
+            }
+            vsCodeCompletionItem.detail = `<attribute name="${dataSchemaAttribute.name}">`;
+            if (dataSchemaAttribute.description != undefined) {
+                vsCodeCompletionItem.documentation = MarkdownUtils.buildDataSchemaAttributeDetail(
+                    undefined,
+                    undefined,
+                    dataSchemaAttribute,
+                    { appendHeader: false }
+                );
+            }
+        }
+        if (suggestionItem.type === SuggestionItemType.Type && this.userDefinedTypes != undefined) {
+            const userDefinedTypeInfo = this.userDefinedTypes.find(x => x.name === suggestionItem.name);
+            vsCodeCompletionItem.detail = `<type name="${suggestionItem.name}">`;
+            if (userDefinedTypeInfo == undefined) {
+                return vsCodeCompletionItem;
+            }
+            let documentationText = "";
+            if (userDefinedTypeInfo.description != undefined) {
+                documentationText += userDefinedTypeInfo.description + "\n";
+            }
+            if (userDefinedTypeInfo.constraintStrings.length > 0) {
+                documentationText += "```xml\n";
+                documentationText += userDefinedTypeInfo.constraintStrings.join("\n");
+                documentationText += "```\n";
+            }
+            vsCodeCompletionItem.documentation = {
+                kind: "markdown",
+                value: documentationText,
+            };
+        }
+        return vsCodeCompletionItem;
     }
 
     private updateDom(text: string): void {
         this.logger.info("Begin update");
         try {
-            this.offsetToNodeMap = this.builder.buildOffsetToNodeMap(text);
+            const sugarDocument = this.builder.buildCodeDom(text);
+            this.offsetToNodeMap = this.builder.buildOffsetToNodeMapFromDom(sugarDocument);
+            this.userDefinedTypes = this.typeInfoExtractor.extractTypeInfos(sugarDocument);
+            this.suggester.updateUserDefinedSugarType(this.userDefinedTypes);
         } catch (ignoreError) {
             // По всей вимдости код невалиден. Просто оставим последний валидный map
         }

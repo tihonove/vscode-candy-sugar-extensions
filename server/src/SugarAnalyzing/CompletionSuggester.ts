@@ -1,8 +1,8 @@
 import { DataPathUtils } from "../DataSchema/DataPathUtils";
 import { DataSchemaAttribute, DataSchemaElementNode } from "../DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "../DataSchema/DataSchemaUtils";
-import { SugarElementInfo } from "../SugarElements/SugarElementInfo";
-import { UsedDefinedSugarTypeInfo } from "../SugarElements/UsedDefinedSugarTypeInfo";
+import { AttributeType, SugarElementInfo } from "../SugarElements/SugarElementInfo";
+import { TypeKind, UserDefinedSugarTypeInfo } from "../SugarElements/UserDefinedSugarTypeInfo";
 import {
     CompletionContext,
     getCompletionContext,
@@ -22,6 +22,7 @@ export enum SuggestionItemType {
     Attribute,
     DataElement,
     DataAttribute,
+    Type,
 }
 
 export type SuggestionItem =
@@ -43,17 +44,21 @@ export type SuggestionItem =
           type: SuggestionItemType.Attribute;
           name: string;
           parentElementName: string;
+      }
+    | {
+          type: SuggestionItemType.Type;
+          name: string;
+          typeKind: TypeKind;
       };
 
 export class CompletionSuggester {
     private readonly sugarElementInfos: SugarElementInfo[];
-    // @ts-ignore
-    private readonly sugarTypes: UsedDefinedSugarTypeInfo[];
+    private sugarTypes: UserDefinedSugarTypeInfo[];
     private readonly dataSchemaRoot: DataSchemaElementNode;
     private readonly contextResolver: CodeContextByNodeResolver;
 
     public constructor(
-        sugarTypes: UsedDefinedSugarTypeInfo[],
+        sugarTypes: UserDefinedSugarTypeInfo[],
         sugarElementInfos: SugarElementInfo[],
         dataSchemaRoot: DataSchemaElementNode
     ) {
@@ -61,6 +66,10 @@ export class CompletionSuggester {
         this.sugarElementInfos = sugarElementInfos;
         this.dataSchemaRoot = dataSchemaRoot;
         this.contextResolver = new CodeContextByNodeResolver(this.sugarElementInfos);
+    }
+
+    public updateUserDefinedSugarType(sugarTypes: UserDefinedSugarTypeInfo[]): void {
+        this.sugarTypes = sugarTypes;
     }
 
     public suggest(codeBeforeCursor: string): Suggestions {
@@ -111,12 +120,32 @@ export class CompletionSuggester {
             return [];
         }
         if (
+            codeContext.type === "AttributeValue" &&
+            completionContext.expectedToken === ExpectedTokenType.AttributeValueContent &&
+            codeContext.currentAttributeInfo != undefined &&
+            codeContext.currentAttributeInfo.valueTypes != undefined &&
+            codeContext.currentAttributeInfo.valueTypes.includes(AttributeType.Type)
+        ) {
+            return this.suggestType();
+        }
+        if (
             codeContext.type === "DataAttributeValue" &&
-            completionContext.expectedToken === ExpectedTokenType.AttributeValueContent
+            completionContext.expectedToken === ExpectedTokenType.AttributeValueContent &&
+            codeContext.currentAttributeInfo != undefined &&
+            codeContext.currentAttributeInfo.valueTypes != undefined &&
+            codeContext.currentAttributeInfo.valueTypes.includes(AttributeType.Path)
         ) {
             return this.suggestDataPath(codeContext.dataContext, this.dataSchemaRoot, completionContext.node.value);
         }
         return [];
+    }
+
+    private suggestType(): SuggestionItem[] {
+        return this.sugarTypes.map<SuggestionItem>(x => ({
+            type: SuggestionItemType.Type,
+            name: x.name,
+            typeKind: TypeKind.UserDefined,
+        }));
     }
 
     private suggestDataPath(

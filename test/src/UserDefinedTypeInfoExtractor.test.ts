@@ -1,7 +1,7 @@
 import { suite, test } from "mocha-typescript";
 
 import { TypeInfoExtractor } from "../../server/src/SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
-import { UsedDefinedSugarTypeInfo } from "../../server/src/SugarElements/UsedDefinedSugarTypeInfo";
+import { UserDefinedSugarTypeInfo } from "../../server/src/SugarElements/UserDefinedSugarTypeInfo";
 import { parseSugar } from "../../server/src/SugarParsing/SugarGrammar/SugarParser";
 import { NullTracer } from "../../server/src/Utils/PegJSUtils/NullTracer";
 
@@ -43,7 +43,7 @@ export class UserDefinedTypeInfoExtractorTest {
         ]);
     }
 
-    private extractTypeInfos(input: string): UsedDefinedSugarTypeInfo[] {
+    private extractTypeInfos(input: string): UserDefinedSugarTypeInfo[] {
         const typeInfoExtractor = new TypeInfoExtractor();
         const parseResult = parseSugar(input, {
             tracer: new NullTracer(),
