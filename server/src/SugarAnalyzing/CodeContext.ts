@@ -35,4 +35,17 @@ interface DataAttributeValueCodeContext {
     dataContext: DataPath;
 }
 
-export type CodeContext = ElementNameCodeContext | AttributeNameCodeContext | DataAttributeValueCodeContext;
+interface AttributeValueCodeContext {
+    type: "AttributeValue";
+    contextNode: SugarAttributeValue;
+    currentElementInfo?: SugarElementInfo;
+    currentAttributeInfo?: SugarAttributeInfo;
+    elementStack: SugarElement[];
+    dataContext: DataPath;
+}
+
+export type CodeContext =
+    | ElementNameCodeContext
+    | AttributeNameCodeContext
+    | DataAttributeValueCodeContext
+    | AttributeValueCodeContext;

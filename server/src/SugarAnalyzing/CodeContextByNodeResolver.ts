@@ -1,5 +1,5 @@
 import { DataPathUtils } from "../DataSchema/DataPathUtils";
-import { SugarElementInfo } from "../SugarElements/SugarElementInfo";
+import { AttributeType, SugarElementInfo } from "../SugarElements/SugarElementInfo";
 import { SugarElement } from "../SugarParsing/SugarGrammar/SugarParser";
 
 import { CodeContext } from "./CodeContext";
@@ -51,6 +51,20 @@ export class CodeContextByNodeResolver {
                     ? undefined
                     : currentElementInfo.attributes.find(x => x.name === node.parent.name.value);
             const dataContext = this.resolveDataContext(this.withoutLast(elementStack));
+            if (
+                currentAttributeInfo == undefined ||
+                currentAttributeInfo.valueTypes == undefined ||
+                !currentAttributeInfo.valueTypes.includes(AttributeType.Path)
+            ) {
+                return {
+                    type: "AttributeValue",
+                    contextNode: node,
+                    currentElementInfo: currentElementInfo,
+                    currentAttributeInfo: currentAttributeInfo,
+                    elementStack: elementStack,
+                    dataContext: DataPathUtils.normalizeDataPath(dataContext),
+                };
+            }
             return {
                 type: "DataAttributeValue",
                 contextNode: node,

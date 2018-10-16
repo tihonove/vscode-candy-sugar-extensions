@@ -257,21 +257,7 @@ export function getCompletionContext(input: string): undefined | CompletionConte
                 node: tracer.failedRuleStackSnapshot[tracer.failedRuleStackSnapshot.length - 1].name,
             };
         }
-        if (tracer.failedRule === "EqualsAfterAttributeName") {
-            const topElement = lastOrUndefined(tracer.failedRuleStackSnapshot);
-            if (topElement == undefined) {
-                return undefined;
-            }
-            const topAttribute = lastOrUndefined(topElement.attributes);
-            if (topAttribute == undefined || topAttribute.name == undefined) {
-                return undefined;
-            }
-            return {
-                expectedToken: ExpectedTokenType.AttributeName,
-                node: topAttribute.name,
-            };
-        }
-        if (tracer.failedRule === "AttributeName") {
+        if (tracer.failedRule === "EqualsAfterAttributeName" || tracer.failedRule === "AttributeName") {
             const topElement = lastOrUndefined(tracer.failedRuleStackSnapshot);
             if (topElement == undefined) {
                 return undefined;

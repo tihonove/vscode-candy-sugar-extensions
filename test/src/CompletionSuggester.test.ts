@@ -80,6 +80,15 @@ export class CompletionSuggesterTest {
     }
 
     @test
+    public "Не предлагать ничего на строковых атрибутах"(): void {
+        const fileSuggester = this.createTestCompletionSuggester();
+        const suggestions = fileSuggester.suggest('<atag1 optional-attr="');
+        expect(suggestions).to.shallowDeepEqual({
+            items: { length: 0 },
+        });
+    }
+
+    @test
     public "Непустой аттрибут path у первого открывающегося тэга"(): void {
         const fileSuggester = this.createTestCompletionSuggester();
         const suggestions = fileSuggester.suggest('<atag1 path="Root/');
