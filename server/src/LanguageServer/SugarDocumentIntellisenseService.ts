@@ -1,152 +1,102 @@
 import * as fs from "fs";
+import * as _ from "lodash";
 import path from "path";
-import { CancellationToken } from "vscode-jsonrpc";
 import {
     CompletionItem,
     CompletionItemKind,
-    Connection,
-    TextDocumentPositionParams,
-    TextDocuments,
-} from "vscode-languageserver";
-import {
     Definition,
+    Diagnostic,
     DiagnosticSeverity,
     Hover,
+    Position,
     Range,
-    TextDocument,
     TextDocumentChangeEvent,
 } from "vscode-languageserver-types";
 
-import { DataSchemaElementNode } from "../DataSchema/DataSchemaNode";
+import { DataSchemaElementNode, DataSchemaNode } from "../DataSchema/DataSchemaNode";
 import { SchemaRngConverter } from "../DataSchema/DataSchemaParser/SchemaRngConverter";
-import { SuggestionItemType } from "../SugarAnalyzing/CompletionSuggester";
+import { DataSchemaUtils } from "../DataSchema/DataSchemaUtils";
+import { CodeContext } from "../SugarAnalyzing/CodeContext";
+import { CodeContextByNodeResolver } from "../SugarAnalyzing/CodeContextByNodeResolver";
+import { CompletionSuggester, SuggestionItemType } from "../SugarAnalyzing/CompletionSuggester";
+import { OffsetToNodeMap } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMap";
+import { OffsetToNodeMapBuilder } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
 import { allElements } from "../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
+import { SugarElementInfo } from "../SugarElements/SugarElementInfo";
+import { createEvent } from "../Utils/Event";
 import { CodePosition } from "../Utils/PegJSUtils/Types";
-import { isNotNullOrUndefined, valueOrDefault } from "../Utils/TypingUtils";
+import { isNotNullOrUndefined } from "../Utils/TypingUtils";
 import { UriUtils } from "../Utils/UriUtils";
 import { SugarValidator } from "../Validator/Validator/SugarValidator";
 import { createDefaultValidator } from "../Validator/ValidatorFactory";
 
-import { ILogger } from "./Logger";
+import { CompletionItemDescriptionResolver } from "./CompletionItemDescriptionResolver";
+import { ILogger } from "./Logging/Logger";
 import { MarkdownUtils } from "./MarkdownUtils";
-import { SugarDocumentServices } from "./SugarDocumentServices";
+
+export interface IDocumentOffsetPositionResolver {
+    offsetAt(position: Position): number;
+    positionAt(offset: number): Position;
+}
 
 export class SugarDocumentIntellisenseService {
-    private readonly connection: Connection;
     private readonly logger: ILogger;
-    private readonly documents: TextDocuments;
-    private parsedSchemaDocuments?: DataSchemaElementNode;
-    private documentServices?: SugarDocumentServices;
-    private validator?: SugarValidator;
+    private readonly parsedSchemaDocuments: DataSchemaElementNode;
+    private readonly validator: SugarValidator;
     private readonly documentUri: string;
+    private readonly schemaFileUri: string;
+    private readonly offsetPositionResolver: IDocumentOffsetPositionResolver;
+    private readonly suggester: CompletionSuggester;
+    private readonly descriptionResolver: CompletionItemDescriptionResolver;
+    private readonly updateDomDebounced = _.debounce((text: string) => this.updateDom(text), 50, { trailing: true });
+    private readonly builder: OffsetToNodeMapBuilder;
+    private offsetToNodeMap?: OffsetToNodeMap;
+    private readonly sugarElements: SugarElementInfo[];
 
-    public constructor(connection: Connection, logger: ILogger, documents: TextDocuments, documentUri: string) {
+    public sendValidationsEvent = createEvent<[Diagnostic[]]>();
+
+    public constructor(logger: ILogger, documentUri: string, offsetPositionResolver: IDocumentOffsetPositionResolver) {
         this.documentUri = documentUri;
-        this.connection = connection;
         this.logger = logger;
-        this.documents = documents;
-        this.documents.onDidChangeContent(this.handleChangeDocumentContent);
-        this.documents.onDidClose(this.handleCloseTextDocument);
-        this.connection.onHover(this.handleHover);
-        this.connection.onDefinition(this.handleResolveDefinition);
-        this.connection.onCompletion(this.handleResolveCompletion);
-        this.connection.onCompletionResolve(this.handleEnrichCompletionItem);
+        this.offsetPositionResolver = offsetPositionResolver;
+        this.schemaFileUri = UriUtils.fileNameToUri(this.findSchemaFile(this.documentUri));
+        this.parsedSchemaDocuments = this.loadDataSchema();
+        this.suggester = new CompletionSuggester([], allElements, this.parsedSchemaDocuments);
+        this.descriptionResolver = new CompletionItemDescriptionResolver(this.parsedSchemaDocuments);
+        this.sugarElements = allElements;
+        this.validator = createDefaultValidator(this.parsedSchemaDocuments);
+        this.builder = new OffsetToNodeMapBuilder();
     }
 
-    public readonly handleCloseTextDocument = ({ document }: TextDocumentChangeEvent): void => {
+    public handleCloseTextDocument({ document }: TextDocumentChangeEvent): void {
         this.logger.info(`Send empty diagnostics for closed file. (${document.uri})`);
-        this.connection.sendDiagnostics({
-            uri: this.documentUri,
-            diagnostics: [],
-        });
-        if (this.parsedSchemaDocuments != undefined) {
-            this.parsedSchemaDocuments = undefined;
-        }
-        if (this.documentServices != undefined) {
-            this.documentServices = undefined;
-        }
-    };
+        this.sendEmptyValidations();
+    }
 
-    public async validateTextDocument(textDocument: TextDocument): Promise<void> {
-        if (this.validator == undefined) {
-            return;
-        }
-        this.logger.info(`Begin document validation. (${textDocument.uri})`);
-        const validationResults = this.validator.validate(textDocument.getText());
-        this.connection.sendDiagnostics({
-            uri: textDocument.uri,
-            diagnostics: validationResults.map(x => ({
+    public validateTextDocument(text: string): void {
+        this.logger.info(`Begin document validation. (${this.documentUri})`);
+        const validationResults = this.validator.validate(text);
+        this.sendValidationsEvent.emit(
+            validationResults.map(x => ({
                 message: x.message,
                 range: this.pegjsPositionToVsCodeRange(x.position),
                 severity: DiagnosticSeverity.Error,
                 source: "sugar-validator",
                 code: x.ruleName,
-            })),
-        });
-        this.logger.info(`End document validation. (${textDocument.uri})`);
-    }
-
-    public readonly handleChangeDocumentContent = (change: TextDocumentChangeEvent) => {
-        const documentUri = change.document.uri;
-        this.logger.info(`Begin handle document change. (${documentUri})`);
-        if (change.document.languageId !== "sugar-xml") {
-            return;
-        }
-        this.documents[documentUri] = change.document.getText();
-        const schemaFile = this.findSchemaFile(documentUri);
-        const schemaFileUri = UriUtils.fileNameToUri(schemaFile);
-        const schemaParser = new SchemaRngConverter();
-        if (this.parsedSchemaDocuments == undefined) {
-            this.logger.info(`Schema is not loaded. Loading. (${documentUri})`);
-            try {
-                const schemaFileContent = fs.readFileSync(schemaFile, "utf8");
-                this.parsedSchemaDocuments = schemaParser.toDataSchema(schemaFileContent);
-            } catch (e) {
-                this.logger.info(`Failed to load schema. (${documentUri})`);
-                // ignore read error
-            }
-        }
-
-        let documentService = this.documentServices;
-        if (documentService == undefined) {
-            this.logger.info(`Create services for document. (${documentUri})`);
-            documentService = new SugarDocumentServices(
-                schemaFileUri,
-                valueOrDefault(this.parsedSchemaDocuments, emptyDataSchema),
-                allElements,
-                this.logger
-            );
-            this.documentServices = documentService;
-        }
-        documentService.sugarDocumentDom.processDocumentChange(change.document.getText());
-        this.validator = createDefaultValidator(this.parsedSchemaDocuments);
-        this.validateTextDocument(change.document);
-        this.logger.info(`End handle document change. (${documentUri})`);
-    };
-
-    public findSchemaFile(uri: string): string {
-        const filename = UriUtils.toFileName(uri);
-        const formDirName = path.basename(path.dirname(path.dirname(filename)));
-        const schemaFile = path.join(path.dirname(filename), "..", "schemas", formDirName + ".rng.xml");
-        return schemaFile;
-    }
-
-    public getDocumentServices(): undefined | SugarDocumentServices {
-        if (this.documentServices != undefined) {
-            return this.documentServices;
-        }
-        return undefined;
-    }
-
-    public readonly handleHover = (positionParams: TextDocumentPositionParams): undefined | Hover => {
-        const textDocument = this.documents.get(positionParams.textDocument.uri);
-        const services = this.getDocumentServices();
-        if (services == undefined || textDocument == undefined) {
-            return undefined;
-        }
-        const context = services.sugarDocumentDom.resolveContextAsOffset(
-            textDocument.offsetAt(positionParams.position)
+            }))
         );
+        this.logger.info(`End document validation. (${this.documentUri})`);
+    }
+
+    public processChangeDocumentContent(text: string): void {
+        this.logger.info(`Begin handle document change. (${this.documentUri})`);
+        this.updateDomDebounced(text);
+        this.validateTextDocument(text);
+        this.logger.info(`End handle document change. (${this.documentUri})`);
+    }
+
+    public getHoverInfoAtPosition(position: Position): undefined | Hover {
+        const context = this.resolveContextAsOffset(this.offsetPositionResolver.offsetAt(position));
         if (context == undefined) {
             return undefined;
         }
@@ -179,7 +129,7 @@ export class SugarDocumentIntellisenseService {
             if (context.currentDataContext == undefined) {
                 return undefined;
             }
-            const value = services.sugarDocumentDom.getDataElementOrAttributeByPath(context.currentDataContext);
+            const value = this.getDataElementOrAttributeByPath(context.currentDataContext);
             if (value == undefined) {
                 return undefined;
             }
@@ -216,74 +166,28 @@ export class SugarDocumentIntellisenseService {
             return undefined;
         }
         return undefined;
-    };
+    }
 
-    public readonly handleResolveDefinition = (positionParams: TextDocumentPositionParams): undefined | Definition => {
-        const services = this.getDocumentServices();
-        const textDocument = this.documents.get(positionParams.textDocument.uri);
-        if (services == undefined || textDocument == undefined) {
-            return undefined;
-        }
-        const context = services.sugarDocumentDom.resolveContextAsOffset(
-            textDocument.offsetAt(positionParams.position)
-        );
+    public getSymbolDefinitionAtPosition(position: Position): undefined | Definition {
+        const context = this.resolveContextAsOffset(this.offsetPositionResolver.offsetAt(position));
         if (context == undefined) {
             return undefined;
         }
         if (context.type === "DataAttributeValue" && context.currentDataContext != undefined) {
-            const dataNode = services.sugarDocumentDom.getDataElementOrAttributeByPath(context.currentDataContext);
-            const dataSchemaUri = services.sugarDocumentDom.getDataSchemaUri();
-            if (dataNode == undefined || dataSchemaUri == undefined) {
+            const dataNode = this.getDataElementOrAttributeByPath(context.currentDataContext);
+            if (dataNode == undefined) {
                 return undefined;
             }
             return {
-                range: {
-                    start: {
-                        character: dataNode.position.start.column - 1,
-                        line: dataNode.position.start.line - 1,
-                    },
-                    end: {
-                        character: dataNode.position.end.column - 1,
-                        line: dataNode.position.end.line - 1,
-                    },
-                },
-                uri: dataSchemaUri,
+                range: this.pegjsPositionToVsCodeRange(dataNode.position),
+                uri: this.schemaFileUri,
             };
         }
         return undefined;
-    };
-
-    public pegjsPositionToVsCodeRange(position: CodePosition): Range {
-        return {
-            start: {
-                character: position.start.column - 1,
-                line: position.start.line - 1,
-            },
-            end: {
-                character: position.end.column - 1,
-                line: position.end.line - 1,
-            },
-        };
     }
 
-    public readonly handleResolveCompletion = (
-        textDocumentPosition: TextDocumentPositionParams,
-        _token: CancellationToken
-    ): CompletionItem[] => {
-        const text = this.documents.get(textDocumentPosition.textDocument.uri);
-        if (text == undefined) {
-            return [];
-        }
-        const textToCursor = text.getText({ start: text.positionAt(0), end: textDocumentPosition.position });
-        const documentService = this.documentServices;
-        if (documentService == undefined) {
-            return [];
-        }
-        const suggester = documentService.suggester;
-
-        if (suggester == undefined) {
-            return [];
-        }
+    public getCompletionAfterText(textToCursor: string): CompletionItem[] {
+        const suggester = this.suggester;
         const results = suggester.suggest(textToCursor);
         if (results == undefined) {
             return [];
@@ -296,7 +200,7 @@ export class SugarDocumentIntellisenseService {
                         kind: CompletionItemKind.Constructor,
                         data: {
                             suggestionItem: x,
-                            uri: textDocumentPosition.textDocument.uri,
+                            uri: this.documentUri,
                         },
                         commitCharacters: [" "],
                     };
@@ -307,7 +211,7 @@ export class SugarDocumentIntellisenseService {
                         kind: CompletionItemKind.Method,
                         data: {
                             suggestionItem: x,
-                            uri: textDocumentPosition.textDocument.uri,
+                            uri: this.documentUri,
                         },
                         commitCharacters: ["="],
                     };
@@ -318,7 +222,7 @@ export class SugarDocumentIntellisenseService {
                         kind: CompletionItemKind.Module,
                         data: {
                             suggestionItem: x,
-                            uri: textDocumentPosition.textDocument.uri,
+                            uri: this.documentUri,
                         },
                         commitCharacters: ["/"],
                     };
@@ -329,7 +233,7 @@ export class SugarDocumentIntellisenseService {
                         kind: CompletionItemKind.Field,
                         data: {
                             suggestionItem: x,
-                            uri: textDocumentPosition.textDocument.uri,
+                            uri: this.documentUri,
                         },
                         commitCharacters: ['"'],
                     };
@@ -337,19 +241,79 @@ export class SugarDocumentIntellisenseService {
                 return undefined;
             })
             .filter(isNotNullOrUndefined);
-    };
+    }
 
-    public readonly handleEnrichCompletionItem = (item: CompletionItem): CompletionItem => {
+    public enrichCompletionItem(item: CompletionItem): CompletionItem {
         // tslint:disable-next-line no-unsafe-any
         const { suggestionItem } = item.data;
-        const services = this.documentServices;
-        if (services == undefined) {
-            return item;
-        }
         // tslint:disable-next-line no-unsafe-any
-        services.descriptionResolver.enrichCompletionItem(item, suggestionItem);
+        this.descriptionResolver.enrichCompletionItem(item, suggestionItem);
         return item;
-    };
+    }
+
+    private updateDom(text: string): void {
+        this.logger.info("Begin update");
+        try {
+            this.offsetToNodeMap = this.builder.buildOffsetToNodeMap(text);
+        } catch (ignoreError) {
+            // По всей вимдости код невалиден. Просто оставим последний валидный map
+        }
+        this.logger.info("End update");
+    }
+
+    private getDataElementOrAttributeByPath(path: string[]): undefined | DataSchemaNode {
+        return DataSchemaUtils.findSchemaNodeByPath(this.parsedSchemaDocuments, path);
+    }
+
+    private resolveContextAsOffset(offset: number): undefined | CodeContext {
+        if (this.offsetToNodeMap == undefined) {
+            return undefined;
+        }
+        const contextAtCursorResolver = new CodeContextByNodeResolver(this.sugarElements);
+        const node = this.offsetToNodeMap.getNodeByOffset(offset);
+        if (node == undefined) {
+            return undefined;
+        }
+        return contextAtCursorResolver.resolveContext(node);
+    }
+
+    private loadDataSchema(): DataSchemaElementNode {
+        const schemaFile = this.findSchemaFile(this.documentUri);
+        const schemaParser = new SchemaRngConverter();
+        this.logger.info(`Schema is not loaded. Loading. (${this.documentUri})`);
+        try {
+            const schemaFileContent = fs.readFileSync(schemaFile, "utf8");
+            return schemaParser.toDataSchema(schemaFileContent);
+        } catch (e) {
+            return emptyDataSchema;
+            this.logger.info(`Failed to load schema. (${this.documentUri})`);
+            // ignore read error
+        }
+    }
+
+    private findSchemaFile(uri: string): string {
+        const filename = UriUtils.toFileName(uri);
+        const formDirName = path.basename(path.dirname(path.dirname(filename)));
+        const schemaFile = path.join(path.dirname(filename), "..", "schemas", formDirName + ".rng.xml");
+        return schemaFile;
+    }
+
+    private pegjsPositionToVsCodeRange(position: CodePosition): Range {
+        return {
+            start: {
+                character: position.start.column - 1,
+                line: position.start.line - 1,
+            },
+            end: {
+                character: position.end.column - 1,
+                line: position.end.line - 1,
+            },
+        };
+    }
+
+    private sendEmptyValidations(): void {
+        this.sendValidationsEvent.emit([]);
+    }
 }
 
 const emptyDataSchema: DataSchemaElementNode = {

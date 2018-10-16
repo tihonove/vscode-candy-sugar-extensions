@@ -8,10 +8,37 @@ import {
     TextDocumentPositionParams,
     TextDocuments,
 } from "vscode-languageserver";
-import { Definition, Hover, TextDocumentChangeEvent } from "vscode-languageserver-types";
+import { Definition, Hover, Position, TextDocumentChangeEvent } from "vscode-languageserver-types";
 
-import { ILogger, VsCodeServerLogger } from "./Logger";
-import { SugarDocumentIntellisenseService } from "./SugarDocumentIntellisenseService";
+import { ILogger } from "./Logging/Logger";
+import { VsCodeServerLogger } from "./Logging/VsCodeServerLogger";
+import { IDocumentOffsetPositionResolver, SugarDocumentIntellisenseService } from "./SugarDocumentIntellisenseService";
+
+class DocumentOffsetPositionResolver implements IDocumentOffsetPositionResolver {
+    private readonly documents: TextDocuments;
+    private readonly documentUri: string;
+
+    public constructor(documents: TextDocuments, documentUri: string) {
+        this.documents = documents;
+        this.documentUri = documentUri;
+    }
+
+    public offsetAt(position: Position): number {
+        const document = this.documents.get(this.documentUri);
+        if (document == undefined) {
+            throw new Error(`Document with uri '${this.documentUri}' does not exists in observer documents`);
+        }
+        return document.offsetAt(position);
+    }
+
+    public positionAt(offset: number): Position {
+        const document = this.documents.get(this.documentUri);
+        if (document == undefined) {
+            throw new Error(`Document with uri '${this.documentUri}' does not exists in observer documents`);
+        }
+        return document.positionAt(offset);
+    }
+}
 
 export class SugarLanguageServer {
     private readonly connection: Connection;
@@ -65,21 +92,33 @@ export class SugarLanguageServer {
         }
         let documentService = this.documentServices[documentUri];
         if (documentService == undefined) {
-            documentService = new SugarDocumentIntellisenseService(
-                this.connection,
-                this.logger,
-                this.documents,
-                documentUri
-            );
+            documentService = this.createSugarDocumentIntellisenseService(documentUri);
             this.documentServices[documentUri] = documentService;
         }
-        documentService.handleChangeDocumentContent(change);
+        documentService.processChangeDocumentContent(change.document.getText());
     };
+
+    private createSugarDocumentIntellisenseService(documentUri: string): SugarDocumentIntellisenseService {
+        const result = new SugarDocumentIntellisenseService(
+            this.logger,
+            documentUri,
+            new DocumentOffsetPositionResolver(this.documents, documentUri)
+        );
+
+        result.sendValidationsEvent.addListener(validations => {
+            this.connection.sendDiagnostics({
+                uri: documentUri,
+                diagnostics: validations,
+            });
+        });
+
+        return result;
+    }
 
     private readonly handleHover = (positionParams: TextDocumentPositionParams): undefined | Hover => {
         const documentService = this.documentServices[positionParams.textDocument.uri];
         if (documentService != undefined) {
-            return documentService.handleHover(positionParams);
+            return documentService.getHoverInfoAtPosition(positionParams.position);
         }
         return undefined;
     };
@@ -87,7 +126,7 @@ export class SugarLanguageServer {
     private readonly handleResolveDefinition = (positionParams: TextDocumentPositionParams): undefined | Definition => {
         const documentService = this.documentServices[positionParams.textDocument.uri];
         if (documentService != undefined) {
-            return documentService.handleResolveDefinition(positionParams);
+            return documentService.getSymbolDefinitionAtPosition(positionParams.position);
         }
         return undefined;
     };
@@ -96,9 +135,17 @@ export class SugarLanguageServer {
         textDocumentPosition: TextDocumentPositionParams,
         _token: CancellationToken
     ): CompletionItem[] => {
+        const text = this.documents.get(textDocumentPosition.textDocument.uri);
+        if (text == undefined) {
+            return [];
+        }
+        const textToCursor = text.getText({
+            start: text.positionAt(0),
+            end: textDocumentPosition.position,
+        });
         const documentService = this.documentServices[textDocumentPosition.textDocument.uri];
         if (documentService != undefined) {
-            return documentService.handleResolveCompletion(textDocumentPosition, _token);
+            return documentService.getCompletionAfterText(textToCursor);
         }
         return [];
     };
@@ -108,7 +155,7 @@ export class SugarLanguageServer {
         const { uri } = item.data;
         const documentService = this.documentServices[uri];
         if (documentService != undefined) {
-            return documentService.handleEnrichCompletionItem(item);
+            return documentService.enrichCompletionItem(item);
         }
         return item;
     };

@@ -1,8 +1,6 @@
 import { RemoteConsole } from "vscode-languageserver";
 
-export interface ILogger {
-    info(message: string): void;
-}
+import { ILogger } from "./Logger";
 
 export class VsCodeServerLogger implements ILogger {
     private readonly remoteConsole: RemoteConsole;
@@ -10,7 +8,7 @@ export class VsCodeServerLogger implements ILogger {
 
     public constructor(remoteConsole: RemoteConsole) {
         this.remoteConsole = remoteConsole;
-        this.showLogs = false;
+        this.showLogs = true;
     }
 
     public info(message: string): void {

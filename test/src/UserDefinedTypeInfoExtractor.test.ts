@@ -1,10 +1,10 @@
 import { suite, test } from "mocha-typescript";
 
+import { TypeInfoExtractor } from "../../server/src/SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
 import { UsedDefinedSugarTypeInfo } from "../../server/src/SugarElements/UsedDefinedSugarTypeInfo";
 import { parseSugar } from "../../server/src/SugarParsing/SugarGrammar/SugarParser";
 import { NullTracer } from "../../server/src/Utils/PegJSUtils/NullTracer";
 
-import { TypeInfoExtractor } from "../../server/src/SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
 import { expect } from "./Utils/Expect";
 
 @suite
