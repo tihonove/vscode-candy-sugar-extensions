@@ -4,7 +4,7 @@
 	"description": "VSCode extensions for Candy.Sugar",
 	"author": "tihonove",
 	"license": "MIT",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"icon": "icon.png",
 	"repository": {
 		"type": "git",
