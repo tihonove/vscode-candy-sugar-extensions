@@ -1,7 +1,7 @@
 import { suite, test } from "mocha-typescript";
 
-import { CodeContext } from "../../server/src/SugarAnalyzing/CodeContext";
-import { CodeContextByNodeResolver } from "../../server/src/SugarAnalyzing/CodeContextByNodeResolver";
+import { CodeContext } from "../../server/src/SugarAnalyzing/ContextResolving/CodeContext";
+import { CodeContextByNodeResolver } from "../../server/src/SugarAnalyzing/ContextResolving/CodeContextByNodeResolver";
 import { OffsetToNodeMapBuilder } from "../../server/src/SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
 import { SugarElementInfo } from "../../server/src/SugarElements/SugarElementInfo";
 

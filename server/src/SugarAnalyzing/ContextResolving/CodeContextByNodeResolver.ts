@@ -1,9 +1,9 @@
-import { DataPathUtils } from "../DataSchema/DataPathUtils";
-import { AttributeType, SugarElementInfo } from "../SugarElements/SugarElementInfo";
-import { SugarElement } from "../SugarParsing/SugarGrammar/SugarParser";
+import { DataPathUtils } from "../../DataSchema/DataPathUtils";
+import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
+import { SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
+import { NodeWithDefinition } from "../OffsetToNodeMaping/OffsetToNodeMapBuilder";
 
 import { CodeContext } from "./CodeContext";
-import { NodeWithDefinition } from "./OffsetToNodeMaping/OffsetToNodeMapBuilder";
 
 export class CodeContextByNodeResolver {
     private readonly sugarElementInfos: SugarElementInfo[];

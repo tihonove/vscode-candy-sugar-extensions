@@ -1,10 +1,7 @@
 import { suite, test } from "mocha-typescript";
 
-import {
-    CompletionSuggester,
-    SuggestionItem,
-    SuggestionItemType,
-} from "../../server/src/SugarAnalyzing/CompletionSuggester";
+import { CompletionSuggester } from "../../server/src/SugarAnalyzing/ComletionSuggesting/CompletionSuggester";
+import { SuggestionItem, SuggestionItemType } from "../../server/src/SugarAnalyzing/ComletionSuggesting/SuggestionItem";
 
 import { expect } from "./Utils/Expect";
 import { testDataSchema, testSugarElementInfos, testSugarTypes } from "./Utils/TestInfos";

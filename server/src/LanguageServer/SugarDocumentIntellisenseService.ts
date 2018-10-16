@@ -16,9 +16,10 @@ import {
 import { DataSchemaElementNode, DataSchemaNode } from "../DataSchema/DataSchemaNode";
 import { SchemaRngConverter } from "../DataSchema/DataSchemaParser/SchemaRngConverter";
 import { DataSchemaUtils } from "../DataSchema/DataSchemaUtils";
-import { CodeContext } from "../SugarAnalyzing/CodeContext";
-import { CodeContextByNodeResolver } from "../SugarAnalyzing/CodeContextByNodeResolver";
-import { CompletionSuggester, SuggestionItem, SuggestionItemType } from "../SugarAnalyzing/CompletionSuggester";
+import { CompletionSuggester } from "../SugarAnalyzing/ComletionSuggesting/CompletionSuggester";
+import { SuggestionItem, SuggestionItemType } from "../SugarAnalyzing/ComletionSuggesting/SuggestionItem";
+import { CodeContext } from "../SugarAnalyzing/ContextResolving/CodeContext";
+import { CodeContextByNodeResolver } from "../SugarAnalyzing/ContextResolving/CodeContextByNodeResolver";
 import { OffsetToNodeMap } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMap";
 import { OffsetToNodeMapBuilder } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
 import { TypeInfoExtractor } from "../SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";

@@ -1,55 +1,22 @@
-import { DataPathUtils } from "../DataSchema/DataPathUtils";
-import { DataSchemaAttribute, DataSchemaElementNode } from "../DataSchema/DataSchemaNode";
-import { DataSchemaUtils } from "../DataSchema/DataSchemaUtils";
-import { AttributeType, SugarElementInfo } from "../SugarElements/SugarElementInfo";
-import { TypeKind, UserDefinedSugarTypeInfo } from "../SugarElements/UserDefinedSugarTypeInfo";
+import { DataPathUtils } from "../../DataSchema/DataPathUtils";
+import { DataSchemaAttribute, DataSchemaElementNode } from "../../DataSchema/DataSchemaNode";
+import { DataSchemaUtils } from "../../DataSchema/DataSchemaUtils";
+import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
+import { TypeKind, UserDefinedSugarTypeInfo } from "../../SugarElements/UserDefinedSugarTypeInfo";
 import {
     CompletionContext,
     getCompletionContext,
-} from "../SugarParsing/CompletionClassificator/CompletionClassificator";
-import { ExpectedTokenType } from "../SugarParsing/CompletionClassificator/ExpectedTokenType";
-import { valueOrDefault } from "../Utils/TypingUtils";
+} from "../../SugarParsing/CompletionClassificator/CompletionClassificator";
+import { ExpectedTokenType } from "../../SugarParsing/CompletionClassificator/ExpectedTokenType";
+import { valueOrDefault } from "../../Utils/TypingUtils";
+import { CodeContext } from "../ContextResolving/CodeContext";
+import { CodeContextByNodeResolver } from "../ContextResolving/CodeContextByNodeResolver";
 
-import { CodeContext } from "./CodeContext";
-import { CodeContextByNodeResolver } from "./CodeContextByNodeResolver";
+import { SuggestionItem, SuggestionItemType } from "./SuggestionItem";
 
 export interface Suggestions {
     items: SuggestionItem[];
 }
-
-export enum SuggestionItemType {
-    Element,
-    Attribute,
-    DataElement,
-    DataAttribute,
-    Type,
-}
-
-export type SuggestionItem =
-    | {
-          type: SuggestionItemType.Element;
-          name: string;
-      }
-    | {
-          type: SuggestionItemType.DataElement;
-          name: string;
-          fullPath: string[];
-      }
-    | {
-          type: SuggestionItemType.DataAttribute;
-          name: string;
-          fullPath: string[];
-      }
-    | {
-          type: SuggestionItemType.Attribute;
-          name: string;
-          parentElementName: string;
-      }
-    | {
-          type: SuggestionItemType.Type;
-          name: string;
-          typeKind: TypeKind;
-      };
 
 export class CompletionSuggester {
     private readonly sugarElementInfos: SugarElementInfo[];

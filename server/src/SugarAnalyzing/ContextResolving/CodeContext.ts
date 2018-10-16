@@ -1,12 +1,12 @@
-import { DataPath } from "../DataSchema/DataPathUtils";
-import { SugarAttributeInfo, SugarElementInfo } from "../SugarElements/SugarElementInfo";
+import { DataPath } from "../../DataSchema/DataPathUtils";
+import { SugarAttributeInfo, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 
 import {
     SugarAttributeName,
     SugarAttributeValue,
     SugarElement,
     SugarElementName,
-} from "../SugarParsing/SugarGrammar/SugarParser";
+} from "../../SugarParsing/SugarGrammar/SugarParser";
 
 export interface ElementNameCodeContext {
     type: "ElementName";
