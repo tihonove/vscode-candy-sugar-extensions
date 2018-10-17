@@ -8,6 +8,7 @@ import {
     Diagnostic,
     DiagnosticSeverity,
     Hover,
+    MarkupKind,
     Position,
     Range,
     TextDocumentChangeEvent,
@@ -24,8 +25,8 @@ import { OffsetToNodeMap } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNo
 import { OffsetToNodeMapBuilder } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
 import { TypeInfoExtractor } from "../SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
 import { allElements } from "../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
-import { SugarElementInfo } from "../SugarElements/SugarElementInfo";
-import { TypeKind, UserDefinedSugarTypeInfo } from "../SugarElements/UserDefinedSugarTypeInfo";
+import { AttributeType, SugarElementInfo } from "../SugarElements/SugarElementInfo";
+import { defaultBuiltInTypeNames, TypeKind, UserDefinedSugarTypeInfo } from "../SugarElements/UserDefinedSugarTypeInfo";
 import { createEvent } from "../Utils/Event";
 import { CodePosition } from "../Utils/PegJSUtils/Types";
 import { isNotNullOrUndefined } from "../Utils/TypingUtils";
@@ -128,6 +129,48 @@ export class SugarDocumentIntellisenseService {
             };
         }
 
+        if (context.type === "AttributeValue" && context.currentAttributeInfo != undefined) {
+            if (context.currentAttributeInfo.valueTypes.includes(AttributeType.Type)) {
+                const typeName = context.contextNode.value;
+                if (this.userDefinedTypes != undefined) {
+                    const userDefinedTypeInfo = this.userDefinedTypes.find(x => x.name === typeName);
+                    if (userDefinedTypeInfo != undefined) {
+                        let documentationText = "";
+                        if (userDefinedTypeInfo.description != undefined) {
+                            documentationText += "```xml\n";
+                            documentationText += `<type name="${userDefinedTypeInfo.name}" />\n`;
+                            documentationText += "```\n";
+                        }
+                        if (userDefinedTypeInfo.description != undefined) {
+                            documentationText += userDefinedTypeInfo.description + "\n";
+                        }
+                        if (userDefinedTypeInfo.constraintStrings.length > 0) {
+                            documentationText += "```xml\n";
+                            documentationText += userDefinedTypeInfo.constraintStrings.join("\n");
+                            documentationText += "```\n";
+                        }
+
+                        return {
+                            range: this.pegjsPositionToVsCodeRange(context.contextNode.position),
+                            contents: {
+                                kind: MarkupKind.Markdown,
+                                value: documentationText,
+                            },
+                        };
+                    }
+                }
+                if (defaultBuiltInTypeNames.includes(typeName)) {
+                    return {
+                        range: this.pegjsPositionToVsCodeRange(context.contextNode.position),
+                        contents: {
+                            kind: MarkupKind.Markdown,
+                            value: `**${typeName}**\nBuiltIn type`,
+                        },
+                    };
+                }
+            }
+        }
+
         if (context.type === "DataAttributeValue") {
             if (context.currentDataContext == undefined) {
                 return undefined;
@@ -175,6 +218,21 @@ export class SugarDocumentIntellisenseService {
         const context = this.resolveContextAsOffset(this.offsetPositionResolver.offsetAt(position));
         if (context == undefined) {
             return undefined;
+        }
+        if (
+            context.type === "AttributeValue" &&
+            this.userDefinedTypes != undefined &&
+            context.currentAttributeInfo != undefined &&
+            context.currentAttributeInfo.valueTypes.includes(AttributeType.Type)
+        ) {
+            const userDefinedTypeInfo = this.userDefinedTypes.find(x => x.name === context.contextNode.value);
+            if (userDefinedTypeInfo == undefined) {
+                return undefined;
+            }
+            return {
+                range: this.pegjsPositionToVsCodeRange(userDefinedTypeInfo.position),
+                uri: this.documentUri,
+            };
         }
         if (context.type === "DataAttributeValue" && context.currentDataContext != undefined) {
             const dataNode = this.getDataElementOrAttributeByPath(context.currentDataContext);
@@ -337,9 +395,11 @@ export class SugarDocumentIntellisenseService {
         }
         if (suggestionItem.type === SuggestionItemType.Type && this.userDefinedTypes != undefined) {
             const userDefinedTypeInfo = this.userDefinedTypes.find(x => x.name === suggestionItem.name);
-            vsCodeCompletionItem.detail = `<type name="${suggestionItem.name}">`;
             if (userDefinedTypeInfo == undefined) {
+                vsCodeCompletionItem.detail = `BuiltIn type`;
                 return vsCodeCompletionItem;
+            } else {
+                vsCodeCompletionItem.detail = `<type name="${suggestionItem.name}">`;
             }
             let documentationText = "";
             if (userDefinedTypeInfo.description != undefined) {
