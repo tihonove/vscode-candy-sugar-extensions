@@ -26,6 +26,7 @@ export interface SugarAttributeInfo {
     valueTypes: AttributeType[];
     markdownDescription?: string;
     shortMarkdownDescription?: string;
+    defaultValue?: string;
     optional?: boolean;
     deprecated?: boolean;
 }
