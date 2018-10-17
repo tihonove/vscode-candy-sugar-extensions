@@ -98,3 +98,13 @@ required-attribute (243, 15)
 valid-syntax (47, 8)
   Expected [a-zA-Z0-9\-_] but "Н" found.
 ``` 
+
+### `valid-type`
+
+Проверяет, что в атрибутах с типом, валидный UserDefined-тип или один из встроенных типов.
+
+Пример вывода:
+```
+valid-type (47, 8)
+  Type 'kpppEnvd' не существует.
+``` 
