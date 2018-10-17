@@ -13,3 +13,5 @@ export interface UserDefinedSugarTypeInfo {
     constraintStrings: string[];
     position: CodePosition;
 }
+
+export const defaultBuiltInTypeNames = ["string", "pattern", "integer", "decimal", "date", "gYear"];

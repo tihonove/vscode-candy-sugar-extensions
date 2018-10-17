@@ -1,0 +1,6 @@
+string
+pattern
+integer
+decimal
+date
+gYear

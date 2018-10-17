@@ -2,6 +2,7 @@ import { suite, test } from "mocha-typescript";
 
 import { CompletionSuggester } from "../../server/src/SugarAnalyzing/ComletionSuggesting/CompletionSuggester";
 import { SuggestionItem, SuggestionItemType } from "../../server/src/SugarAnalyzing/ComletionSuggesting/SuggestionItem";
+import { TypeKind } from "../../server/src/SugarElements/UserDefinedSugarTypeInfo";
 
 import { expect } from "./Utils/Expect";
 import { testDataSchema, testSugarElementInfos, testSugarTypes } from "./Utils/TestInfos";
@@ -355,12 +356,31 @@ export class CompletionSuggesterTest {
             {
                 type: SuggestionItemType.Type,
                 name: "a-type1",
+                typeKind: TypeKind.UserDefined,
             },
             {
                 type: SuggestionItemType.Type,
                 name: "b-type2",
+                typeKind: TypeKind.UserDefined,
+            },
+            {
+                type: SuggestionItemType.Type,
+                name: "gYear",
+                typeKind: TypeKind.UserDefined,
+            },
+            {
+                type: SuggestionItemType.Type,
+                name: "string",
+                typeKind: TypeKind.BuiltIn,
             },
         ]);
+    }
+
+    @test
+    public "Если UserDefined-тип совпадет со встроенным, то подсказываем UserDefined"(): void {
+        const fileSuggester = this.createTestCompletionSuggester();
+        const suggestions = fileSuggester.suggest('<atag1 type="');
+        expect(suggestions.items.filter(x => x.name === "gYear").length).to.eql(1);
     }
 
     private assertSuggestions(textToCursor: string, items: Array<Partial<SuggestionItem>>): void {

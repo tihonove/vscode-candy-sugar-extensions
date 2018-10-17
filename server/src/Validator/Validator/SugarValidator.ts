@@ -4,6 +4,8 @@ import { ISugarValidatorRule } from "../Rules/Bases/ISugarValidatorRule";
 import { ValidationItem } from "../Rules/Bases/ValidationItem";
 
 import { traverseSugar } from "../../SugarAnalyzing/Traversing/TraverseSugar";
+import { TypeInfoExtractor } from "../../SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
+import { UserDefinedSugarTypeInfo } from "../../SugarElements/UserDefinedSugarTypeInfo";
 
 enum ValidationSeverity {
     Error = "Error",
@@ -16,13 +18,19 @@ export interface ValidationReportItem extends ValidationItem {
 
 export class SugarValidator {
     private readonly rules: SugarValidatorRuleFactory[] = [];
+    private readonly typeInfoExtractor: TypeInfoExtractor;
+
+    public constructor() {
+        this.typeInfoExtractor = new TypeInfoExtractor();
+    }
 
     public validate(input: string): ValidationReportItem[] {
         try {
             const parseResult = parseSugar(input, { tracer: new NullTracer() });
+            const userDefinedTypeInfos = this.typeInfoExtractor.extractTypeInfos(parseResult);
             const validations: ValidationReportItem[] = [];
             for (const ruleFactory of this.rules) {
-                const rule = ruleFactory();
+                const rule = ruleFactory(userDefinedTypeInfos);
                 validations.push(...this.processRule(rule, parseResult));
             }
             return validations;
@@ -54,4 +62,4 @@ export class SugarValidator {
     }
 }
 
-export type SugarValidatorRuleFactory = () => ISugarValidatorRule;
+export type SugarValidatorRuleFactory = (userDefinedTypeInfos: UserDefinedSugarTypeInfo[]) => ISugarValidatorRule;

@@ -22,6 +22,11 @@ export const testSugarTypes: UserDefinedSugarTypeInfo[] = [
         constraintStrings: [],
         position: fakePosition,
     },
+    {
+        name: "gYear",
+        constraintStrings: [],
+        position: fakePosition,
+    },
 ];
 
 export const testSugarElementInfos: SugarElementInfo[] = [

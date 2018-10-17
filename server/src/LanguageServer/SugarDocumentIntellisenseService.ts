@@ -25,7 +25,7 @@ import { OffsetToNodeMapBuilder } from "../SugarAnalyzing/OffsetToNodeMaping/Off
 import { TypeInfoExtractor } from "../SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
 import { allElements } from "../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
 import { SugarElementInfo } from "../SugarElements/SugarElementInfo";
-import { UserDefinedSugarTypeInfo } from "../SugarElements/UserDefinedSugarTypeInfo";
+import { TypeKind, UserDefinedSugarTypeInfo } from "../SugarElements/UserDefinedSugarTypeInfo";
 import { createEvent } from "../Utils/Event";
 import { CodePosition } from "../Utils/PegJSUtils/Types";
 import { isNotNullOrUndefined } from "../Utils/TypingUtils";
@@ -244,7 +244,10 @@ export class SugarDocumentIntellisenseService {
                 if (x.type === SuggestionItemType.Type) {
                     return {
                         label: x.name,
-                        kind: CompletionItemKind.Class,
+                        kind:
+                            x.typeKind === TypeKind.UserDefined
+                                ? CompletionItemKind.Class
+                                : CompletionItemKind.Interface,
                         data: {
                             suggestionItem: x,
                             uri: this.documentUri,

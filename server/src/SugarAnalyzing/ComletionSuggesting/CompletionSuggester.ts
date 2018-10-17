@@ -2,7 +2,11 @@ import { DataPathUtils } from "../../DataSchema/DataPathUtils";
 import { DataSchemaAttribute, DataSchemaElementNode } from "../../DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "../../DataSchema/DataSchemaUtils";
 import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
-import { TypeKind, UserDefinedSugarTypeInfo } from "../../SugarElements/UserDefinedSugarTypeInfo";
+import {
+    defaultBuiltInTypeNames,
+    TypeKind,
+    UserDefinedSugarTypeInfo,
+} from "../../SugarElements/UserDefinedSugarTypeInfo";
 import {
     CompletionContext,
     getCompletionContext,
@@ -108,11 +112,18 @@ export class CompletionSuggester {
     }
 
     private suggestType(): SuggestionItem[] {
-        return this.sugarTypes.map<SuggestionItem>(x => ({
-            type: SuggestionItemType.Type,
-            name: x.name,
-            typeKind: TypeKind.UserDefined,
-        }));
+        return [
+            ...this.sugarTypes.map<SuggestionItem>(x => ({
+                type: SuggestionItemType.Type,
+                name: x.name,
+                typeKind: TypeKind.UserDefined,
+            })),
+            ...defaultBuiltInTypeNames.filter(x => this.sugarTypes.every(y => y.name !== x)).map<SuggestionItem>(x => ({
+                type: SuggestionItemType.Type,
+                name: x,
+                typeKind: TypeKind.BuiltIn,
+            })),
+        ];
     }
 
     private suggestDataPath(
