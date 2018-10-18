@@ -7,21 +7,12 @@ import {
     TextEditor,
 } from "vscode";
 
-export function insertAutoCloseTag(activeTextEditor: undefined | TextEditor, event: TextDocumentChangeEvent): void {
+export function insertAutoCloseTag(activeTextEditor: TextEditor, event: TextDocumentChangeEvent): void {
     if (!event.contentChanges[0]) {
         return;
     }
     const isRightAngleBracket = checkRightAngleBracket(event.contentChanges[0]);
     if (!isRightAngleBracket && event.contentChanges[0].text !== "/") {
-        return;
-    }
-
-    if (!activeTextEditor) {
-        return;
-    }
-
-    const languageId = activeTextEditor.document.languageId;
-    if (languageId !== "sugar-xml") {
         return;
     }
 
@@ -69,17 +60,7 @@ export function insertAutoCloseTag(activeTextEditor: undefined | TextEditor, eve
                 occurrenceCount(result[0], '"') % 2 === 0 &&
                 occurrenceCount(result[0], "`") % 2 === 0)
         ) {
-            if (result[2] === ">") {
-                if (excludedTags.indexOf(result[1].toLowerCase()) === -1) {
-                    activeTextEditor
-                        .edit(editBuilder => {
-                            editBuilder.insert(originalPosition, `</${result[1]}>`);
-                        })
-                        .then(() => {
-                            activeTextEditor.selection = new Selection(originalPosition, originalPosition);
-                        });
-                }
-            } else {
+            if (result[2] !== ">") {
                 if (
                     textLine.text.length <= selection.start.character + 1 ||
                     textLine.text[selection.start.character + 1] !== ">"

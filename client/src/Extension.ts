@@ -10,10 +10,16 @@ export function activate(context: ExtensionContext): void {
     languageClient = startSugarLanguageServer(context);
 
     workspace.onDidChangeTextDocument(event => {
+        if (window.activeTextEditor == undefined) {
+            return;
+        }
+        if (window.activeTextEditor.document.languageId !== "sugar-xml") {
+            return;
+        }
         insertAutoCloseTag(window.activeTextEditor, event);
     });
 
-    const closeTag = commands.registerCommand("auto-close-tag.closeTag", () => {
+    const closeTag = commands.registerCommand("vscode-candy-sugar.closeTag", () => {
         insertCloseTag(window.activeTextEditor);
     });
 
