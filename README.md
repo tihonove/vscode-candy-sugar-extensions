@@ -55,6 +55,9 @@ ext install vscode-candy-sugar
 #### Переход к определению схемы из сахара
 ![Auto close tag example](https://raw.githubusercontent.com/tihonove/vscode-candy-sugar-extensions/master/docs/images/data-go-to-def.gif)
 
+#### Контекстный переход на справку
+![Browse to docs](https://raw.githubusercontent.com/tihonove/vscode-candy-sugar-extensions/master/docs/images/browse-to-docs.png)
+
 
 ## Как помочь
 
