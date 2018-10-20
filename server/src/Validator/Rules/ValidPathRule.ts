@@ -1,24 +1,22 @@
 import { DataPathUtils } from "../../DataSchema/DataPathUtils";
 import { DataSchemaElementNode } from "../../DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "../../DataSchema/DataSchemaUtils";
-import { EmptySugarDomVisitor } from "../../SugarAnalyzing/Traversing/EmptySugarDomVisitor";
 import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { SugarAttribute, SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
 
+import { SugarValidatorRuleBase } from "./Bases/SugarValidatorRuleBase";
 import { ValidationItem } from "./Bases/ValidationItem";
 
-export class ValidPathRule extends EmptySugarDomVisitor {
+export class ValidPathRule extends SugarValidatorRuleBase {
     private readonly elementInfos: SugarElementInfo[];
     private readonly validations: ValidationItem[] = [];
     private readonly dataSchema: DataSchemaElementNode;
-    public readonly name: string;
     public pathScopeStack: string[][] = [];
 
     public constructor(dataSchema: DataSchemaElementNode, elementInfos: SugarElementInfo[]) {
-        super();
+        super("valid-path");
         this.dataSchema = dataSchema;
         this.elementInfos = elementInfos;
-        this.name = "valid-path";
     }
 
     public enterElement(element: SugarElement): void {

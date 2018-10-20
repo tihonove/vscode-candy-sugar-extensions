@@ -1,19 +1,17 @@
-import { EmptySugarDomVisitor } from "../../SugarAnalyzing/Traversing/EmptySugarDomVisitor";
 import { SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
 
+import { SugarValidatorRuleBase } from "./Bases/SugarValidatorRuleBase";
 import { ValidationItem } from "./Bases/ValidationItem";
 
-export class RequiredAttributesRule extends EmptySugarDomVisitor {
+export class RequiredAttributesRule extends SugarValidatorRuleBase {
     private readonly elementInfos: SugarElementInfo[];
     private readonly validations: ValidationItem[] = [];
     private readonly checkOnlyElementNames: string[];
-    public readonly name: string;
 
     public constructor(elementInfos: SugarElementInfo[]) {
-        super();
+        super("required-attribute");
         this.elementInfos = elementInfos;
-        this.name = "required-attribute";
         this.checkOnlyElementNames = ["form", "input", "atag1"];
     }
 

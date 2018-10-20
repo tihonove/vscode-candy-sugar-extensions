@@ -31,6 +31,7 @@ export class SugarValidator {
             const validations: ValidationReportItem[] = [];
             for (const ruleFactory of this.rules) {
                 const rule = ruleFactory(userDefinedTypeInfos);
+                rule.beforeProcess(parseResult);
                 validations.push(...this.processRule(rule, parseResult));
             }
             return validations;

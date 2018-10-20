@@ -1,6 +1,6 @@
 import opn from "opn";
-import { commands, ExtensionContext, window, workspace } from "vscode";
-import { RequestType, RequestType0, RequestType1 } from "vscode-jsonrpc";
+import { commands, ExtensionContext, Selection, window, workspace } from "vscode";
+import { RequestType } from "vscode-jsonrpc";
 import { LanguageClient } from "vscode-languageclient";
 
 import { insertAutoCloseTag, insertCloseTag } from "./AutoCloseTag";
@@ -25,6 +25,20 @@ export function activate(context: ExtensionContext): void {
     const closeTag = commands.registerCommand("vscode-candy-sugar.closeTag", () => {
         insertCloseTag(window.activeTextEditor);
     });
+
+    const someCommand = commands.registerCommand(
+        "vscode-candy-sugar.open-usages-at-offset",
+        async (offset: number): Promise<void> => {
+            const activeTextEditor = window.activeTextEditor;
+            if (activeTextEditor != undefined) {
+                const position = activeTextEditor.document.positionAt(offset);
+                const oldSelections = activeTextEditor.selections;
+                activeTextEditor.selection = new Selection(position, position);
+                await asPromise(commands.executeCommand("editor.action.referenceSearch.trigger"));
+                activeTextEditor.selections = oldSelections;
+            }
+        }
+    );
 
     const openHelpPage = commands.registerCommand("vscode-candy-sugar.open-help-page", async () => {
         if (window.activeTextEditor == undefined) {
@@ -51,6 +65,7 @@ export function activate(context: ExtensionContext): void {
 
     context.subscriptions.push(closeTag);
     context.subscriptions.push(openHelpPage);
+    context.subscriptions.push(someCommand);
 }
 
 export async function deactivate(): Promise<void> {

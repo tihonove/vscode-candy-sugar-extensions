@@ -2,12 +2,14 @@ import * as fs from "fs";
 import * as _ from "lodash";
 import path from "path";
 import {
+    CodeLens,
     CompletionItem,
     CompletionItemKind,
     Definition,
     Diagnostic,
     DiagnosticSeverity,
     Hover,
+    Location,
     MarkupKind,
     Position,
     Range,
@@ -24,10 +26,13 @@ import { CodeContextByNodeResolver } from "../SugarAnalyzing/ContextResolving/Co
 import { OffsetToNodeMap } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMap";
 import { OffsetToNodeMapBuilder } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
 import { TypeInfoExtractor } from "../SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
+import { UserDefinedTypeUsagesBuilder } from "../SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesBuilder";
+import { UserDefinedTypeUsagesInfo } from "../SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesInfo";
 import { allElements } from "../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
 import { sugarElementsGroups } from "../SugarElements/DefaultSugarElementInfos/DefaultSugarElementsGrouped";
 import { AttributeType, SugarElementInfo } from "../SugarElements/SugarElementInfo";
 import { defaultBuiltInTypeNames, TypeKind, UserDefinedSugarTypeInfo } from "../SugarElements/UserDefinedSugarTypeInfo";
+import { oc } from "../Utils/ChainWrapper";
 import { createEvent } from "../Utils/Event";
 import { CodePosition } from "../Utils/PegJSUtils/Types";
 import { isNotNullOrUndefined } from "../Utils/TypingUtils";
@@ -52,14 +57,16 @@ export class SugarDocumentIntellisenseService {
     private readonly schemaFileUri: string;
     private readonly offsetPositionResolver: IDocumentOffsetPositionResolver;
     private readonly suggester: CompletionSuggester;
-    private readonly updateDomDebounced = _.debounce((text: string) => this.updateDom(text), 50, { trailing: true });
     private readonly typeInfoExtractor: TypeInfoExtractor;
     private readonly builder: OffsetToNodeMapBuilder;
     private offsetToNodeMap?: OffsetToNodeMap;
     private userDefinedTypes?: UserDefinedSugarTypeInfo[];
+    private userDefinedTypeUsagesInfo?: UserDefinedTypeUsagesInfo[];
     private readonly sugarElements: SugarElementInfo[];
     private readonly helpUrlBuilder: HelpUrlBuilder;
     public sendValidationsEvent = createEvent<[Diagnostic[]]>();
+
+    private updateDomListeners: Array<() => void> = [];
 
     public constructor(logger: ILogger, documentUri: string, offsetPositionResolver: IDocumentOffsetPositionResolver) {
         this.documentUri = documentUri;
@@ -73,6 +80,22 @@ export class SugarDocumentIntellisenseService {
         this.builder = new OffsetToNodeMapBuilder();
         this.typeInfoExtractor = new TypeInfoExtractor();
         this.helpUrlBuilder = new HelpUrlBuilder(sugarElementsGroups);
+    }
+
+    public readonly updateDomDebounced = _.debounce((text: string) => this.updateDom(text), 50, { trailing: true });
+
+    public getCodeLenses(): undefined | CodeLens[] {
+        if (this.userDefinedTypeUsagesInfo != undefined) {
+            return this.userDefinedTypeUsagesInfo.map<CodeLens>(x => ({
+                range: this.pegjsPositionToVsCodeRange(x.type.position),
+                command: {
+                    command: x.usages.length > 0 ? "vscode-candy-sugar.open-usages-at-offset" : "",
+                    title: x.usages.length === 1 ? `1 usage` : `${x.usages.length} usages`,
+                    arguments: [x.type.position.start.offset + 1],
+                },
+            }));
+        }
+        return undefined;
     }
 
     public handleCloseTextDocument({ document }: TextDocumentChangeEvent): void {
@@ -100,6 +123,33 @@ export class SugarDocumentIntellisenseService {
         this.updateDomDebounced(text);
         this.validateTextDocument(text);
         this.logger.info(`End handle document change. (${this.documentUri})`);
+    }
+
+    public findAllReferences(position: Position): undefined | Location[] {
+        const context = this.resolveContextAsOffset(this.offsetPositionResolver.offsetAt(position));
+        if (context == undefined) {
+            return undefined;
+        }
+        if (context.type === "ElementName") {
+            if (context.contextNode.value === "type") {
+                const typeName = oc(context.contextNode.parent)
+                    .with(x => x.attributes)
+                    .with(x => x.find(x => x.name.value === "name"))
+                    .with(x => x.value)
+                    .with(x => x.value)
+                    .return(x => x, undefined);
+                if (typeName != undefined && this.userDefinedTypeUsagesInfo != undefined) {
+                    const usages = this.userDefinedTypeUsagesInfo.find(x => x.type.name === typeName);
+                    if (usages != undefined) {
+                        return usages.usages.map(x => ({
+                            uri: this.documentUri,
+                            range: this.pegjsPositionToVsCodeRange(x.elementPosition),
+                        }));
+                    }
+                }
+            }
+        }
+        return undefined;
     }
 
     public getHelpUrlForCurrentPosition(caretOffset: number): undefined | string {
@@ -438,6 +488,12 @@ export class SugarDocumentIntellisenseService {
         return vsCodeCompletionItem;
     }
 
+    public ensureCodeDomUpdated(): Promise<void> {
+        return new Promise(resolve => {
+            this.updateDomListeners.push(resolve);
+        });
+    }
+
     private updateDom(text: string): void {
         this.logger.info("Begin update");
         try {
@@ -445,10 +501,21 @@ export class SugarDocumentIntellisenseService {
             this.offsetToNodeMap = this.builder.buildOffsetToNodeMapFromDom(sugarDocument);
             this.userDefinedTypes = this.typeInfoExtractor.extractTypeInfos(sugarDocument);
             this.suggester.updateUserDefinedSugarType(this.userDefinedTypes);
+            const usagesBuilder = new UserDefinedTypeUsagesBuilder(this.sugarElements);
+            this.userDefinedTypeUsagesInfo = usagesBuilder.buildUsages(this.userDefinedTypes, sugarDocument);
+            this.domUpdateCompleted();
         } catch (ignoreError) {
             // По всей вимдости код невалиден. Просто оставим последний валидный map
         }
         this.logger.info("End update");
+    }
+
+    private domUpdateCompleted(): void {
+        const listeners = this.updateDomListeners;
+        this.updateDomListeners = [];
+        for (const listener of listeners) {
+            listener();
+        }
     }
 
     private getDataElementOrAttributeByPath(path: string[]): undefined | DataSchemaNode {

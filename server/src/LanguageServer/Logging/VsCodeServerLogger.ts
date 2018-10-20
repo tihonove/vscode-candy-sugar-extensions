@@ -8,7 +8,7 @@ export class VsCodeServerLogger implements ILogger {
 
     public constructor(remoteConsole: RemoteConsole) {
         this.remoteConsole = remoteConsole;
-        this.showLogs = false;
+        this.showLogs = true;
     }
 
     public info(message: string): void {

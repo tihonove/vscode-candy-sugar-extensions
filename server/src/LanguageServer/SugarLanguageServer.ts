@@ -1,10 +1,15 @@
 import { CancellationToken, RequestType } from "vscode-jsonrpc";
 import {
+    CodeLens,
+    CodeLensParams,
     CompletionItem,
     Connection,
     createConnection,
     InitializeParams,
+    InitializeResult,
+    Location,
     ProposedFeatures,
+    ReferenceParams,
     TextDocumentPositionParams,
     TextDocuments,
 } from "vscode-languageserver";
@@ -62,12 +67,40 @@ export class SugarLanguageServer {
             new RequestType<[string, number], undefined | string, Error, void>("resolveHelpPage"),
             this.handlerResolveHelpPage
         );
+        this.connection.onCodeLens(this.handleProvideCodeLenses);
+        this.connection.onCodeLensResolve(this.handleResolveCodeLens);
+        this.connection.onReferences(this.handleFindAllReferences);
     }
 
     public listen(): void {
         this.documents.listen(this.connection);
         this.connection.listen();
     }
+
+    private readonly handleFindAllReferences = (params: ReferenceParams): undefined | Location[] => {
+        const documentService = this.documentServices[params.textDocument.uri];
+        if (documentService != undefined) {
+            return documentService.findAllReferences(params.position);
+        }
+        return undefined;
+    };
+
+    private readonly handleResolveCodeLens = (lens: CodeLens): CodeLens => lens;
+
+    private readonly handleProvideCodeLenses = async ({
+        textDocument,
+    }: CodeLensParams): Promise<CodeLens[] | undefined | null> => {
+        this.logger.info("Code lens requested");
+        const documentService = this.documentServices[textDocument.uri];
+        const document = this.documents.get(textDocument.uri);
+        if (documentService != undefined && document != undefined) {
+            documentService.updateDomDebounced(document.getText());
+            await documentService.ensureCodeDomUpdated();
+            this.logger.info("Code lens awaited update");
+            return documentService.getCodeLenses();
+        }
+        return undefined;
+    };
 
     private readonly handlerResolveHelpPage = ([documentUri, caretOffset]: [string, number]): undefined | string => {
         const documentService = this.documentServices[documentUri];
@@ -85,14 +118,18 @@ export class SugarLanguageServer {
         }
     };
 
-    private readonly handleInitialize = (_params: InitializeParams) => ({
+    private readonly handleInitialize = (_params: InitializeParams): InitializeResult => ({
         capabilities: {
             textDocumentSync: this.documents.syncKind,
             hoverProvider: true,
             definitionProvider: true,
+            referencesProvider: true,
             completionProvider: {
                 resolveProvider: true,
                 triggerCharacters: ["/"],
+            },
+            codeLensProvider: {
+                resolveProvider: true,
             },
         },
     });
@@ -107,7 +144,9 @@ export class SugarLanguageServer {
             documentService = this.createSugarDocumentIntellisenseService(documentUri);
             this.documentServices[documentUri] = documentService;
         }
+        this.logger.info("Begin process change");
         documentService.processChangeDocumentContent(change.document.getText());
+        this.logger.info("End process change");
     };
 
     private createSugarDocumentIntellisenseService(documentUri: string): SugarDocumentIntellisenseService {

@@ -1,6 +1,7 @@
 import { DataSchemaElementNode } from "../DataSchema/DataSchemaNode";
 import { allElements } from "../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
 
+import { NoUnusedTypesRule } from "./Rules/NoUnusedTypesRule";
 import { RequiredAttributesRule } from "./Rules/RequiredAttributesRule";
 import { ValidAttributeRule } from "./Rules/ValidAttributeRule";
 import { ValidAttributeValueType } from "./Rules/ValidAttributeValueType";
@@ -16,6 +17,7 @@ export function createDefaultValidator(dataSchema: undefined | DataSchemaElement
     sugarValidator.addRule(() => new RequiredAttributesRule(allElements));
     sugarValidator.addRule(() => new ValidAttributeValueType(allElements));
     sugarValidator.addRule(userDefinedTypes => new ValidTypeRule(userDefinedTypes, allElements));
+    sugarValidator.addRule(userDefinedTypes => new NoUnusedTypesRule(userDefinedTypes, allElements));
     if (dataSchema != undefined) {
         sugarValidator.addRule(() => new ValidPathRule(dataSchema, allElements));
     }
