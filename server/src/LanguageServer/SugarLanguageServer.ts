@@ -1,4 +1,4 @@
-import { CancellationToken } from "vscode-jsonrpc";
+import { CancellationToken, RequestType, RequestType0 } from "vscode-jsonrpc";
 import {
     CompletionItem,
     Connection,
@@ -58,12 +58,24 @@ export class SugarLanguageServer {
         this.connection.onDefinition(this.handleResolveDefinition);
         this.connection.onCompletion(this.handleResolveCompletion);
         this.connection.onCompletionResolve(this.handleEnrichCompletionItem);
+        this.connection.onRequest(
+            new RequestType<[string, number], undefined | string, Error, void>("resolveHelpPage"),
+            this.handlerResolveHelpPage
+        );
     }
 
     public listen(): void {
         this.documents.listen(this.connection);
         this.connection.listen();
     }
+
+    private readonly handlerResolveHelpPage = ([documentUri, caretOffset]: [string, number]): undefined | string => {
+        const documentService = this.documentServices[documentUri];
+        if (documentService != undefined) {
+            return documentService.getHelpUrlForCurrentPosition(caretOffset);
+        }
+        return "";
+    };
 
     private readonly handleCloseTextDocument = ({ document }: TextDocumentChangeEvent): void => {
         const documentService = this.documentServices[document.uri];

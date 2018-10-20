@@ -25,6 +25,7 @@ import { OffsetToNodeMap } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNo
 import { OffsetToNodeMapBuilder } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
 import { TypeInfoExtractor } from "../SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
 import { allElements } from "../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
+import { sugarElementsGroups } from "../SugarElements/DefaultSugarElementInfos/DefaultSugarElementsGrouped";
 import { AttributeType, SugarElementInfo } from "../SugarElements/SugarElementInfo";
 import { defaultBuiltInTypeNames, TypeKind, UserDefinedSugarTypeInfo } from "../SugarElements/UserDefinedSugarTypeInfo";
 import { createEvent } from "../Utils/Event";
@@ -34,6 +35,7 @@ import { UriUtils } from "../Utils/UriUtils";
 import { SugarValidator } from "../Validator/Validator/SugarValidator";
 import { createDefaultValidator } from "../Validator/ValidatorFactory";
 
+import { HelpUrlBuilder } from "./HelpUrlBuilder";
 import { ILogger } from "./Logging/Logger";
 import { MarkdownUtils } from "./MarkdownUtils";
 
@@ -56,7 +58,7 @@ export class SugarDocumentIntellisenseService {
     private offsetToNodeMap?: OffsetToNodeMap;
     private userDefinedTypes?: UserDefinedSugarTypeInfo[];
     private readonly sugarElements: SugarElementInfo[];
-
+    private readonly helpUrlBuilder: HelpUrlBuilder;
     public sendValidationsEvent = createEvent<[Diagnostic[]]>();
 
     public constructor(logger: ILogger, documentUri: string, offsetPositionResolver: IDocumentOffsetPositionResolver) {
@@ -70,6 +72,7 @@ export class SugarDocumentIntellisenseService {
         this.validator = createDefaultValidator(this.parsedSchemaDocuments);
         this.builder = new OffsetToNodeMapBuilder();
         this.typeInfoExtractor = new TypeInfoExtractor();
+        this.helpUrlBuilder = new HelpUrlBuilder(sugarElementsGroups);
     }
 
     public handleCloseTextDocument({ document }: TextDocumentChangeEvent): void {
@@ -97,6 +100,23 @@ export class SugarDocumentIntellisenseService {
         this.updateDomDebounced(text);
         this.validateTextDocument(text);
         this.logger.info(`End handle document change. (${this.documentUri})`);
+    }
+
+    public getHelpUrlForCurrentPosition(caretOffset: number): undefined | string {
+        const context = this.resolveContextAsOffset(caretOffset);
+        if (context == undefined) {
+            return undefined;
+        }
+        if (context.type === "ElementName") {
+            return this.helpUrlBuilder.getHelpUrlForElement(context.contextNode.value);
+        }
+        if (context.type === "AttributeName") {
+            return this.helpUrlBuilder.getHelpUrlForAttribute(
+                context.contextNode.parent.name.value,
+                context.contextNode.value
+            );
+        }
+        return undefined;
     }
 
     public getHoverInfoAtPosition(position: Position): undefined | Hover {

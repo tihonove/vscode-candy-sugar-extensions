@@ -1,8 +1,11 @@
+import opn from "opn";
 import { commands, ExtensionContext, window, workspace } from "vscode";
+import { RequestType, RequestType0, RequestType1 } from "vscode-jsonrpc";
 import { LanguageClient } from "vscode-languageclient";
 
 import { insertAutoCloseTag, insertCloseTag } from "./AutoCloseTag";
 import { startSugarLanguageServer, stopLanguageServer } from "./SugarLanguageClient";
+import { asPromise } from "./TypingUtils";
 
 let languageClient: LanguageClient;
 
@@ -23,7 +26,31 @@ export function activate(context: ExtensionContext): void {
         insertCloseTag(window.activeTextEditor);
     });
 
+    const openHelpPage = commands.registerCommand("vscode-candy-sugar.open-help-page", async () => {
+        if (window.activeTextEditor == undefined) {
+            return;
+        }
+        if (window.activeTextEditor.document.languageId !== "sugar-xml") {
+            return;
+        }
+        try {
+            const caretOffset = window.activeTextEditor.document.offsetAt(window.activeTextEditor.selection.start);
+            const result = await asPromise(
+                languageClient.sendRequest(new RequestType<[string, number], string, Error, void>("resolveHelpPage"), [
+                    window.activeTextEditor.document.uri.toString(),
+                    caretOffset,
+                ])
+            );
+            if (result != undefined) {
+                opn(result);
+            }
+        } catch (ignoreError) {
+            // ignore error
+        }
+    });
+
     context.subscriptions.push(closeTag);
+    context.subscriptions.push(openHelpPage);
 }
 
 export async function deactivate(): Promise<void> {
