@@ -14,21 +14,3 @@ export const gridRow: SugarElementInfo = {
         },
     ],
 };
-
-export const gridCol: SugarElementInfo = {
-    name: "grid-col",
-    availableChildren: {
-        type: AvailableChildrenType.Any,
-    },
-    attributes: [
-        classNameAttribute,
-        {
-            name: "autocalc",
-            valueTypes: [AttributeType.FunctionName],
-        },
-        {
-            name: "cols",
-            valueTypes: [AttributeType.Number],
-        },
-    ],
-};

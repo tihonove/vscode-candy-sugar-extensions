@@ -1,0 +1,10 @@
+{
+	"name": "sugar-docs-generator",
+	"description": "Docs Generator",
+	"version": "1.0.0",
+	"author": "tihonove",
+	"license": "MIT",
+	"engines": {
+		"node": "*"
+	}
+}

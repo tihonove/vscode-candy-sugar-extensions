@@ -13,6 +13,3 @@ export const ifElement: SugarElementInfo = {
     ],
 };
 
-export const then: SugarElementInfo = { name: "then", availableChildren: { type: AvailableChildrenType.Any } };
-
-export const elseElement: SugarElementInfo = { name: "else", availableChildren: { type: AvailableChildrenType.Any } };

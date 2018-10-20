@@ -49,170 +49,37 @@ import { togs } from "./ContentElements/togs";
 import { typl } from "./ContentElements/typl";
 import { vid } from "./ContentElements/vid";
 import { year } from "./ContentElements/year";
-import { choice } from "./ControlFlowElements/choice";
-import { elseElement, ifElement, then } from "./ControlFlowElements/if";
-import { otherwise } from "./ControlFlowElements/otherwise";
-import { when } from "./ControlFlowElements/when";
-import { attachments } from "./DataElements/attachments";
-import { checkbox } from "./DataElements/checkbox";
-import { combobox } from "./DataElements/combobox";
-import { date } from "./DataElements/date";
-import { diadocSuggestComboBox } from "./DataElements/diadocSuggestComboBox";
-import { digest } from "./DataElements/digest";
-import { fileloader } from "./DataElements/fileloader";
-import { fio } from "./DataElements/fio";
-import { highlight } from "./DataElements/highlight";
-import { inn } from "./DataElements/inn";
-import { input } from "./DataElements/input";
-import { kladr } from "./DataElements/kladr";
-import { link } from "./DataElements/link";
-import { page } from "./DataElements/page";
-import { picklist } from "./DataElements/picklist";
-import { radio } from "./DataElements/radio";
-import { radiogroup } from "./DataElements/radiogroup";
-import { select } from "./DataElements/select";
-import { text } from "./DataElements/text";
-import { textarea } from "./DataElements/textarea";
-import { gridCol, gridRow } from "./GridElements/grid";
+import { sugarElementsGroups } from "./DefaultSugarElementsGrouped";
 import { Checkbox, Column, Row } from "./InvalidElementCaseWorkaround";
-import { block } from "./LayoutElement/block";
-import { bold } from "./LayoutElement/bold";
-import { br } from "./LayoutElement/br";
-import { caption } from "./LayoutElement/caption";
-import { entity } from "./LayoutElement/entity";
-import { gray } from "./LayoutElement/gray";
-import { header } from "./LayoutElement/header";
-import { help } from "./LayoutElement/help";
-import { hr } from "./LayoutElement/hr";
-import { icon } from "./LayoutElement/icon";
-import { italic } from "./LayoutElement/italic";
-import { linetext } from "./LayoutElement/linetext";
-import { strong } from "./LayoutElement/strong";
-import { sub } from "./LayoutElement/sub";
-import { subheader } from "./LayoutElement/subheader";
-import { sup } from "./LayoutElement/sup";
-import { warning } from "./LayoutElement/warning";
 import { item } from "./ListElements/item";
 import { list } from "./ListElements/list";
 import { infoip } from "./StrangeElements/infoip";
 import { infoorg } from "./StrangeElements/infoorg";
 import { sign } from "./StrangeElements/sign";
-import { form } from "./SystemElements/form";
-import { normativehelp } from "./SystemElements/normativehelp";
-import { sugar } from "./SystemElements/sugar";
-import { column } from "./TableElements/column";
-import { multiline } from "./TableElements/multiline";
-import { row } from "./TableElements/row";
-import { table } from "./TableElements/table";
-import { addRowButton } from "./TourElements/addRowButton";
-import { enterEvent } from "./TourElements/enterEvent";
-import { startTour } from "./TourElements/startTour";
-import { totalAmount } from "./TourElements/totalAmount";
-import { tour } from "./TourElements/tour";
-import { customValidation } from "./TypeDefinitionElements/customValidation";
-import { digestCheck } from "./TypeDefinitionElements/digestCheck";
-import { enumeration } from "./TypeDefinitionElements/enumeration";
-import { fractionDigits } from "./TypeDefinitionElements/fractionDigits";
-import { integerDigits } from "./TypeDefinitionElements/integerDigits";
-import { length } from "./TypeDefinitionElements/length";
-import { maxInclusive } from "./TypeDefinitionElements/maxInclusive";
-import { maxLength } from "./TypeDefinitionElements/maxLength";
-import { minInclusive } from "./TypeDefinitionElements/minInclusive";
-import { minLength } from "./TypeDefinitionElements/minLength";
-import { pattern } from "./TypeDefinitionElements/pattern";
-import { totalDigits } from "./TypeDefinitionElements/totalDigits";
-import { typeElement } from "./TypeDefinitionElements/type";
-import { types } from "./TypeDefinitionElements/types";
 import { address, corrnumber, cross, ferm_vb_j, force, ifns, reorganization, signer } from "./UnclassifiedElements";
 
 export const allElements: SugarElementInfo[] = [
+    ...sugarElementsGroups.map(x => x.elements).reduce((x, y) => x.concat(y), []),
     Checkbox,
-    combobox,
     content,
     corrnumber,
     cross,
-    customValidation,
-    date,
-    digest,
-    elseElement,
-    enumeration,
-    fio,
-    fractionDigits,
-    gray,
-    gridRow,
-    gridCol,
-    header,
-    help,
-    highlight,
-    hr,
-    ifElement,
     ifns,
     infoip,
     infoorg,
-    inn,
-    integerDigits,
-    italic,
     item,
-    kladr,
     kpp,
-    length,
-    linetext,
     list,
     local,
-    maxLength,
-    minLength,
-    multiline,
     name,
-    normativehelp,
     okved,
-    otherwise,
-    pattern,
     period,
     phone,
-    picklist,
-    radio,
-    radiogroup,
     reorganization,
-    select,
     sign,
     signer,
-    strong,
-    sub,
-    subheader,
-    sugar,
-    sup,
-    table,
-    text,
-    then,
-    totalDigits,
-    typeElement,
-    types,
-    warning,
-    when,
     year,
-    column,
-    row,
-    link,
-    icon,
-    input,
-    page,
-    form,
-    checkbox,
-    block,
-    bold,
-    br,
-    caption,
-    choice,
-    digestCheck,
-    tour,
-    startTour,
-    addRowButton,
-    totalAmount,
-    enterEvent,
     force,
-    attachments,
-    textarea,
-    fileloader,
     togs,
     okpo,
     leader_fio,
@@ -225,8 +92,6 @@ export const allElements: SugarElementInfo[] = [
     inv,
     okved_out,
     mail,
-    minInclusive,
-    maxInclusive,
     okato,
     mal_vb_j,
     deyt,
@@ -258,8 +123,6 @@ export const allElements: SugarElementInfo[] = [
     address,
     okogu,
     okpo_2,
-    diadocSuggestComboBox,
-    entity,
     Column,
     Row,
 ];
