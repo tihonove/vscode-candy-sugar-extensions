@@ -1,4 +1,4 @@
-import { CancellationToken, RequestType, RequestType0 } from "vscode-jsonrpc";
+import { CancellationToken, RequestType } from "vscode-jsonrpc";
 import {
     CompletionItem,
     Connection,
