@@ -32,6 +32,13 @@ import { allElements } from "../SugarElements/DefaultSugarElementInfos/DefaultSu
 import { sugarElementsGroups } from "../SugarElements/DefaultSugarElementInfos/DefaultSugarElementsGrouped";
 import { AttributeType, SugarElementInfo } from "../SugarElements/SugarElementInfo";
 import { defaultBuiltInTypeNames, TypeKind, UserDefinedSugarTypeInfo } from "../SugarElements/UserDefinedSugarTypeInfo";
+import {
+    SugarAttribute,
+    SugarAttributeName,
+    SugarAttributeValue,
+    SugarElement,
+    SugarElementName,
+} from "../SugarParsing/SugarGrammar/SugarParser";
 import { oc } from "../Utils/ChainWrapper";
 import { createEvent } from "../Utils/Event";
 import { CodePosition } from "../Utils/PegJSUtils/Types";
@@ -68,6 +75,8 @@ export class SugarDocumentIntellisenseService {
 
     private updateDomListeners: Array<() => void> = [];
 
+    public readonly updateDomDebounced = _.debounce((text: string) => this.updateDom(text), 50, { trailing: true });
+
     public constructor(logger: ILogger, documentUri: string, offsetPositionResolver: IDocumentOffsetPositionResolver) {
         this.documentUri = documentUri;
         this.logger = logger;
@@ -81,8 +90,6 @@ export class SugarDocumentIntellisenseService {
         this.typeInfoExtractor = new TypeInfoExtractor();
         this.helpUrlBuilder = new HelpUrlBuilder(sugarElementsGroups);
     }
-
-    public readonly updateDomDebounced = _.debounce((text: string) => this.updateDom(text), 50, { trailing: true });
 
     public getCodeLenses(): undefined | CodeLens[] {
         if (this.userDefinedTypeUsagesInfo != undefined) {
@@ -130,23 +137,20 @@ export class SugarDocumentIntellisenseService {
         if (context == undefined) {
             return undefined;
         }
-        if (context.type === "ElementName") {
-            if (context.contextNode.value === "type") {
-                const typeName = oc(context.contextNode.parent)
-                    .with(x => x.attributes)
-                    .with(x => x.find(x => x.name.value === "name"))
-                    .with(x => x.value)
-                    .with(x => x.value)
-                    .return(x => x, undefined);
-                if (typeName != undefined && this.userDefinedTypeUsagesInfo != undefined) {
-                    const usages = this.userDefinedTypeUsagesInfo.find(x => x.type.name === typeName);
-                    if (usages != undefined) {
-                        return usages.usages.map(x => ({
-                            uri: this.documentUri,
-                            range: this.pegjsPositionToVsCodeRange(x.elementPosition),
-                        }));
-                    }
-                }
+        const typeElement = this.findNearestTypeElement(context.contextNode);
+        const typeName = oc(typeElement)
+            .with(x => x.attributes)
+            .with(x => x.find(x => x.name.value === "name"))
+            .with(x => x.value)
+            .with(x => x.value)
+            .return(x => x, undefined);
+        if (typeName != undefined && this.userDefinedTypeUsagesInfo != undefined) {
+            const usages = this.userDefinedTypeUsagesInfo.find(x => x.type.name === typeName);
+            if (usages != undefined) {
+                return usages.usages.map(x => ({
+                    uri: this.documentUri,
+                    range: this.pegjsPositionToVsCodeRange(x.elementPosition),
+                }));
             }
         }
         return undefined;
@@ -492,6 +496,18 @@ export class SugarDocumentIntellisenseService {
         return new Promise(resolve => {
             this.updateDomListeners.push(resolve);
         });
+    }
+
+    private findNearestTypeElement(
+        contextNode: SugarAttribute | SugarElement | SugarElementName | SugarAttributeName | SugarAttributeValue
+    ): undefined | SugarElement {
+        if (contextNode.type === "Element" && contextNode.name.value === "type") {
+            return contextNode;
+        }
+        if (contextNode.parent == undefined) {
+            return undefined;
+        }
+        return this.findNearestTypeElement(contextNode.parent);
     }
 
     private updateDom(text: string): void {
