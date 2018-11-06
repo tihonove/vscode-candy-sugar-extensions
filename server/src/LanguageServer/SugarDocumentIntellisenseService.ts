@@ -1,6 +1,4 @@
-import * as fs from "fs";
 import * as _ from "lodash";
-import path from "path";
 import {
     CodeLens,
     CompletionItem,
@@ -17,7 +15,6 @@ import {
 } from "vscode-languageserver-types";
 
 import { DataSchemaElementNode, DataSchemaNode } from "../DataSchema/DataSchemaNode";
-import { SchemaRngConverter } from "../DataSchema/DataSchemaParser/SchemaRngConverter";
 import { DataSchemaUtils } from "../DataSchema/DataSchemaUtils";
 import { CompletionSuggester } from "../SugarAnalyzing/ComletionSuggesting/CompletionSuggester";
 import { SuggestionItem, SuggestionItemType } from "../SugarAnalyzing/ComletionSuggesting/SuggestionItem";
@@ -50,6 +47,10 @@ import { createDefaultValidator } from "../Validator/ValidatorFactory";
 import { HelpUrlBuilder } from "./HelpUrlBuilder";
 import { ILogger } from "./Logging/Logger";
 import { MarkdownUtils } from "./MarkdownUtils";
+import {
+    SugarProjectIntellisenseService,
+    SugarProjectIntellisenseServiceCollection,
+} from "./SugarProjectIntellisenseService";
 
 export interface IDocumentOffsetPositionResolver {
     offsetAt(position: Position): number;
@@ -57,11 +58,12 @@ export interface IDocumentOffsetPositionResolver {
 }
 
 export class SugarDocumentIntellisenseService {
+    private get dataSchema(): DataSchemaElementNode {
+        return this.sugarProject.getDataSchema();
+    }
     private readonly logger: ILogger;
-    private parsedSchemaDocument: DataSchemaElementNode;
     private readonly validator: SugarValidator;
     private readonly documentUri: string;
-    private readonly schemaFileUri: string;
     private readonly offsetPositionResolver: IDocumentOffsetPositionResolver;
     private readonly suggester: CompletionSuggester;
     private readonly typeInfoExtractor: TypeInfoExtractor;
@@ -72,33 +74,29 @@ export class SugarDocumentIntellisenseService {
     private readonly sugarElements: SugarElementInfo[];
     private readonly helpUrlBuilder: HelpUrlBuilder;
     public sendValidationsEvent = createEvent<[Diagnostic[]]>();
-
     private updateDomListeners: Array<() => void> = [];
+    private readonly sugarProject: SugarProjectIntellisenseService;
 
+    public schemaChangedEvent = createEvent<[string]>();
     public readonly updateDomDebounced = _.debounce((text: string) => this.updateDom(text), 50, { trailing: true });
 
-    public constructor(logger: ILogger, documentUri: string, offsetPositionResolver: IDocumentOffsetPositionResolver) {
+    public constructor(
+        logger: ILogger,
+        documentUri: string,
+        offsetPositionResolver: IDocumentOffsetPositionResolver,
+        sugarProjects: SugarProjectIntellisenseServiceCollection
+    ) {
+        this.sugarProject = sugarProjects.getOrCreateServiceBySugarFileUri(documentUri);
+        this.sugarProject.dataSchemaChangeEvent.addListener(this.handleChangeDataSchema);
         this.documentUri = documentUri;
         this.logger = logger;
         this.offsetPositionResolver = offsetPositionResolver;
-        this.schemaFileUri = UriUtils.fileNameToUri(this.findSchemaFile(this.documentUri));
-        this.parsedSchemaDocument = this.loadDataSchema();
-        this.suggester = new CompletionSuggester([], allElements, this.parsedSchemaDocument);
+        this.suggester = new CompletionSuggester([], allElements, this.sugarProject.getDataSchema());
         this.sugarElements = allElements;
-        this.validator = createDefaultValidator(this.parsedSchemaDocument);
+        this.validator = createDefaultValidator(this.dataSchema);
         this.builder = new OffsetToNodeMapBuilder();
         this.typeInfoExtractor = new TypeInfoExtractor();
         this.helpUrlBuilder = new HelpUrlBuilder(sugarElementsGroups);
-    }
-
-    public updateSchema(): void {
-        this.parsedSchemaDocument = this.loadDataSchema();
-        this.validator.updateDataSchema(this.parsedSchemaDocument);
-        this.suggester.updateDataSchema(this.parsedSchemaDocument);
-    }
-
-    public isLinkedWithSchemaFile(uri: string): boolean {
-        return this.schemaFileUri === uri;
     }
 
     public getCodeLenses(): undefined | CodeLens[] {
@@ -117,6 +115,7 @@ export class SugarDocumentIntellisenseService {
 
     public handleCloseTextDocument({ document }: TextDocumentChangeEvent): void {
         this.logger.info(`Send empty diagnostics for closed file. (${document.uri})`);
+        this.sugarProject.dataSchemaChangeEvent.removeListener(this.handleChangeDataSchema);
         this.sendEmptyValidations();
     }
 
@@ -325,7 +324,7 @@ export class SugarDocumentIntellisenseService {
             }
             return {
                 range: this.pegjsPositionToVsCodeRange(dataNode.position),
-                uri: this.schemaFileUri,
+                uri: UriUtils.fileNameToUri(this.sugarProject.getSchemaFileName()),
             };
         }
         return undefined;
@@ -441,10 +440,7 @@ export class SugarDocumentIntellisenseService {
         }
 
         if (suggestionItem.type === SuggestionItemType.DataElement) {
-            const dataSchemaNode = DataSchemaUtils.findElementByPath(
-                this.parsedSchemaDocument,
-                suggestionItem.fullPath
-            );
+            const dataSchemaNode = DataSchemaUtils.findElementByPath(this.dataSchema, suggestionItem.fullPath);
             if (dataSchemaNode == undefined) {
                 return vsCodeCompletionItem;
             }
@@ -460,10 +456,7 @@ export class SugarDocumentIntellisenseService {
         }
 
         if (suggestionItem.type === SuggestionItemType.DataAttribute) {
-            const dataSchemaAttribute = DataSchemaUtils.findAttributeByPath(
-                this.parsedSchemaDocument,
-                suggestionItem.fullPath
-            );
+            const dataSchemaAttribute = DataSchemaUtils.findAttributeByPath(this.dataSchema, suggestionItem.fullPath);
             if (dataSchemaAttribute == undefined) {
                 return vsCodeCompletionItem;
             }
@@ -508,6 +501,12 @@ export class SugarDocumentIntellisenseService {
         });
     }
 
+    private readonly handleChangeDataSchema = (dataSchema: DataSchemaElementNode): void => {
+        this.validator.updateDataSchema(dataSchema);
+        this.suggester.updateDataSchema(dataSchema);
+        this.schemaChangedEvent.emit(this.documentUri);
+    };
+
     private findNearestTypeElement(
         contextNode: SugarAttribute | SugarElement | SugarElementName | SugarAttributeName | SugarAttributeValue
     ): undefined | SugarElement {
@@ -545,7 +544,7 @@ export class SugarDocumentIntellisenseService {
     }
 
     private getDataElementOrAttributeByPath(path: string[]): undefined | DataSchemaNode {
-        return DataSchemaUtils.findSchemaNodeByPath(this.parsedSchemaDocument, path);
+        return DataSchemaUtils.findSchemaNodeByPath(this.dataSchema, path);
     }
 
     private resolveContextAsOffset(offset: number): undefined | CodeContext {
@@ -558,27 +557,6 @@ export class SugarDocumentIntellisenseService {
             return undefined;
         }
         return contextAtCursorResolver.resolveContext(node);
-    }
-
-    private loadDataSchema(): DataSchemaElementNode {
-        const schemaFile = this.findSchemaFile(this.documentUri);
-        const schemaParser = new SchemaRngConverter();
-        this.logger.info(`Schema is not loaded. Loading. (${this.documentUri})`);
-        try {
-            const schemaFileContent = fs.readFileSync(schemaFile, "utf8");
-            return schemaParser.toDataSchema(schemaFileContent);
-        } catch (e) {
-            return emptyDataSchema;
-            this.logger.info(`Failed to load schema. (${this.documentUri})`);
-            // ignore read error
-        }
-    }
-
-    private findSchemaFile(uri: string): string {
-        const filename = UriUtils.toFileName(uri);
-        const formDirName = path.basename(path.dirname(path.dirname(filename)));
-        const schemaFile = path.join(path.dirname(filename), "..", "schemas", formDirName + ".rng.xml");
-        return schemaFile;
     }
 
     private pegjsPositionToVsCodeRange(position: CodePosition): Range {
@@ -598,12 +576,3 @@ export class SugarDocumentIntellisenseService {
         this.sendValidationsEvent.emit([]);
     }
 }
-
-const emptyDataSchema: DataSchemaElementNode = {
-    name: "",
-    type: "DataSchemaElementNode",
-    position: {
-        start: { line: 0, column: 0, offset: 0 },
-        end: { line: 0, column: 0, offset: 0 },
-    },
-};

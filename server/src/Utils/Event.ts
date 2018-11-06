@@ -8,7 +8,7 @@ type Listener<U extends any[]> = (...args: U) => void;
 
 // tslint:disable-next-line:no-any
 export class Event<U extends any[]> {
-    private readonly listeners: Array<Listener<U>> = [];
+    private listeners: Array<Listener<U>> = [];
 
     public emit(...args: U): void {
         for (const listener of this.listeners) {
@@ -18,5 +18,9 @@ export class Event<U extends any[]> {
 
     public addListener(listener: (...args: U) => void): void {
         this.listeners.push(listener);
+    }
+
+    public removeListener(listener: (...args: U) => void): void {
+        this.listeners = this.listeners.filter(x => x !== listener);
     }
 }

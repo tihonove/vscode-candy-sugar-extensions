@@ -20,6 +20,7 @@ import { Definition, Hover, Position, TextDocumentChangeEvent } from "vscode-lan
 import { ILogger } from "./Logging/Logger";
 import { VsCodeServerLogger } from "./Logging/VsCodeServerLogger";
 import { IDocumentOffsetPositionResolver, SugarDocumentIntellisenseService } from "./SugarDocumentIntellisenseService";
+import { SugarProjectIntellisenseServiceCollection } from "./SugarProjectIntellisenseService";
 
 class DocumentOffsetPositionResolver implements IDocumentOffsetPositionResolver {
     private readonly documents: TextDocuments;
@@ -52,6 +53,7 @@ export class SugarLanguageServer {
     private readonly logger: ILogger;
     private readonly documents: TextDocuments;
     private readonly documentServices: { [uri: string]: undefined | SugarDocumentIntellisenseService };
+    private readonly projects: SugarProjectIntellisenseServiceCollection;
 
     public constructor() {
         this.connection = createConnection(ProposedFeatures.all);
@@ -72,6 +74,7 @@ export class SugarLanguageServer {
         this.connection.onCodeLens(this.handleProvideCodeLenses);
         this.connection.onCodeLensResolve(this.handleResolveCodeLens);
         this.connection.onReferences(this.handleFindAllReferences);
+        this.projects = new SugarProjectIntellisenseServiceCollection(this.logger);
     }
 
     public listen(): void {
@@ -82,19 +85,9 @@ export class SugarLanguageServer {
     }
 
     private readonly handleChangeWatchedFiles = (params: DidChangeWatchedFilesParams): void => {
-        for (const documentUri of Object.keys(this.documentServices)) {
-            const documentService = this.documentServices[documentUri];
-            if (documentService != undefined) {
-                for (const uri of params.changes.map(x => x.uri)) {
-                    if (documentService.isLinkedWithSchemaFile(uri)) {
-                        documentService.updateSchema();
-                        const textDocument = this.documents.get(documentUri);
-                        if (textDocument != undefined) {
-                            documentService.validateTextDocument(textDocument.getText());
-                        }
-                    }
-                }
-            }
+        for (const uri of params.changes.map(x => x.uri)) {
+            const project = this.projects.getOrCreateServiceBySchemaFileUri(uri);
+            project.updateSchema();
         }
     };
 
@@ -174,7 +167,8 @@ export class SugarLanguageServer {
         const result = new SugarDocumentIntellisenseService(
             this.logger,
             documentUri,
-            new DocumentOffsetPositionResolver(this.documents, documentUri)
+            new DocumentOffsetPositionResolver(this.documents, documentUri),
+            this.projects
         );
 
         result.sendValidationsEvent.addListener(validations => {
@@ -183,6 +177,17 @@ export class SugarLanguageServer {
                 diagnostics: validations,
             });
         });
+
+        result.schemaChangedEvent.addListener(
+            (sugarDocumentUri: string): void => {
+                const textDocument = this.documents.get(sugarDocumentUri);
+                const sugarDocumentService = this.documentServices[sugarDocumentUri];
+                if (textDocument != undefined && sugarDocumentService != undefined) {
+                    const text = textDocument.getText();
+                    sugarDocumentService.validateTextDocument(text);
+                }
+            }
+        );
 
         return result;
     }
