@@ -9,7 +9,7 @@ import { testSugarElementInfos } from "../Utils/TestInfos";
 export class SugarValidatorTest {
     @test
     public testSyntaxError(): void {
-        const validator = new SugarValidator();
+        const validator = new SugarValidator(undefined);
         validator.addRule(() => new ValidElementRule(testSugarElementInfos));
 
         expect(validator.validate("<not ")).to.shallowDeepEqual([

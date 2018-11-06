@@ -25,7 +25,7 @@ export interface Suggestions {
 export class CompletionSuggester {
     private readonly sugarElementInfos: SugarElementInfo[];
     private sugarTypes: UserDefinedSugarTypeInfo[];
-    private readonly dataSchemaRoot: DataSchemaElementNode;
+    private dataSchemaRoot: DataSchemaElementNode;
     private readonly contextResolver: CodeContextByNodeResolver;
 
     public constructor(
@@ -37,6 +37,10 @@ export class CompletionSuggester {
         this.sugarElementInfos = sugarElementInfos;
         this.dataSchemaRoot = dataSchemaRoot;
         this.contextResolver = new CodeContextByNodeResolver(this.sugarElementInfos);
+    }
+
+    public updateDataSchema(dataSchema: DataSchemaElementNode): void {
+        this.dataSchemaRoot = dataSchema;
     }
 
     public updateUserDefinedSugarType(sugarTypes: UserDefinedSugarTypeInfo[]): void {

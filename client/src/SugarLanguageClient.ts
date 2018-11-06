@@ -20,7 +20,7 @@ export function startSugarLanguageServer(context: ExtensionContext): LanguageCli
     const clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: "file", language: "sugar-xml" }, { scheme: "file", language: "xml" }],
         synchronize: {
-            fileEvents: workspace.createFileSystemWatcher("**/.clientrc"),
+            fileEvents: workspace.createFileSystemWatcher("**/*.rng.xml"),
         },
     };
 

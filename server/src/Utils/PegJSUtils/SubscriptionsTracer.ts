@@ -4,6 +4,7 @@ export type RuleHandler<TResult> = (result: TResult, location: CodePosition, act
 
 export class SubscriptionsTracer implements IPegJSTracer {
     private handlers: {
+        // tslint:disable-next-line:no-any
         [ruleName: string]: undefined | { [value in RuleAction]?: RuleHandler<any> };
     } = {};
 

@@ -11,15 +11,13 @@ import { ValidTypeRule } from "./Rules/ValidTypeRule";
 import { SugarValidator } from "./Validator/SugarValidator";
 
 export function createDefaultValidator(dataSchema: undefined | DataSchemaElementNode): SugarValidator {
-    const sugarValidator = new SugarValidator();
+    const sugarValidator = new SugarValidator(dataSchema);
     sugarValidator.addRule(() => new ValidElementRule(allElements));
     sugarValidator.addRule(() => new ValidAttributeRule(allElements));
     sugarValidator.addRule(() => new RequiredAttributesRule(allElements));
     sugarValidator.addRule(() => new ValidAttributeValueType(allElements));
     sugarValidator.addRule(userDefinedTypes => new ValidTypeRule(userDefinedTypes, allElements));
     sugarValidator.addRule(userDefinedTypes => new NoUnusedTypesRule(userDefinedTypes, allElements));
-    if (dataSchema != undefined) {
-        sugarValidator.addRule(() => new ValidPathRule(dataSchema, allElements));
-    }
+    sugarValidator.addRule((_x, dataSchema) => new ValidPathRule(dataSchema, allElements));
     return sugarValidator;
 }

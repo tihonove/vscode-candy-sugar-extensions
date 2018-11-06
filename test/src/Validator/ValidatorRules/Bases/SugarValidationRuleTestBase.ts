@@ -7,14 +7,14 @@ import { SugarValidator } from "../../../../../server/src/Validator/Validator/Su
 
 export class SugarValidationRuleTestBase {
     protected assertValidCode(input: string): void {
-        const validator = new SugarValidator();
+        const validator = new SugarValidator(undefined);
         validator.addRule(userDefinedTypes => this.createRule(userDefinedTypes));
 
         expect(validator.validate(input)).to.eql([]);
     }
 
     protected assertInvalidCode(input: string, ...errors: ValidationReportItemAssert[]): void {
-        const validator = new SugarValidator();
+        const validator = new SugarValidator(undefined);
         validator.addRule(userDefinedTypes => this.createRule(userDefinedTypes));
 
         if (errors.length === 0) {

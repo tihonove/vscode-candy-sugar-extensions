@@ -58,7 +58,7 @@ export interface IDocumentOffsetPositionResolver {
 
 export class SugarDocumentIntellisenseService {
     private readonly logger: ILogger;
-    private readonly parsedSchemaDocuments: DataSchemaElementNode;
+    private parsedSchemaDocument: DataSchemaElementNode;
     private readonly validator: SugarValidator;
     private readonly documentUri: string;
     private readonly schemaFileUri: string;
@@ -82,13 +82,23 @@ export class SugarDocumentIntellisenseService {
         this.logger = logger;
         this.offsetPositionResolver = offsetPositionResolver;
         this.schemaFileUri = UriUtils.fileNameToUri(this.findSchemaFile(this.documentUri));
-        this.parsedSchemaDocuments = this.loadDataSchema();
-        this.suggester = new CompletionSuggester([], allElements, this.parsedSchemaDocuments);
+        this.parsedSchemaDocument = this.loadDataSchema();
+        this.suggester = new CompletionSuggester([], allElements, this.parsedSchemaDocument);
         this.sugarElements = allElements;
-        this.validator = createDefaultValidator(this.parsedSchemaDocuments);
+        this.validator = createDefaultValidator(this.parsedSchemaDocument);
         this.builder = new OffsetToNodeMapBuilder();
         this.typeInfoExtractor = new TypeInfoExtractor();
         this.helpUrlBuilder = new HelpUrlBuilder(sugarElementsGroups);
+    }
+
+    public updateSchema(): void {
+        this.parsedSchemaDocument = this.loadDataSchema();
+        this.validator.updateDataSchema(this.parsedSchemaDocument);
+        this.suggester.updateDataSchema(this.parsedSchemaDocument);
+    }
+
+    public isLinkedWithSchemaFile(uri: string): boolean {
+        return this.schemaFileUri === uri;
     }
 
     public getCodeLenses(): undefined | CodeLens[] {
@@ -432,7 +442,7 @@ export class SugarDocumentIntellisenseService {
 
         if (suggestionItem.type === SuggestionItemType.DataElement) {
             const dataSchemaNode = DataSchemaUtils.findElementByPath(
-                this.parsedSchemaDocuments,
+                this.parsedSchemaDocument,
                 suggestionItem.fullPath
             );
             if (dataSchemaNode == undefined) {
@@ -451,7 +461,7 @@ export class SugarDocumentIntellisenseService {
 
         if (suggestionItem.type === SuggestionItemType.DataAttribute) {
             const dataSchemaAttribute = DataSchemaUtils.findAttributeByPath(
-                this.parsedSchemaDocuments,
+                this.parsedSchemaDocument,
                 suggestionItem.fullPath
             );
             if (dataSchemaAttribute == undefined) {
@@ -535,7 +545,7 @@ export class SugarDocumentIntellisenseService {
     }
 
     private getDataElementOrAttributeByPath(path: string[]): undefined | DataSchemaNode {
-        return DataSchemaUtils.findSchemaNodeByPath(this.parsedSchemaDocuments, path);
+        return DataSchemaUtils.findSchemaNodeByPath(this.parsedSchemaDocument, path);
     }
 
     private resolveContextAsOffset(offset: number): undefined | CodeContext {

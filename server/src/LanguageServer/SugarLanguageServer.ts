@@ -5,6 +5,8 @@ import {
     CompletionItem,
     Connection,
     createConnection,
+    DidChangeConfigurationNotification,
+    DidChangeWatchedFilesParams,
     InitializeParams,
     InitializeResult,
     Location,
@@ -75,7 +77,26 @@ export class SugarLanguageServer {
     public listen(): void {
         this.documents.listen(this.connection);
         this.connection.listen();
+        this.connection.client.register(DidChangeConfigurationNotification.type, undefined);
+        this.connection.onDidChangeWatchedFiles(this.handleChangeWatchedFiles);
     }
+
+    private readonly handleChangeWatchedFiles = (params: DidChangeWatchedFilesParams): void => {
+        for (const documentUri of Object.keys(this.documentServices)) {
+            const documentService = this.documentServices[documentUri];
+            if (documentService != undefined) {
+                for (const uri of params.changes.map(x => x.uri)) {
+                    if (documentService.isLinkedWithSchemaFile(uri)) {
+                        documentService.updateSchema();
+                        const textDocument = this.documents.get(documentUri);
+                        if (textDocument != undefined) {
+                            documentService.validateTextDocument(textDocument.getText());
+                        }
+                    }
+                }
+            }
+        }
+    };
 
     private readonly handleFindAllReferences = (params: ReferenceParams): undefined | Location[] => {
         const documentService = this.documentServices[params.textDocument.uri];

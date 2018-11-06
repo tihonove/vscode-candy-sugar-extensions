@@ -10,10 +10,10 @@ import { ValidationItem } from "./Bases/ValidationItem";
 export class ValidPathRule extends SugarValidatorRuleBase {
     private readonly elementInfos: SugarElementInfo[];
     private readonly validations: ValidationItem[] = [];
-    private readonly dataSchema: DataSchemaElementNode;
+    private readonly dataSchema: undefined | DataSchemaElementNode;
     public pathScopeStack: string[][] = [];
 
-    public constructor(dataSchema: DataSchemaElementNode, elementInfos: SugarElementInfo[]) {
+    public constructor(dataSchema: undefined | DataSchemaElementNode, elementInfos: SugarElementInfo[]) {
         super("valid-path");
         this.dataSchema = dataSchema;
         this.elementInfos = elementInfos;
@@ -37,6 +37,9 @@ export class ValidPathRule extends SugarValidatorRuleBase {
         const attributeName = attribute.name;
         const element = attribute.parent;
         const elementInfo = this.elementInfos.find(x => x.name === element.name.value);
+        if (this.dataSchema == undefined) {
+            return;
+        }
         if (attribute.value == undefined) {
             return;
         }
