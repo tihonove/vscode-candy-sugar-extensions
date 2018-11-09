@@ -2,10 +2,9 @@ import * as fs from "fs";
 import * as glob from "glob";
 import * as path from "path";
 
-import { DataSchemaElementNode } from "../../server/src/DataSchema/DataSchemaNode";
-import { SchemaRngConverter } from "../../server/src/DataSchema/DataSchemaParser/SchemaRngConverter";
 import { createDefaultValidator } from "../../server/src/Validator/ValidatorFactory";
 
+import { StaticSugarProjectContext } from "./staticSugarProjectContext";
 import { runCommandLineApp } from "./CommandLineUtils/CommandLineRunner";
 import { parseArguments } from "./CommandLineUtils/ParseArguments";
 import { createReporter } from "./Reporters/ReporterFactory";
@@ -23,7 +22,8 @@ function sugarValidatorEntryPoint(): void {
     const reporter = createReporter(options.reporter);
     reporter.beginValidate();
     for (const fileToValidate of filesToValidate) {
-        const validator = createDefaultValidator(findAndParseDataSchema(fileToValidate));
+        const sugarProject = loadProjectBySugarFile(fileToValidate);
+        const validator = createDefaultValidator(sugarProject);
         const fileContent = fs.readFileSync(fileToValidate, "utf8");
         const validationResult = validator.validate(fileContent);
         reporter.report(fileToValidate, validationResult);
@@ -31,17 +31,13 @@ function sugarValidatorEntryPoint(): void {
     reporter.endValidate();
 }
 
-function findAndParseDataSchema(sugarFilePath: string): undefined | DataSchemaElementNode {
+function loadProjectBySugarFile(sugarFilePath: string): StaticSugarProjectContext {
+    return new StaticSugarProjectContext(findProjectRootBySugarFile(sugarFilePath));
+}
+
+function findProjectRootBySugarFile(sugarFilePath: string): string {
     const filename = sugarFilePath;
-    const formDirName = path.basename(path.dirname(path.dirname(filename)));
-    const schemaFile = path.join(path.dirname(filename), "..", "schemas", formDirName + ".rng.xml");
-    const schemaParser = new SchemaRngConverter();
-    try {
-        const schemaFileContent = fs.readFileSync(schemaFile, "utf8");
-        return schemaParser.toDataSchema(schemaFileContent);
-    } catch (e) {
-        return undefined;
-    }
+    return path.dirname(path.dirname(filename));
 }
 
 runCommandLineApp(sugarValidatorEntryPoint);

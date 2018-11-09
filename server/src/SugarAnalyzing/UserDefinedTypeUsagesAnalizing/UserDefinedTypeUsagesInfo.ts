@@ -11,4 +11,5 @@ interface UserDefinedTypeUsage {
     attributeValueNode: SugarAttributeValue;
     typeUsagePosition: CodePosition;
     elementPosition: CodePosition;
+    absoluteSugarFilePath: string;
 }

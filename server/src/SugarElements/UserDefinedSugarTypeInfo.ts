@@ -12,6 +12,7 @@ export interface UserDefinedSugarTypeInfo {
     requiredDescription?: string;
     constraintStrings: string[];
     position: CodePosition;
+    absoluteSugarFilePath?: string;
 }
 
 export const defaultBuiltInTypeNames = ["string", "pattern", "integer", "decimal", "date", "gYear"];

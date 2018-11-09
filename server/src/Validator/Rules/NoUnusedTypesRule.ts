@@ -1,25 +1,28 @@
+import { TypeInfoExtractor } from "../../SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
 import { UserDefinedTypeUsagesBuilder } from "../../SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesBuilder";
 import { SugarElementInfo } from "../../SugarElements/SugarElementInfo";
-import { UserDefinedSugarTypeInfo } from "../../SugarElements/UserDefinedSugarTypeInfo";
 import { SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
+import { ISugarProjectContext } from "../Validator/ISugarProjectContext";
 
 import { SugarValidatorRuleBase } from "./Bases/SugarValidatorRuleBase";
 import { ValidationItem } from "./Bases/ValidationItem";
 
 export class NoUnusedTypesRule extends SugarValidatorRuleBase {
-    public userDefinedTypes: UserDefinedSugarTypeInfo[];
-    public sugarElementInfos: SugarElementInfo[];
+    private readonly sugarElementInfos: SugarElementInfo[];
+    private readonly context: ISugarProjectContext;
     private readonly validations: ValidationItem[] = [];
 
-    public constructor(userDefinedTypes: UserDefinedSugarTypeInfo[], sugarElementInfos: SugarElementInfo[]) {
+    public constructor(context: ISugarProjectContext) {
         super("no-unused-types");
-        this.userDefinedTypes = userDefinedTypes;
-        this.sugarElementInfos = sugarElementInfos;
+        this.context = context;
+        this.sugarElementInfos = context.getSugarElementInfos();
     }
 
     public beforeProcess(sugarDocument: SugarElement): void {
+        const typeInfoExtractor = new TypeInfoExtractor();
+        const userDefinedTypes = typeInfoExtractor.extractTypeInfos(sugarDocument);
         const userDefinedTypeUsagesBuilder = new UserDefinedTypeUsagesBuilder(this.sugarElementInfos);
-        const usages = userDefinedTypeUsagesBuilder.buildUsages(this.userDefinedTypes, sugarDocument);
+        const usages = userDefinedTypeUsagesBuilder.buildUsages(userDefinedTypes, this.context);
         this.validations.push(
             ...usages.filter(x => x.usages.length === 0).map(x => ({
                 position: x.type.position,

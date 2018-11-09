@@ -3,6 +3,7 @@ import { DataSchemaElementNode } from "../../DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "../../DataSchema/DataSchemaUtils";
 import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { SugarAttribute, SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
+import { ISugarProjectContext } from "../Validator/ISugarProjectContext";
 
 import { SugarValidatorRuleBase } from "./Bases/SugarValidatorRuleBase";
 import { ValidationItem } from "./Bases/ValidationItem";
@@ -13,10 +14,10 @@ export class ValidPathRule extends SugarValidatorRuleBase {
     private readonly dataSchema: undefined | DataSchemaElementNode;
     public pathScopeStack: string[][] = [];
 
-    public constructor(dataSchema: undefined | DataSchemaElementNode, elementInfos: SugarElementInfo[]) {
+    public constructor(context: ISugarProjectContext) {
         super("valid-path");
-        this.dataSchema = dataSchema;
-        this.elementInfos = elementInfos;
+        this.dataSchema = context.getDataSchema();
+        this.elementInfos = context.getSugarElementInfos();
     }
 
     public enterElement(element: SugarElement): void {

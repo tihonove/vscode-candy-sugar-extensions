@@ -1,6 +1,7 @@
 import { AttributeTypeUtils } from "../../SugarElements/AttributeTypeUtils";
 import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { SugarAttribute } from "../../SugarParsing/SugarGrammar/SugarParser";
+import { ISugarProjectContext } from "../Validator/ISugarProjectContext";
 
 import { SugarValidatorRuleBase } from "./Bases/SugarValidatorRuleBase";
 import { ValidationItem } from "./Bases/ValidationItem";
@@ -9,9 +10,9 @@ export class ValidAttributeValueType extends SugarValidatorRuleBase {
     private readonly elementInfos: SugarElementInfo[];
     private readonly validations: ValidationItem[] = [];
 
-    public constructor(elementInfos: SugarElementInfo[]) {
+    public constructor(context: ISugarProjectContext) {
         super("valid-attribute-type");
-        this.elementInfos = elementInfos;
+        this.elementInfos = context.getSugarElementInfos();
     }
 
     public visitAttribute(attribute: SugarAttribute): void {

@@ -1,16 +1,15 @@
 import { suite, test } from "mocha-typescript";
 
-import { UserDefinedSugarTypeInfo } from "../../../../server/src/SugarElements/UserDefinedSugarTypeInfo";
 import { ISugarValidatorRule } from "../../../../server/src/Validator/Rules/Bases/ISugarValidatorRule";
 import { NoUnusedTypesRule } from "../../../../server/src/Validator/Rules/NoUnusedTypesRule";
-import { testSugarElementInfos } from "../../Utils/TestInfos";
+import { ISugarProjectContext } from "../../../../server/src/Validator/Validator/ISugarProjectContext";
 
 import { SugarValidationRuleTestBase } from "./Bases/SugarValidationRuleTestBase";
 
 @suite
 export class NoUnusedTypesRuleTest extends SugarValidationRuleTestBase {
-    protected createRule(userDefinedTypes: UserDefinedSugarTypeInfo[]): ISugarValidatorRule {
-        return new NoUnusedTypesRule(userDefinedTypes, testSugarElementInfos);
+    protected createRule(context: ISugarProjectContext): ISugarValidatorRule {
+        return new NoUnusedTypesRule(context);
     }
 
     @test

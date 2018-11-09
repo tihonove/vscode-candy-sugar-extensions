@@ -14,43 +14,40 @@ import {
     TextDocumentChangeEvent,
 } from "vscode-languageserver-types";
 
-import { DataSchemaElementNode, DataSchemaNode } from "../DataSchema/DataSchemaNode";
-import { DataSchemaUtils } from "../DataSchema/DataSchemaUtils";
-import { CompletionSuggester } from "../SugarAnalyzing/ComletionSuggesting/CompletionSuggester";
-import { SuggestionItem, SuggestionItemType } from "../SugarAnalyzing/ComletionSuggesting/SuggestionItem";
-import { CodeContext } from "../SugarAnalyzing/ContextResolving/CodeContext";
-import { CodeContextByNodeResolver } from "../SugarAnalyzing/ContextResolving/CodeContextByNodeResolver";
-import { OffsetToNodeMap } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMap";
-import { OffsetToNodeMapBuilder } from "../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
-import { TypeInfoExtractor } from "../SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
-import { UserDefinedTypeUsagesBuilder } from "../SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesBuilder";
-import { UserDefinedTypeUsagesInfo } from "../SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesInfo";
-import { allElements } from "../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
-import { sugarElementsGroups } from "../SugarElements/DefaultSugarElementInfos/DefaultSugarElementsGrouped";
-import { AttributeType, SugarElementInfo } from "../SugarElements/SugarElementInfo";
-import { defaultBuiltInTypeNames, TypeKind, UserDefinedSugarTypeInfo } from "../SugarElements/UserDefinedSugarTypeInfo";
+import { DataSchemaElementNode, DataSchemaNode } from "../../DataSchema/DataSchemaNode";
+import { DataSchemaUtils } from "../../DataSchema/DataSchemaUtils";
+import { CompletionSuggester } from "../../SugarAnalyzing/ComletionSuggesting/CompletionSuggester";
+import { SuggestionItem, SuggestionItemType } from "../../SugarAnalyzing/ComletionSuggesting/SuggestionItem";
+import { CodeContext } from "../../SugarAnalyzing/ContextResolving/CodeContext";
+import { CodeContextByNodeResolver } from "../../SugarAnalyzing/ContextResolving/CodeContextByNodeResolver";
+import { OffsetToNodeMap } from "../../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMap";
+import { OffsetToNodeMapBuilder } from "../../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
+import { UserDefinedTypeUsagesBuilder } from "../../SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesBuilder";
+import { UserDefinedTypeUsagesInfo } from "../../SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesInfo";
+import { allElements } from "../../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
+import { sugarElementsGroups } from "../../SugarElements/DefaultSugarElementInfos/DefaultSugarElementsGrouped";
+import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
+import { defaultBuiltInTypeNames, TypeKind } from "../../SugarElements/UserDefinedSugarTypeInfo";
 import {
     SugarAttribute,
     SugarAttributeName,
     SugarAttributeValue,
     SugarElement,
     SugarElementName,
-} from "../SugarParsing/SugarGrammar/SugarParser";
-import { oc } from "../Utils/ChainWrapper";
-import { createEvent } from "../Utils/Event";
-import { CodePosition } from "../Utils/PegJSUtils/Types";
-import { isNotNullOrUndefined } from "../Utils/TypingUtils";
-import { UriUtils } from "../Utils/UriUtils";
-import { SugarValidator } from "../Validator/Validator/SugarValidator";
-import { createDefaultValidator } from "../Validator/ValidatorFactory";
+} from "../../SugarParsing/SugarGrammar/SugarParser";
+import { oc } from "../../Utils/ChainWrapper";
+import { createEvent } from "../../Utils/Event";
+import { CodePosition } from "../../Utils/PegJSUtils/Types";
+import { isNotNullOrUndefined } from "../../Utils/TypingUtils";
+import { UriUtils } from "../../Utils/UriUtils";
+import { SugarValidator } from "../../Validator/Validator/SugarValidator";
+import { createDefaultValidator } from "../../Validator/ValidatorFactory";
+import { HelpUrlBuilder } from "../HelpUrlBuilder";
+import { ILogger } from "../Logging/Logger";
+import { MarkdownUtils } from "../MarkdownUtils";
 
-import { HelpUrlBuilder } from "./HelpUrlBuilder";
-import { ILogger } from "./Logging/Logger";
-import { MarkdownUtils } from "./MarkdownUtils";
-import {
-    SugarProjectIntellisenseService,
-    SugarProjectIntellisenseServiceCollection,
-} from "./SugarProjectIntellisenseService";
+import { SugarProjectIntellisenseService } from "./SugarProjectIntellisenseService";
+import { SugarProjectIntellisenseServiceCollection } from "./SugarProjectIntellisenseServiceCollection";
 
 export interface IDocumentOffsetPositionResolver {
     offsetAt(position: Position): number;
@@ -58,25 +55,20 @@ export interface IDocumentOffsetPositionResolver {
 }
 
 export class SugarDocumentIntellisenseService {
-    private get dataSchema(): DataSchemaElementNode {
-        return this.sugarProject.getDataSchema();
-    }
     private readonly logger: ILogger;
     private readonly validator: SugarValidator;
     private readonly documentUri: string;
     private readonly offsetPositionResolver: IDocumentOffsetPositionResolver;
     private readonly suggester: CompletionSuggester;
-    private readonly typeInfoExtractor: TypeInfoExtractor;
     private readonly builder: OffsetToNodeMapBuilder;
-    private offsetToNodeMap?: OffsetToNodeMap;
-    private userDefinedTypes?: UserDefinedSugarTypeInfo[];
-    private userDefinedTypeUsagesInfo?: UserDefinedTypeUsagesInfo[];
     private readonly sugarElements: SugarElementInfo[];
     private readonly helpUrlBuilder: HelpUrlBuilder;
-    public sendValidationsEvent = createEvent<[Diagnostic[]]>();
-    private updateDomListeners: Array<() => void> = [];
     private readonly sugarProject: SugarProjectIntellisenseService;
+    private offsetToNodeMap?: OffsetToNodeMap;
+    private userDefinedTypeUsagesInfo?: UserDefinedTypeUsagesInfo[];
+    private updateDomListeners: Array<() => void> = [];
 
+    public sendValidationsEvent = createEvent<[Diagnostic[]]>();
     public schemaChangedEvent = createEvent<[string]>();
     public readonly updateDomDebounced = _.debounce((text: string) => this.updateDom(text), 50, { trailing: true });
 
@@ -93,10 +85,13 @@ export class SugarDocumentIntellisenseService {
         this.offsetPositionResolver = offsetPositionResolver;
         this.suggester = new CompletionSuggester([], allElements, this.sugarProject.getDataSchema());
         this.sugarElements = allElements;
-        this.validator = createDefaultValidator(this.dataSchema);
+        this.validator = createDefaultValidator(this.sugarProject);
         this.builder = new OffsetToNodeMapBuilder();
-        this.typeInfoExtractor = new TypeInfoExtractor();
         this.helpUrlBuilder = new HelpUrlBuilder(sugarElementsGroups);
+    }
+
+    private get dataSchema(): DataSchemaElementNode {
+        return this.sugarProject.getDataSchema();
     }
 
     public getCodeLenses(): undefined | CodeLens[] {
@@ -157,7 +152,7 @@ export class SugarDocumentIntellisenseService {
             const usages = this.userDefinedTypeUsagesInfo.find(x => x.type.name === typeName);
             if (usages != undefined) {
                 return usages.usages.map(x => ({
-                    uri: this.documentUri,
+                    uri: UriUtils.fileNameToUri(x.absoluteSugarFilePath),
                     range: this.pegjsPositionToVsCodeRange(x.elementPosition),
                 }));
             }
@@ -215,17 +210,20 @@ export class SugarDocumentIntellisenseService {
         if (context.type === "AttributeValue" && context.currentAttributeInfo != undefined) {
             if (context.currentAttributeInfo.valueTypes.includes(AttributeType.Type)) {
                 const typeName = context.contextNode.value;
-                if (this.userDefinedTypes != undefined) {
-                    const userDefinedTypeInfo = this.userDefinedTypes.find(x => x.name === typeName);
+                const userDefinedTypes = this.sugarProject.userDefinedTypes;
+                if (userDefinedTypes != undefined) {
+                    const userDefinedTypeInfo = userDefinedTypes.find(x => x.name === typeName);
                     if (userDefinedTypeInfo != undefined) {
                         let documentationText = "";
-                        if (userDefinedTypeInfo.description != undefined) {
+                        if (userDefinedTypeInfo != undefined) {
                             documentationText += "```xml\n";
                             documentationText += `<type name="${userDefinedTypeInfo.name}" />\n`;
                             documentationText += "```\n";
                         }
                         if (userDefinedTypeInfo.description != undefined) {
                             documentationText += userDefinedTypeInfo.description + "\n";
+                        } else {
+                            documentationText += "\n\n";
                         }
                         if (userDefinedTypeInfo.constraintStrings.length > 0) {
                             documentationText += "```xml\n";
@@ -302,19 +300,20 @@ export class SugarDocumentIntellisenseService {
         if (context == undefined) {
             return undefined;
         }
+        const userDefinedTypes = this.sugarProject.userDefinedTypes;
         if (
             context.type === "AttributeValue" &&
-            this.userDefinedTypes != undefined &&
+            userDefinedTypes != undefined &&
             context.currentAttributeInfo != undefined &&
             context.currentAttributeInfo.valueTypes.includes(AttributeType.Type)
         ) {
-            const userDefinedTypeInfo = this.userDefinedTypes.find(x => x.name === context.contextNode.value);
-            if (userDefinedTypeInfo == undefined) {
+            const userDefinedTypeInfo = userDefinedTypes.find(x => x.name === context.contextNode.value);
+            if (userDefinedTypeInfo == undefined || userDefinedTypeInfo.absoluteSugarFilePath == undefined) {
                 return undefined;
             }
             return {
                 range: this.pegjsPositionToVsCodeRange(userDefinedTypeInfo.position),
-                uri: this.documentUri,
+                uri: UriUtils.fileNameToUri(userDefinedTypeInfo.absoluteSugarFilePath),
             };
         }
         if (context.type === "DataAttributeValue" && context.currentDataContext != undefined) {
@@ -470,8 +469,9 @@ export class SugarDocumentIntellisenseService {
                 );
             }
         }
-        if (suggestionItem.type === SuggestionItemType.Type && this.userDefinedTypes != undefined) {
-            const userDefinedTypeInfo = this.userDefinedTypes.find(x => x.name === suggestionItem.name);
+        const userDefinedTypes = this.sugarProject.userDefinedTypes;
+        if (suggestionItem.type === SuggestionItemType.Type && userDefinedTypes != undefined) {
+            const userDefinedTypeInfo = userDefinedTypes.find(x => x.name === suggestionItem.name);
             if (userDefinedTypeInfo == undefined) {
                 vsCodeCompletionItem.detail = `BuiltIn type`;
                 return vsCodeCompletionItem;
@@ -502,7 +502,6 @@ export class SugarDocumentIntellisenseService {
     }
 
     private readonly handleChangeDataSchema = (dataSchema: DataSchemaElementNode): void => {
-        this.validator.updateDataSchema(dataSchema);
         this.suggester.updateDataSchema(dataSchema);
         this.schemaChangedEvent.emit(this.documentUri);
     };
@@ -524,10 +523,15 @@ export class SugarDocumentIntellisenseService {
         try {
             const sugarDocument = this.builder.buildCodeDom(text);
             this.offsetToNodeMap = this.builder.buildOffsetToNodeMapFromDom(sugarDocument);
-            this.userDefinedTypes = this.typeInfoExtractor.extractTypeInfos(sugarDocument);
-            this.suggester.updateUserDefinedSugarType(this.userDefinedTypes);
+            this.sugarProject.updateDocumentDom(this.documentUri, sugarDocument);
+            this.suggester.updateUserDefinedSugarType(this.sugarProject.userDefinedTypes);
             const usagesBuilder = new UserDefinedTypeUsagesBuilder(this.sugarElements);
-            this.userDefinedTypeUsagesInfo = usagesBuilder.buildUsages(this.userDefinedTypes, sugarDocument);
+            const currentUserDefinedTypes = this.sugarProject.getUserDefinedTypesBySugarFile(this.documentUri);
+            if (currentUserDefinedTypes != undefined) {
+                this.userDefinedTypeUsagesInfo = usagesBuilder.buildUsages(currentUserDefinedTypes, this.sugarProject);
+            } else {
+                this.userDefinedTypeUsagesInfo = undefined;
+            }
             this.domUpdateCompleted();
         } catch (ignoreError) {
             // По всей вимдости код невалиден. Просто оставим последний валидный map

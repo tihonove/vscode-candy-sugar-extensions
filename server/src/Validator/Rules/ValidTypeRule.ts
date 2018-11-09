@@ -1,6 +1,7 @@
 import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { defaultBuiltInTypeNames, UserDefinedSugarTypeInfo } from "../../SugarElements/UserDefinedSugarTypeInfo";
 import { SugarAttribute } from "../../SugarParsing/SugarGrammar/SugarParser";
+import { ISugarProjectContext } from "../Validator/ISugarProjectContext";
 
 import { SugarValidatorRuleBase } from "./Bases/SugarValidatorRuleBase";
 import { ValidationItem } from "./Bases/ValidationItem";
@@ -10,10 +11,10 @@ export class ValidTypeRule extends SugarValidatorRuleBase {
     private readonly validations: ValidationItem[] = [];
     private readonly userDefinedTypes: UserDefinedSugarTypeInfo[];
 
-    public constructor(userDefinedTypes: UserDefinedSugarTypeInfo[], elementInfos: SugarElementInfo[]) {
+    public constructor(context: ISugarProjectContext) {
         super("valid-type");
-        this.userDefinedTypes = userDefinedTypes;
-        this.elementInfos = elementInfos;
+        this.userDefinedTypes = context.getAllUserDefinedTypes();
+        this.elementInfos = context.getSugarElementInfos();
     }
 
     public visitAttribute(attribute: SugarAttribute): void {

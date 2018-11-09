@@ -2,15 +2,15 @@ import { suite, test } from "mocha-typescript";
 
 import { ValidElementRule } from "../../../server/src/Validator/Rules/ValidElementRule";
 import { SugarValidator } from "../../../server/src/Validator/Validator/SugarValidator";
+import { TestProjectContext } from "../TestProjectContext";
 import { expect } from "../Utils/Expect";
-import { testSugarElementInfos } from "../Utils/TestInfos";
 
 @suite
 export class SugarValidatorTest {
     @test
     public testSyntaxError(): void {
-        const validator = new SugarValidator(undefined);
-        validator.addRule(() => new ValidElementRule(testSugarElementInfos));
+        const validator = new SugarValidator(new TestProjectContext({}));
+        validator.addRule(context => new ValidElementRule(context));
 
         expect(validator.validate("<not ")).to.shallowDeepEqual([
             {

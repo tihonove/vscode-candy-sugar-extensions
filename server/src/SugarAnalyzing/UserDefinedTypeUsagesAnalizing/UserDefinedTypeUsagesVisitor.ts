@@ -10,6 +10,8 @@ export class UserDefinedTypeUsagesVisitor extends EmptySugarDomVisitor {
     private readonly sugarElementInfos: SugarElementInfo[];
     private readonly userDefinedTypes: UserDefinedSugarTypeInfo[];
 
+    public currentlyTraversingFilePath?: string;
+
     public constructor(userDefinedTypes: UserDefinedSugarTypeInfo[], sugarElementInfos: SugarElementInfo[]) {
         super();
         this.sugarElementInfos = sugarElementInfos;
@@ -22,6 +24,9 @@ export class UserDefinedTypeUsagesVisitor extends EmptySugarDomVisitor {
     }
 
     public visitAttribute(attribute: SugarAttribute): void {
+        if (this.currentlyTraversingFilePath === undefined) {
+            throw new Error("currentlyTraversingFilePath should be not null");
+        }
         const elementName = attribute.parent.name.value;
         const attributeName = attribute.name.value;
         if (attribute.value == undefined) {
@@ -52,6 +57,7 @@ export class UserDefinedTypeUsagesVisitor extends EmptySugarDomVisitor {
             attributeValueNode: attribute.value,
             elementPosition: attribute.parent.position,
             typeUsagePosition: attribute.value.position,
+            absoluteSugarFilePath: this.currentlyTraversingFilePath,
         });
     }
 }

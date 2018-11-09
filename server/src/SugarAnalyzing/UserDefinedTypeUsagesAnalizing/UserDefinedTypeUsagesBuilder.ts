@@ -1,6 +1,6 @@
 import { SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { UserDefinedSugarTypeInfo } from "../../SugarElements/UserDefinedSugarTypeInfo";
-import { SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
+import { ISugarProjectContext } from "../../Validator/Validator/ISugarProjectContext";
 import { traverseSugar } from "../Traversing/TraverseSugar";
 
 import { UserDefinedTypeUsagesInfo } from "./UserDefinedTypeUsagesInfo";
@@ -15,10 +15,14 @@ export class UserDefinedTypeUsagesBuilder {
 
     public buildUsages(
         userDefinedTypes: UserDefinedSugarTypeInfo[],
-        sugarDom: SugarElement
+        projectContext: ISugarProjectContext
     ): UserDefinedTypeUsagesInfo[] {
         const visitor = new UserDefinedTypeUsagesVisitor(userDefinedTypes, this.sugarElementInfos);
-        traverseSugar(sugarDom, visitor);
+        for (const projectFilePath of projectContext.getAllProjectFilePaths()) {
+            visitor.currentlyTraversingFilePath = projectFilePath;
+            traverseSugar(projectContext.getSugarDomByFilePath(projectFilePath), visitor);
+        }
+
         return visitor.getUsages();
     }
 }

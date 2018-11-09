@@ -7,6 +7,12 @@ import { EmptySugarDomVisitor } from "../Traversing/EmptySugarDomVisitor";
 export class TypeInfoExtractionVisitor extends EmptySugarDomVisitor {
     private readonly typeInfos: UserDefinedSugarTypeInfo[] = [];
     private isInsideTypesElement = false;
+    private readonly absolutePath?: string;
+
+    public constructor(absolutePath?: string) {
+        super();
+        this.absolutePath = absolutePath;
+    }
 
     public getTypeInfos(): UserDefinedSugarTypeInfo[] {
         return this.typeInfos;
@@ -49,6 +55,7 @@ export class TypeInfoExtractionVisitor extends EmptySugarDomVisitor {
                 .map(child => this.constraintElementToString(child))
                 .filter(isNotNullOrUndefined),
             position: element.position,
+            absoluteSugarFilePath: this.absolutePath,
         };
     }
 

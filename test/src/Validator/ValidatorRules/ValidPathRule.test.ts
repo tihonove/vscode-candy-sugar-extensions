@@ -2,14 +2,14 @@ import { suite, test } from "mocha-typescript";
 
 import { ISugarValidatorRule } from "../../../../server/src/Validator/Rules/Bases/ISugarValidatorRule";
 import { ValidPathRule } from "../../../../server/src/Validator/Rules/ValidPathRule";
-import { testDataSchema, testSugarElementInfos } from "../../Utils/TestInfos";
+import { ISugarProjectContext } from "../../../../server/src/Validator/Validator/ISugarProjectContext";
 
 import { SugarValidationRuleTestBase } from "./Bases/SugarValidationRuleTestBase";
 
 @suite
 export class ValidPathRuleTest extends SugarValidationRuleTestBase {
-    protected createRule(): ISugarValidatorRule {
-        return new ValidPathRule(testDataSchema, testSugarElementInfos);
+    protected createRule(context: ISugarProjectContext): ISugarValidatorRule {
+        return new ValidPathRule(context);
     }
 
     @test

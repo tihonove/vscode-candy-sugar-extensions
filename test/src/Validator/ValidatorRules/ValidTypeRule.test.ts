@@ -2,14 +2,14 @@ import { suite, test } from "mocha-typescript";
 
 import { ISugarValidatorRule } from "../../../../server/src/Validator/Rules/Bases/ISugarValidatorRule";
 import { ValidTypeRule } from "../../../../server/src/Validator/Rules/ValidTypeRule";
-import { testSugarElementInfos, testSugarTypes } from "../../Utils/TestInfos";
+import { ISugarProjectContext } from "../../../../server/src/Validator/Validator/ISugarProjectContext";
 
 import { SugarValidationRuleTestBase } from "./Bases/SugarValidationRuleTestBase";
 
 @suite
-export class ValidAttributeRuleTest extends SugarValidationRuleTestBase {
-    protected createRule(): ISugarValidatorRule {
-        return new ValidTypeRule(testSugarTypes, testSugarElementInfos);
+export class ValidRuleTypeTest extends SugarValidationRuleTestBase {
+    protected createRule(context: ISugarProjectContext): ISugarValidatorRule {
+        return new ValidTypeRule(context);
     }
 
     @test
@@ -25,7 +25,9 @@ export class ValidAttributeRuleTest extends SugarValidationRuleTestBase {
 
     @test
     public validCode(): void {
-        this.assertValidCode(`<atag1 type="a-type1"/>`);
+        this.assertValidCode(
+            `<form><types><type name="a-type1" base="string" /></types><atag1 type="a-type1"/></form>`
+        );
     }
 
     @test

@@ -1,1 +1,1 @@
-node validator/bin/cli.js %*
+node %~dp0/validator/bin/cli.js %*

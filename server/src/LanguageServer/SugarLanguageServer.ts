@@ -17,10 +17,13 @@ import {
 } from "vscode-languageserver";
 import { Definition, Hover, Position, TextDocumentChangeEvent } from "vscode-languageserver-types";
 
+import {
+    IDocumentOffsetPositionResolver,
+    SugarDocumentIntellisenseService,
+} from "./IntellisenseServices/SugarDocumentIntellisenseService";
+import { SugarProjectIntellisenseServiceCollection } from "./IntellisenseServices/SugarProjectIntellisenseServiceCollection";
 import { ILogger } from "./Logging/Logger";
 import { VsCodeServerLogger } from "./Logging/VsCodeServerLogger";
-import { IDocumentOffsetPositionResolver, SugarDocumentIntellisenseService } from "./SugarDocumentIntellisenseService";
-import { SugarProjectIntellisenseServiceCollection } from "./SugarProjectIntellisenseService";
 
 class DocumentOffsetPositionResolver implements IDocumentOffsetPositionResolver {
     private readonly documents: TextDocuments;

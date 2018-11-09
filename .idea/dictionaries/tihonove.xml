@@ -13,6 +13,7 @@
       <w>dirname</w>
       <w>doctype</w>
       <w>documentroot</w>
+      <w>doms</w>
       <w>doublequoted</w>
       <w>entitytype</w>
       <w>esnext</w>

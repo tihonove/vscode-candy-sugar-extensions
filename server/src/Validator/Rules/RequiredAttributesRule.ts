@@ -1,5 +1,6 @@
 import { SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
+import { ISugarProjectContext } from "../Validator/ISugarProjectContext";
 
 import { SugarValidatorRuleBase } from "./Bases/SugarValidatorRuleBase";
 import { ValidationItem } from "./Bases/ValidationItem";
@@ -9,9 +10,9 @@ export class RequiredAttributesRule extends SugarValidatorRuleBase {
     private readonly validations: ValidationItem[] = [];
     private readonly checkOnlyElementNames: string[];
 
-    public constructor(elementInfos: SugarElementInfo[]) {
+    public constructor(context: ISugarProjectContext) {
         super("required-attribute");
-        this.elementInfos = elementInfos;
+        this.elementInfos = context.getSugarElementInfos();
         this.checkOnlyElementNames = ["form", "input", "atag1"];
     }
 
