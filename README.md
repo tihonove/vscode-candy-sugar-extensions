@@ -29,18 +29,18 @@ ext install vscode-candy-sugar
 ![Auto close tag example](https://raw.githubusercontent.com/tihonove/vscode-candy-sugar-extensions/master/docs/images/auto-close-tag.gif)
 
 
-#### Автокоплит элементов сахара: тэгов и атритутов
+#### Автокомплит элементов сахара: тэгов и атритутов
 ![Auto close tag example](https://raw.githubusercontent.com/tihonove/vscode-candy-sugar-extensions/master/docs/images/element-and-attr-completion.gif)
 
-#### Автокоплит для определённых пользователем типов в сахаре
+#### Автокомплит для определённых пользователем типов в сахаре
 ![User Defined Sugar Type Completion](https://raw.githubusercontent.com/tihonove/vscode-candy-sugar-extensions/master/docs/images/user-defined-sugar-type-completion.png)
 
 
-#### Автокоплит путей к данным по соответствующей схеме данных
+#### Автокомплит путей к данным по соответствующей схеме данных
 ![Auto close tag example](https://raw.githubusercontent.com/tihonove/vscode-candy-sugar-extensions/master/docs/images/data-completion.gif)
 
 
-#### Всплывающие подсказки для атритутов
+#### Всплывающие подсказки для атрибутов
 ![Auto close tag example](https://raw.githubusercontent.com/tihonove/vscode-candy-sugar-extensions/master/docs/images/attr-element-hint.gif)
 
 
@@ -50,7 +50,6 @@ ext install vscode-candy-sugar
 
 #### Быстрый просмотр элементов схемы данных из сахара
 ![Auto close tag example](https://raw.githubusercontent.com/tihonove/vscode-candy-sugar-extensions/master/docs/images/data-peek-def.gif)
-
 
 #### Переход к определению схемы из сахара
 ![Auto close tag example](https://raw.githubusercontent.com/tihonove/vscode-candy-sugar-extensions/master/docs/images/data-go-to-def.gif)
