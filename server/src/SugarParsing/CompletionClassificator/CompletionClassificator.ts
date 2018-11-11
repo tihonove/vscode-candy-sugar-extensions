@@ -281,7 +281,7 @@ export function getCompletionContext(input: string): undefined | CompletionConte
                 topAttribute == undefined ||
                 topAttribute.name == undefined ||
                 topAttribute.value == undefined ||
-                typeof topAttribute.value !== "string"
+                topAttribute.value.type !== "AttributeValue"
             ) {
                 return undefined;
             }
@@ -303,7 +303,7 @@ export function getCompletionContext(input: string): undefined | CompletionConte
                 topAttribute == undefined ||
                 topAttribute.name == undefined ||
                 topAttribute.value == undefined ||
-                typeof topAttribute.value !== "string"
+                topAttribute.value.type !== "AttributeValue"
             ) {
                 return undefined;
             }

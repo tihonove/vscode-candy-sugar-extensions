@@ -44,7 +44,7 @@ export class OffsetToNodeMapBuilder {
         }
         if (root.type === "Attribute") {
             this.traverseSugarAstAndGetNodes(root.name, foundNodes);
-            if (root.value != undefined && typeof root.value === "string") {
+            if (root.value != undefined && root.value.type === "AttributeValue") {
                 this.traverseSugarAstAndGetNodes(root.value, foundNodes);
             }
         }
