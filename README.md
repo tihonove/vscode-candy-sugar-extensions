@@ -24,6 +24,8 @@ ext install vscode-candy-sugar
 Также доступна консольная версия валидатора: 
 [@kontur.candy/sugar-validator](https://www.npmjs.com/package/@kontur.candy/sugar-validator)
 
+#### Форматирование сахара
+![Formatting](https://raw.githubusercontent.com/tihonove/vscode-candy-sugar-extensions/master/docs/images/formatting.gif)
 
 #### Автозакрывание тэгов
 ![Auto close tag example](https://raw.githubusercontent.com/tihonove/vscode-candy-sugar-extensions/master/docs/images/auto-close-tag.gif)
