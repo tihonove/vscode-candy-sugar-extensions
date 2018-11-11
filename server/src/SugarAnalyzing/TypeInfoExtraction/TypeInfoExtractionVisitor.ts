@@ -1,5 +1,5 @@
 import { UserDefinedSugarTypeInfo } from "../../SugarElements/UserDefinedSugarTypeInfo";
-import { SugarElement, SugarText } from "../../SugarParsing/SugarGrammar/SugarParser";
+import { SugarComment, SugarElement, SugarText } from "../../SugarParsing/SugarGrammar/SugarParser";
 import { oc } from "../../Utils/ChainWrapper";
 import { isNotNullOrUndefined } from "../../Utils/TypingUtils";
 import { EmptySugarDomVisitor } from "../Traversing/EmptySugarDomVisitor";
@@ -59,8 +59,8 @@ export class TypeInfoExtractionVisitor extends EmptySugarDomVisitor {
         };
     }
 
-    private constraintElementToString(child: SugarElement | SugarText): undefined | string {
-        if (child.type === "Text") {
+    private constraintElementToString(child: SugarElement | SugarText | SugarComment): undefined | string {
+        if (child.type === "Text" || child.type === "Comment") {
             return undefined;
         }
         const attrs = (child.attributes || []).map(x => `${x.name.value}="${x.value ? x.value.value : ""}"`).join(" ");
@@ -71,10 +71,15 @@ export class TypeInfoExtractionVisitor extends EmptySugarDomVisitor {
     }
 
     private getAttributeValue(element: SugarElement, attributeName: string): undefined | string {
-        return oc(element.attributes)
+        const value = oc(element.attributes)
             .with(x => x.find(a => a.name.value === attributeName))
             .with(x => x.value)
             .with(x => x.value)
             .return(x => x, undefined);
+        if (typeof value === "string") {
+            return value;
+        } else {
+            return undefined;
+        }
     }
 }

@@ -107,7 +107,11 @@ export class CodeContextByNodeResolver {
             if (pathAttribute == undefined || pathAttribute.value == undefined) {
                 continue;
             }
-            result = DataPathUtils.joinDataPaths(result, this.parseDataAttributeValue(pathAttribute.value.value));
+            const pathAttributeValue = pathAttribute.value.value;
+            if (typeof pathAttributeValue !== "string") {
+                continue;
+            }
+            result = DataPathUtils.joinDataPaths(result, this.parseDataAttributeValue(pathAttributeValue));
         }
         return result;
     }

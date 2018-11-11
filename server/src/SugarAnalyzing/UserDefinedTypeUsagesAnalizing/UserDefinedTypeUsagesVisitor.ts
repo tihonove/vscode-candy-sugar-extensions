@@ -53,6 +53,9 @@ export class UserDefinedTypeUsagesVisitor extends EmptySugarDomVisitor {
             usageInfo = { type: userDefinedType, usages: [] };
             this.usages.push(usageInfo);
         }
+        if (attribute.value.type !== "AttributeValue") {
+            return;
+        }
         usageInfo.usages.push({
             attributeValueNode: attribute.value,
             elementPosition: attribute.parent.position,

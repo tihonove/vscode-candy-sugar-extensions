@@ -7,6 +7,7 @@ import {
     createConnection,
     DidChangeConfigurationNotification,
     DidChangeWatchedFilesParams,
+    DocumentFormattingParams,
     InitializeParams,
     InitializeResult,
     Location,
@@ -14,6 +15,7 @@ import {
     ReferenceParams,
     TextDocumentPositionParams,
     TextDocuments,
+    TextEdit,
 } from "vscode-languageserver";
 import { Definition, Hover, Position, TextDocumentChangeEvent } from "vscode-languageserver-types";
 
@@ -77,6 +79,7 @@ export class SugarLanguageServer {
         this.connection.onCodeLens(this.handleProvideCodeLenses);
         this.connection.onCodeLensResolve(this.handleResolveCodeLens);
         this.connection.onReferences(this.handleFindAllReferences);
+        this.connection.onDocumentFormatting(this.handleDocumentFormatting);
         this.projects = new SugarProjectIntellisenseServiceCollection(this.logger);
     }
 
@@ -92,6 +95,27 @@ export class SugarLanguageServer {
             const project = this.projects.getOrCreateServiceBySchemaFileUri(uri);
             project.updateSchema();
         }
+    };
+
+    private readonly handleDocumentFormatting = (params: DocumentFormattingParams): TextEdit[] | undefined => {
+        const documentUri = params.textDocument.uri;
+        const document = this.documents.get(documentUri);
+        const documentService = this.documentServices[documentUri];
+        if (document != undefined && documentService != undefined) {
+            const reformattedText = documentService.reformatDocument(document.getText());
+            if (reformattedText != undefined) {
+                return [
+                    {
+                        newText: reformattedText,
+                        range: {
+                            start: document.positionAt(0),
+                            end: document.positionAt(Infinity),
+                        },
+                    },
+                ];
+            }
+        }
+        return undefined;
     };
 
     private readonly handleFindAllReferences = (params: ReferenceParams): undefined | Location[] => {
@@ -138,6 +162,7 @@ export class SugarLanguageServer {
     private readonly handleInitialize = (_params: InitializeParams): InitializeResult => ({
         capabilities: {
             textDocumentSync: this.documents.syncKind,
+            documentFormattingProvider: true,
             hoverProvider: true,
             definitionProvider: true,
             referencesProvider: true,

@@ -26,7 +26,8 @@ export class ValidAttributeValueType extends SugarValidatorRuleBase {
         if (attributeInfo == undefined) {
             return;
         }
-        const attributeValue = attribute.value ? attribute.value.value : undefined;
+        const attributeValue =
+            attribute.value && typeof attribute.value.value === "string" ? attribute.value.value : undefined;
         if (attributeInfo.valueTypes.every(x => !this.isValueMatchToType(attributeValue, x))) {
             this.validations.push({
                 position: attribute.value != undefined ? attribute.value.position : attribute.name.position,

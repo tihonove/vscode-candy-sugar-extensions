@@ -3,6 +3,7 @@ import { suite, test } from "mocha-typescript";
 import path from "path";
 
 import { OffsetToNodeMapBuilder } from "../../server/src/SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
+import { SugarElement } from "../../server/src/SugarParsing/SugarGrammar/SugarParser";
 
 import { expect } from "./Utils/Expect";
 
@@ -235,8 +236,318 @@ export class SugarCodeDomBuilderTest {
         />`);
     }
 
+    @test
+    public testCodeDomForText(): void {
+        this.checkCodeDom(`<a>text</a>`, {
+            type: "Element",
+            children: [
+                {
+                    type: "Text",
+                    value: "text",
+                },
+            ],
+        });
+    }
+
+    @test
+    public testCodeDomForEmptyText(): void {
+        this.checkCodeDom(`<a></a>`, {
+            type: "Element",
+            children: { length: 0 },
+        });
+        this.checkCodeDom(`<a> </a>`, {
+            type: "Element",
+            children: { length: 0 },
+        });
+        this.checkCodeDom(
+            `<a>
+</a>`,
+            {
+                type: "Element",
+                children: { length: 0 },
+            }
+        );
+        this.checkCodeDom(
+            `<a>
+
+</a>`,
+            {
+                type: "Element",
+                children: { length: 0 },
+            }
+        );
+    }
+
+    @test
+    public testCodeDomForComment(): void {
+        this.checkCodeDom(`<a><!-- text --></a>`, {
+            type: "Element",
+            children: [
+                {
+                    type: "Comment",
+                    text: " text ",
+                },
+            ],
+        });
+        this.checkCodeDom(`<a><!--a1--><b /><!--a1--><b /><!--a3--><b /></a>`, {
+            type: "Element",
+            children: {
+                length: 6,
+            },
+        });
+        this.checkCodeDom(`<a><!----></a>`, {
+            type: "Element",
+            children: [
+                {
+                    type: "Comment",
+                    text: "",
+                },
+            ],
+        });
+        this.checkCodeDom(`<a><!-- test1\n    text1 --></a>`, {
+            type: "Element",
+            children: [
+                {
+                    type: "Comment",
+                    text: " test1\n    text1 ",
+                },
+            ],
+        });
+    }
+
+    @test
+    public testCodeDomForJavascriptObjectLiterals(): void {
+        this.checkCodeDom(`<a z={{  }} />`, {
+            type: "Element",
+            attributes: [
+                {
+                    name: { value: "z" },
+                    value: {
+                        value: {
+                            type: "JavaScriptObjectLiteral",
+                            properties: { length: 0 },
+                        },
+                    },
+                },
+            ],
+        });
+        this.checkCodeDom(`<a z={{ a: 1 }} />`, {
+            type: "Element",
+            attributes: [
+                {
+                    name: { value: "z" },
+                    value: {
+                        value: {
+                            type: "JavaScriptObjectLiteral",
+                            properties: [
+                                {
+                                    type: "JavaScriptObjectLiteralProperty",
+                                    name: { type: "JavaScriptObjectLiteralPropertyName", value: "a" },
+                                    value: { type: "JavaScriptNumberLiteral", value: 1 },
+                                },
+                            ],
+                        },
+                    },
+                },
+            ],
+        });
+        this.checkCodeDom(`<a z={{ a: 1, b: 2, c: 3 }} />`, {
+            type: "Element",
+            attributes: [
+                {
+                    value: {
+                        value: {
+                            properties: [
+                                {
+                                    name: { type: "JavaScriptObjectLiteralPropertyName", value: "a" },
+                                    value: { type: "JavaScriptNumberLiteral", value: 1 },
+                                },
+                                {
+                                    name: { type: "JavaScriptObjectLiteralPropertyName", value: "b" },
+                                    value: { type: "JavaScriptNumberLiteral", value: 2 },
+                                },
+                                {
+                                    name: { type: "JavaScriptObjectLiteralPropertyName", value: "c" },
+                                    value: { type: "JavaScriptNumberLiteral", value: 3 },
+                                },
+                            ],
+                        },
+                    },
+                },
+            ],
+        });
+        this.checkCodeDom(`<a z={{ "a": 1, 'b': 2, c: 3 }} />`, {
+            type: "Element",
+            attributes: [
+                {
+                    value: {
+                        value: {
+                            properties: [
+                                {
+                                    name: {
+                                        value: {
+                                            type: "JavaScriptStringLiteral",
+                                            value: "a",
+                                        },
+                                    },
+                                    value: { type: "JavaScriptNumberLiteral", value: 1 },
+                                },
+                                {
+                                    name: {
+                                        value: {
+                                            type: "JavaScriptStringLiteral",
+                                            value: "b",
+                                        },
+                                    },
+                                    value: { type: "JavaScriptNumberLiteral", value: 2 },
+                                },
+                                {
+                                    name: { value: "c" },
+                                    value: { type: "JavaScriptNumberLiteral", value: 3 },
+                                },
+                            ],
+                        },
+                    },
+                },
+            ],
+        });
+    }
+
+    @test
+    public testCodeDomForJavascriptArrayLiterals(): void {
+        this.checkCodeDom(`<a z={[1]} />`, {
+            type: "Element",
+            attributes: [
+                {
+                    name: { value: "z" },
+                    value: {
+                        value: {
+                            type: "JavaScriptArrayLiteral",
+                            values: [{ value: 1 }],
+                        },
+                    },
+                },
+            ],
+        });
+        this.checkCodeDom(`<a z={[1, 2]} />`, {
+            type: "Element",
+            attributes: [
+                {
+                    value: {
+                        value: {
+                            values: [{ value: 1 }, { value: 2 }],
+                        },
+                    },
+                },
+            ],
+        });
+        this.checkCodeDom(`<a z={[1, 2, 3]} />`, {
+            type: "Element",
+            attributes: [
+                {
+                    value: {
+                        value: {
+                            values: [{ value: 1 }, { value: 2 }, { value: 3 }],
+                        },
+                    },
+                },
+            ],
+        });
+    }
+
+    @test
+    public testCodeDomForJavascriptLiterals(): void {
+        this.checkCodeDom(`<a z={"a"} />`, {
+            type: "Element",
+            attributes: [
+                {
+                    name: { value: "z" },
+                    value: {
+                        type: "AttributeJavaScriptValue",
+                        value: {
+                            type: "JavaScriptStringLiteral",
+                            value: "a",
+                        },
+                    },
+                },
+            ],
+        });
+        this.checkCodeDom(`<a z={'a'} />`, {
+            type: "Element",
+            attributes: [
+                {
+                    name: { value: "z" },
+                    value: {
+                        type: "AttributeJavaScriptValue",
+                        value: {
+                            type: "JavaScriptStringLiteral",
+                            value: "a",
+                        },
+                    },
+                },
+            ],
+        });
+        this.checkCodeDom(`<a z={true} />`, {
+            type: "Element",
+            attributes: [
+                {
+                    name: { value: "z" },
+                    value: {
+                        type: "AttributeJavaScriptValue",
+                        value: {
+                            type: "JavaScriptBooleanLiteral",
+                            value: true,
+                        },
+                    },
+                },
+            ],
+        });
+        this.checkCodeDom(`<a z={false} />`, {
+            type: "Element",
+            attributes: [
+                {
+                    name: { value: "z" },
+                    value: {
+                        type: "AttributeJavaScriptValue",
+                        value: {
+                            type: "JavaScriptBooleanLiteral",
+                            value: false,
+                        },
+                    },
+                },
+            ],
+        });
+        this.checkCodeDom(`<a z={222222222} />`, {
+            type: "Element",
+            attributes: [
+                {
+                    name: { value: "z" },
+                    value: {
+                        type: "AttributeJavaScriptValue",
+                        value: {
+                            type: "JavaScriptNumberLiteral",
+                            value: 222222222,
+                        },
+                    },
+                },
+            ],
+        });
+    }
+
+    private checkCodeDom(input: string, expectedCodeDom: DeepPartial<SugarElement>): void {
+        const codeDomBuilder = new OffsetToNodeMapBuilder();
+        const codeDome = codeDomBuilder.buildCodeDom(input);
+        expect(codeDome).to.shallowDeepEqual(expectedCodeDom);
+    }
+
     private checkIsValidSyntax(input: string): void {
         const codeDomBuilder = new OffsetToNodeMapBuilder();
         codeDomBuilder.buildOffsetToNodeMap(input);
     }
 }
+
+type DeepPartial<T> = {
+    [P in keyof T]?: T[P] extends Array<infer U>
+        ? (Array<DeepPartial<U>> | { length?: number; [key: number]: DeepPartial<U> })
+        : T[P] extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>> : DeepPartial<T[P]>
+};

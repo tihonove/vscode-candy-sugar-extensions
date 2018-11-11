@@ -277,7 +277,12 @@ export function getCompletionContext(input: string): undefined | CompletionConte
                 return undefined;
             }
             const topAttribute = lastOrUndefined(topElement.attributes);
-            if (topAttribute == undefined || topAttribute.name == undefined || topAttribute.value == undefined) {
+            if (
+                topAttribute == undefined ||
+                topAttribute.name == undefined ||
+                topAttribute.value == undefined ||
+                typeof topAttribute.value !== "string"
+            ) {
                 return undefined;
             }
             return {
@@ -294,7 +299,12 @@ export function getCompletionContext(input: string): undefined | CompletionConte
                 return undefined;
             }
             const topAttribute = lastOrUndefined(topElement.attributes);
-            if (topAttribute == undefined || topAttribute.name == undefined || topAttribute.value == undefined) {
+            if (
+                topAttribute == undefined ||
+                topAttribute.name == undefined ||
+                topAttribute.value == undefined ||
+                typeof topAttribute.value !== "string"
+            ) {
                 return undefined;
             }
             return {

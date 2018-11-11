@@ -57,6 +57,9 @@ export class ValidPathRule extends SugarValidatorRuleBase {
                 return;
             }
             const rawPathValue = attribute.value.value;
+            if (typeof rawPathValue !== "string") {
+                return;
+            }
             const pathValue = DataPathUtils.parseDataAttributeValue(rawPathValue);
             const fullPath = DataPathUtils.joinDataPaths(
                 this.getCurrentPathScope(elementInfo.createPathScope ? 1 : 0),
@@ -88,7 +91,11 @@ export class ValidPathRule extends SugarValidatorRuleBase {
             return undefined;
         }
         const pathAttribute = (element.attributes || []).find(x => x.name.value === "path");
-        if (pathAttribute == undefined || pathAttribute.value == undefined) {
+        if (
+            pathAttribute == undefined ||
+            pathAttribute.value == undefined ||
+            typeof pathAttribute.value.value !== "string"
+        ) {
             return undefined;
         }
         return DataPathUtils.parseDataAttributeValue(pathAttribute.value.value);

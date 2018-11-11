@@ -1,8 +1,9 @@
+import { traverseSugar } from "../../SugarAnalyzing/Traversing/TraverseSugar";
 import { parseSugar, SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
 import { NullTracer } from "../../Utils/PegJSUtils/NullTracer";
 import { ISugarValidatorRule } from "../Rules/Bases/ISugarValidatorRule";
 import { ValidationItem } from "../Rules/Bases/ValidationItem";
-import { traverseSugar } from "../../SugarAnalyzing/Traversing/TraverseSugar";
+
 import { ISugarProjectContext } from "./ISugarProjectContext";
 
 enum ValidationSeverity {
@@ -28,7 +29,7 @@ export class SugarValidator {
             const validations: ValidationReportItem[] = [];
             for (const ruleFactory of this.rules) {
                 const rule = ruleFactory(this.context);
-                rule.beforeProcess(parseResult);
+                rule.beforeProcess(parseResult, input);
                 validations.push(...this.processRule(rule, parseResult));
             }
             return validations;

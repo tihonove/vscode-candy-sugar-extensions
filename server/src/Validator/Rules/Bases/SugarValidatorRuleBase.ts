@@ -12,7 +12,7 @@ export class SugarValidatorRuleBase extends EmptySugarDomVisitor implements ISug
         this.name = name;
     }
 
-    public beforeProcess(_sugarDocument: SugarElement): void {
+    public beforeProcess(_sugarDocument: SugarElement, _input: string): void {
         // empty impl
     }
 

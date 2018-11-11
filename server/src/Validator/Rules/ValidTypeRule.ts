@@ -33,7 +33,7 @@ export class ValidTypeRule extends SugarValidatorRuleBase {
         }
         if (attributeInfo.valueTypes.length === 1 && attributeInfo.valueTypes[0] === AttributeType.Type) {
             const typeName = attribute.value.value;
-            if (!this.isTypeExists(typeName)) {
+            if (typeof typeName === "string" && !this.isTypeExists(typeName)) {
                 this.validations.push({
                     position: attribute.value.position,
                     message: `Тип '${typeName}' не существует`,

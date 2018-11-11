@@ -28,6 +28,7 @@ import { allElements } from "../../SugarElements/DefaultSugarElementInfos/Defaul
 import { sugarElementsGroups } from "../../SugarElements/DefaultSugarElementInfos/DefaultSugarElementsGrouped";
 import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { defaultBuiltInTypeNames, TypeKind } from "../../SugarElements/UserDefinedSugarTypeInfo";
+import { SugarFormatter } from "../../SugarFormatter/SugarFormatter";
 import {
     SugarAttribute,
     SugarAttributeName,
@@ -88,6 +89,11 @@ export class SugarDocumentIntellisenseService {
         this.validator = createDefaultValidator(this.sugarProject);
         this.builder = new OffsetToNodeMapBuilder();
         this.helpUrlBuilder = new HelpUrlBuilder(sugarElementsGroups);
+    }
+
+    public reformatDocument(text: string): string | undefined {
+        const formatter = new SugarFormatter({ tabs: 4, maxLength: 120 });
+        return formatter.format(text);
     }
 
     private get dataSchema(): DataSchemaElementNode {

@@ -38,10 +38,14 @@ Element =
 
 
 Content = text: NonElementContent* rest: (Element NonElementContent*)* {
-    const list = (rest || []).reduce((result, x) => {
-        result.push(x[0]);
-        return result;
-    }, [])
+    const list = [].concat(
+        (text || []),
+        (rest || []).reduce((result, x) => {
+            result.push(x[0]);
+            result.push.apply(result, x[1] || [])
+            return result;
+        }, [])
+    );
     var result = [];
     for (var i = 0; i < list.length; i++) {
         if (list[i] != undefined) {
@@ -51,21 +55,26 @@ Content = text: NonElementContent* rest: (Element NonElementContent*)* {
     return result;
 }
 
-NonElementContent = Comment / Text {
-    return undefined;
+NonElementContent = content: (Comment / Text) {
+    return content;
 }
 
-Comment = "<!--" (!"-->" .)* "-->" {
+Comment = "<!--" text: (!"-->" .)* "-->" {
     return {
         type: "Comment",
+        text: text.map(x => x[1]).join(""),
         position: location(),
     };
 }
 
 Text = value: [^<]+ {
+    var joinedValue = value.join("");
+    if (joinedValue.trim() === "") {
+        return undefined;
+    }
     return {
         type: "Text",
-        value: value.join(""),
+        value: joinedValue,
         position: location(),
     };
 }
@@ -152,16 +161,72 @@ AttributeJavaScriptValue = "{" _? value: JSValue _? "}" {
 
 // JAVASCRIPT VALUE
 
-JSValue = JSNumber / JSString / JSArray / JSObjectLiteral / JSBooleanLiteral
-JSBooleanLiteral = "true" / "false"
-JSArray = "[" _? ( JSValue _? ("," _? JSValue _?)* )?  _? "]"
-JSNumber = [0-9.]+
-JSString = ("\"" JSDoubleQuotedStringContent "\"") / ("'" JSSingleQuotedStringContent "'")
-JSDoubleQuotedStringContent = ("\\\"" / [^"\n])*
-JSSingleQuotedStringContent = ("\\'" / [^'\n])*
-JSObjectLiteral = "{" _? JSObjectLiteralProperty? (_? "," _? JSObjectLiteralProperty)* _? ","? _? "}"
-JSObjectLiteralProperty = (JSString / JSPropertyName) _? ":" _? JSValue
-JSPropertyName = [a-zA-Z0-9-]+
+JSValue = value: (JSNumber / JSString / JSArray / JSObjectLiteral / JSBooleanLiteral) {
+    return value;
+}
+
+JSBooleanLiteral = value: ("true" / "false") {
+    return {
+        type: "JavaScriptBooleanLiteral",
+        value: value === "true",
+    }
+}
+
+JSArray = "[" _? values: ( JSValue _? ("," _? JSValue _?)* )?  _? "]" {
+    const refinedValues = [values[0]].concat(values[2].map(x => x[2]).filter(x => x != undefined));
+    return {
+        type: "JavaScriptArrayLiteral",
+        values: refinedValues,
+    }
+}
+
+JSNumber = value: [0-9.]+ {
+    return {
+        type: "JavaScriptNumberLiteral",
+        value: Number(value.join("")),
+    }
+}
+
+JSString =
+    value: (
+        ("\"" JSDoubleQuotedStringContent "\"") / ("'" JSSingleQuotedStringContent "'")
+    ) {
+        return {
+            type: "JavaScriptStringLiteral",
+            value: value[1],
+        }
+    }
+
+JSDoubleQuotedStringContent = value: ("\\\"" / [^"\n])* {
+    return value.join("");
+}
+
+JSSingleQuotedStringContent = value: ("\\'" / [^'\n])* {
+    return value.join("");
+}
+
+JSObjectLiteral = "{" _? firstProp: JSObjectLiteralProperty? restProps: (_? "," _? JSObjectLiteralProperty)* _? ","? _? "}" {
+    const refinedProperties = [firstProp].concat(restProps.map(x => x[3])).filter(x => x != undefined);
+    return {
+        type: "JavaScriptObjectLiteral",
+        properties: refinedProperties,
+    }
+}
+
+JSObjectLiteralProperty = name: (JSString / JSPropertyName) _? ":" _? value: JSValue {
+    return {
+        type: "JavaScriptObjectLiteralProperty",
+        name: {
+            type: "JavaScriptObjectLiteralPropertyName",
+            value: name,
+        },
+        value: value,
+    }
+}
+
+JSPropertyName = value: [a-zA-Z0-9-]+ {
+    return value.join("");
+}
 
 SpaceAfterElement = "{!{FAKE_NODE}!}"? _
 
