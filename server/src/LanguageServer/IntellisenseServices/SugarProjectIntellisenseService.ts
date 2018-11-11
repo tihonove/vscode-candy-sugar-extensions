@@ -94,11 +94,15 @@ export class SugarProjectIntellisenseService implements ISugarProjectContext {
     private loadUserDefinedTypesFromDisk(): void {
         const sugarFileNames = this.getAllSugarFileNames();
         for (const sugarFileName of sugarFileNames) {
-            const fileContent = fs.readFileSync(sugarFileName, "utf8");
-            const sugarDocument = this.builder.buildCodeDom(fileContent);
-            this.documentsDoms[sugarFileName] = sugarDocument;
-            const userDefinedTypes = this.typeInfoExtractor.extractTypeInfos(sugarDocument, sugarFileName);
-            this.documentsUserDefinedTypes[sugarFileName] = userDefinedTypes;
+            try {
+                const fileContent = fs.readFileSync(sugarFileName, "utf8");
+                const sugarDocument = this.builder.buildCodeDom(fileContent);
+                this.documentsDoms[sugarFileName] = sugarDocument;
+                const userDefinedTypes = this.typeInfoExtractor.extractTypeInfos(sugarDocument, sugarFileName);
+                this.documentsUserDefinedTypes[sugarFileName] = userDefinedTypes;
+            } catch (ignoreError) {
+                // ignore error
+            }
         }
     }
 

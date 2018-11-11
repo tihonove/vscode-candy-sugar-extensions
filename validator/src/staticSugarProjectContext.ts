@@ -84,11 +84,15 @@ export class StaticSugarProjectContext implements ISugarProjectContext {
 
         const sugarFileNames = this.getAllSugarFileNames();
         for (const sugarFileName of sugarFileNames) {
-            const fileContent = fs.readFileSync(sugarFileName, "utf8");
-            const sugarDocument = builder.buildCodeDom(fileContent);
-            this.documentsDoms[sugarFileName] = sugarDocument;
-            const userDefinedTypes = typeInfoExtractor.extractTypeInfos(sugarDocument, sugarFileName);
-            this.documentsUserDefinedTypes[sugarFileName] = userDefinedTypes;
+            try {
+                const fileContent = fs.readFileSync(sugarFileName, "utf8");
+                const sugarDocument = builder.buildCodeDom(fileContent);
+                this.documentsDoms[sugarFileName] = sugarDocument;
+                const userDefinedTypes = typeInfoExtractor.extractTypeInfos(sugarDocument, sugarFileName);
+                this.documentsUserDefinedTypes[sugarFileName] = userDefinedTypes;
+            } catch (ignoreError) {
+                // ignore read error
+            }
         }
     }
 }

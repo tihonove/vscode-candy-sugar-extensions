@@ -92,8 +92,12 @@ export class SugarDocumentIntellisenseService {
     }
 
     public reformatDocument(text: string): string | undefined {
-        const formatter = new SugarFormatter({ tabs: 4, maxLength: 120 });
-        return formatter.format(text);
+        try {
+            const formatter = new SugarFormatter({ tabs: 4, maxLength: 120 });
+            return formatter.format(text);
+        } catch (ignoreError) {
+            return undefined;
+        }
     }
 
     private get dataSchema(): DataSchemaElementNode {
