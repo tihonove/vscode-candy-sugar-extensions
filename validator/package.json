@@ -1,6 +1,6 @@
 {
     "name": "@kontur.candy/sugar-validator",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "description": "Syntax validator for Candy.Sugar",
     "main": "index.js",
     "repository": "https://github.com/tihonove/vscode-candy-sugar-extensions",
