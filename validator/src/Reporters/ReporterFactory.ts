@@ -26,14 +26,14 @@ class TeamcityReporter implements IReporter {
 
     public report(filePath: string, validationResult: ValidationReportItem[]): void {
         const escapeTestName = this.escapeValue(filePath);
-        this.write(`##teamcity[testStarted name='${escapeTestName}'] captureStandardOutput='true'`);
+        this.write(`##teamcity[testStarted name='${escapeTestName}' captureStandardOutput='true']`);
         try {
             if (validationResult.length > 0) {
                 this.printErrors(validationResult);
                 this.write(
                     `##teamcity[testFailed name='${escapeTestName}' ` +
                         `message='File contains sugar validator violations' details='${this.escapeValue(
-                            `There are ${validationResult} errors`
+                            `There are ${validationResult.length} errors`
                         )}']`
                 );
             }
