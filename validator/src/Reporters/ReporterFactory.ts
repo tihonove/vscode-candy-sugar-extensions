@@ -26,13 +26,14 @@ class TeamcityReporter implements IReporter {
 
     public report(filePath: string, validationResult: ValidationReportItem[]): void {
         const escapeTestName = this.escapeValue(filePath);
-        this.write(`##teamcity[testStarted name='${escapeTestName}']`);
+        this.write(`##teamcity[testStarted name='${escapeTestName}'] captureStandardOutput='true'`);
         try {
             if (validationResult.length > 0) {
+                this.printErrors(validationResult);
                 this.write(
                     `##teamcity[testFailed name='${escapeTestName}' ` +
                         `message='File contains sugar validator violations' details='${this.escapeValue(
-                            this.formatErrors(validationResult)
+                            `There are ${validationResult} errors`
                         )}']`
                 );
             }
@@ -41,10 +42,14 @@ class TeamcityReporter implements IReporter {
         }
     }
 
-    private formatErrors(validationResult: ValidationReportItem[]): string {
-        return validationResult
-            .map(x => `${x.ruleName} (${x.position.start.line}, ${x.position.start.column}) ${x.message}`)
-            .join("\n");
+    private printErrors(validationResult: ValidationReportItem[]): void {
+        for (const validation of validationResult) {
+            console.log(
+                `${validation.ruleName} (${validation.position.start.line}, ${validation.position.start.column}) ${
+                    validation.message
+                }`
+            );
+        }
     }
 
     private escapeValue(str: string): string {
