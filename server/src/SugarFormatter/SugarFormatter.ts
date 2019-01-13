@@ -10,9 +10,12 @@ import {
 } from "../SugarParsing/SugarGrammar/SugarParser";
 import { isNotNullOrUndefined } from "../Utils/TypingUtils";
 
-interface SugarFormatterOptions {
-    tabs: number;
-    maxLength: number;
+export type EndOfLineType = "auto" | "lf" | "crlf" | "cr";
+
+export interface SugarFormatterOptions {
+    tabWidth: number;
+    printWidth: number;
+    endOfLine: EndOfLineType;
 }
 
 interface FormattingResult {
@@ -22,31 +25,72 @@ interface FormattingResult {
 
 export class SugarFormatter {
     private readonly options: SugarFormatterOptions;
+    private currentEndOfLine: string;
+    private readonly splitToLinesRegex = /\r\n|\n|\r/g;
 
     public constructor(options: SugarFormatterOptions) {
         this.options = options;
+        this.currentEndOfLine = "\n";
     }
 
     public format(input: string): string {
         const builder = new OffsetToNodeMapBuilder();
         const rootElement = builder.buildCodeDom(input);
-        return this.removeEmptyLines(this.formatElement(rootElement, this.options.maxLength)) + "\n";
+        this.currentEndOfLine = this.getCurrentEndOfLine(input);
+        return this.removeEmptyLines(this.formatElement(rootElement, this.options.printWidth)) + this.currentEndOfLine;
+    }
+
+    private getCurrentEndOfLine(input: string): string {
+        switch (this.options.endOfLine) {
+            case "auto":
+                return this.detectEndOfLineByInput(input);
+            case "lf":
+                return "\n";
+            case "crlf":
+                return "\r\n";
+            case "cr":
+                return "\r";
+            default:
+                throw new Error(`Unknown end of line type: ${this.options.endOfLine}`);
+        }
+    }
+
+    private detectEndOfLineByInput(text: string): string {
+        if (!/\r|\n/.test(text)) {
+            return "\n";
+        } else {
+            const crlfIndex = text.indexOf("\r\n");
+            const lfIndex = text.indexOf("\n");
+            const crIndex = text.indexOf("\r");
+            if (crlfIndex >= 0 && crlfIndex <= lfIndex && crlfIndex <= crIndex) {
+                return "\r\n";
+            }
+            if (lfIndex >= 0 && (lfIndex <= crlfIndex || crlfIndex === -1) && (lfIndex <= crIndex || crIndex === -1)) {
+                return "\n";
+            }
+            if (crIndex >= 0 && (crIndex <= crlfIndex || crlfIndex === -1) && (crIndex <= lfIndex || lfIndex === -1)) {
+                return "\r";
+            }
+        }
+        return "\n";
     }
 
     private formatElement(element: SugarElement, maxLength: number): string {
         const { inline: inlineChildren, regular: regularChildren } = this.formatChildren(
             element.children,
-            maxLength - this.options.tabs
+            maxLength - this.options.tabWidth
         );
         const attributes = element.attributes || [];
         const { inline: inlineAttributes, regular: regularAttributes } = this.formatAttributeList(
             attributes,
-            maxLength - this.options.tabs
+            maxLength - this.options.tabWidth
         );
         const inlineAttributesWithSpace =
             inlineAttributes == undefined || inlineAttributes === "" ? inlineAttributes : " " + inlineAttributes;
         const indentedRegularAttributes =
-            regularAttributes === "" ? regularAttributes : "\n" + this.indentText(regularAttributes, 1);
+            regularAttributes === ""
+                ? regularAttributes
+                : this.currentEndOfLine + this.indentText(regularAttributes, 1);
         const name = element.name.value;
         if (inlineChildren === "" && regularChildren === "") {
             if (attributes.length === 0) {
@@ -55,7 +99,7 @@ export class SugarFormatter {
             return this.miniMax(
                 [
                     inlineAttributesWithSpace != undefined ? `<${name}${inlineAttributesWithSpace} />` : undefined,
-                    `<${name}${indentedRegularAttributes}\n/>`,
+                    `<${name}${indentedRegularAttributes}${this.currentEndOfLine}/>`,
                 ],
                 maxLength
             );
@@ -70,25 +114,26 @@ export class SugarFormatter {
         }
         variants.push(
             inlineAttributesWithSpace != undefined
-                ? `<${name}${inlineAttributesWithSpace}>\n${this.indentText(regularChildren, 1)}\n</${name}>`
+                ? `<${name}${inlineAttributesWithSpace}>${this.currentEndOfLine}${this.indentText(regularChildren, 1)}${
+                      this.currentEndOfLine
+                  }</${name}>`
                 : undefined,
-            `<${name}${indentedRegularAttributes}>\n${this.indentText(regularChildren, 1)}\n</${name}>`
+            `<${name}${indentedRegularAttributes}>${this.currentEndOfLine}${this.indentText(regularChildren, 1)}${
+                this.currentEndOfLine
+            }</${name}>`
         );
         return this.miniMax(variants, maxLength);
     }
 
     private isCommentSingleLine(child: SugarComment): boolean {
-        return !child.text
-            .replace(/^\s+/, "")
-            .replace(/\s+$/, "")
-            .includes("\n");
+        return !/\n|\r/.test(child.text.replace(/^\s+/, "").replace(/\s+$/, ""));
     }
 
     private removeEmptyLines(value: string): string {
         return value
-            .split("\n")
+            .split(this.splitToLinesRegex)
             .map(x => (/^\s+$/.test(x) ? "" : x))
-            .join("\n");
+            .join(this.currentEndOfLine);
     }
 
     private formatCommentMultiline(child: SugarComment, maxLength: number): string {
@@ -98,12 +143,12 @@ export class SugarFormatter {
             if (result.length <= maxLength) {
                 return result;
             }
-            return `<!--\n${this.indentText(trimmedText, 1)}\n-->`;
+            return `<!--${this.currentEndOfLine}${this.indentText(trimmedText, 1)}${this.currentEndOfLine}-->`;
         }
         let lines = child.text
             .replace(/^\s+/, "")
             .replace(/\s+$/, "")
-            .split("\n");
+            .split(this.splitToLinesRegex);
         let linesExceptFirst = lines.slice(1);
         const minIndent = linesExceptFirst
             .map(x => this.getLeadingSpacesCount(x))
@@ -112,7 +157,9 @@ export class SugarFormatter {
             linesExceptFirst = linesExceptFirst.map(x => x.substring(minIndent));
         }
         lines = [lines[0], ...linesExceptFirst];
-        return `<!--\n${this.indentText(lines.join("\n"), 1)}\n-->`;
+        return `<!--${this.currentEndOfLine}${this.indentText(lines.join(this.currentEndOfLine), 1)}${
+            this.currentEndOfLine
+        }-->`;
     }
 
     private getLeadingSpacesCount(str: string): number {
@@ -146,7 +193,7 @@ export class SugarFormatter {
         if (!formattedAttributes.map(x => x.regular).every(isNotNullOrUndefined)) {
             throw new Error("InvalidProgramState");
         }
-        const regular = formattedAttributes.map(x => x.regular).join("\n");
+        const regular = formattedAttributes.map(x => x.regular).join(this.currentEndOfLine);
         return {
             inline: inline,
             regular: regular,
@@ -217,15 +264,17 @@ export class SugarFormatter {
                 return { inline: "[]", regular: "[]" };
             }
             const inlineValues = value.values
-                .map(x => this.formatJavaScriptLiteral(x, maxLength - this.options.tabs))
+                .map(x => this.formatJavaScriptLiteral(x, maxLength - this.options.tabWidth))
                 .map(x => x.inline);
             if (inlineValues.every(x => x != undefined)) {
                 inline = `[${inlineValues.join(", ")}]`;
             }
             const regularValues = value.values
-                .map(x => this.formatJavaScriptLiteral(x, maxLength - this.options.tabs))
+                .map(x => this.formatJavaScriptLiteral(x, maxLength - this.options.tabWidth))
                 .map(x => x.regular);
-            regular = `[\n${this.indentText(regularValues.join(",\n"), 1)}\n]`;
+            regular = `[${this.currentEndOfLine}${this.indentText(regularValues.join(`,${this.currentEndOfLine}`), 1)}${
+                this.currentEndOfLine
+            }]`;
             return {
                 inline: inline,
                 regular: this.miniMax([inline, regular].filter(isNotNullOrUndefined), maxLength),
@@ -243,7 +292,10 @@ export class SugarFormatter {
             if (!formattedAttributes.map(x => x.regular).every(isNotNullOrUndefined)) {
                 throw new Error("InvalidProgramState");
             }
-            const regular = `{\n${this.indentText(formattedAttributes.map(x => x.regular).join(",\n"), 1)},\n}`;
+            const regular = `{${this.currentEndOfLine}${this.indentText(
+                formattedAttributes.map(x => x.regular).join(`,${this.currentEndOfLine}`),
+                1
+            )},${this.currentEndOfLine}}`;
             return {
                 inline: inline,
                 regular: regular,
@@ -255,7 +307,7 @@ export class SugarFormatter {
     private formatProperty(attribute: SugarJavaScriptObjectLiteralProperty, maxLength: number): FormattingResult {
         const { inline: inlineValue, regular: regularValue } = this.formatJavaScriptLiteral(
             attribute.value,
-            maxLength - this.options.tabs
+            maxLength - this.options.tabWidth
         );
         const nameValue = attribute.name.value;
         const formattedName =
@@ -267,7 +319,7 @@ export class SugarFormatter {
         }
         if (regularValue) {
             variants.push(`${formattedName}: ${regularValue}`);
-            variants.push(`${formattedName}:\n${this.indentText(regularValue, 1)}`);
+            variants.push(`${formattedName}:${this.currentEndOfLine}${this.indentText(regularValue, 1)}`);
         }
         return {
             inline: inline,
@@ -288,7 +340,7 @@ export class SugarFormatter {
 
     private formatTextSingleLine(text: SugarText): string {
         const words = text.value
-            .split(/[\s\n]+/)
+            .split(/[\s\r\n]+/)
             .filter(x => x !== "")
             .filter(x => !/$\s+^/.test(x));
         return words.join(" ");
@@ -296,7 +348,7 @@ export class SugarFormatter {
 
     private formatText(text: SugarText, maxLength: number): string {
         const words = text.value
-            .split(/[\s\n]+/)
+            .split(/[\s\r\n]+/)
             .filter(x => x !== "")
             .filter(x => !/$\s+^/.test(x));
         const lines = [];
@@ -316,7 +368,7 @@ export class SugarFormatter {
         if (currentLine !== "") {
             lines.push(currentLine);
         }
-        return lines.join("\n");
+        return lines.join(this.currentEndOfLine);
     }
 
     private miniMax(variants: Array<undefined | string>, maxWidth: number): string {
@@ -338,7 +390,7 @@ export class SugarFormatter {
 
     private getSumOfOverLength(value: string, maxWidth: number): number {
         return value
-            .split("\n")
+            .split(this.splitToLinesRegex)
             .map(x => x.length - maxWidth)
             .filter(x => x > 0)
             .reduce((x, y) => x + y, 0);
@@ -361,7 +413,7 @@ export class SugarFormatter {
                 inline = this.formatCommentSingleLine(singleElement);
             }
         }
-        const regular = elements.map(x => this.formatChild(x, maxLength)).join("\n");
+        const regular = elements.map(x => this.formatChild(x, maxLength)).join(this.currentEndOfLine);
         return {
             inline: inline,
             regular: regular,
@@ -370,19 +422,19 @@ export class SugarFormatter {
 
     private indentText(text: string, level: number, options: { skipFirst: boolean } = { skipFirst: false }): string {
         return text
-            .split("\n")
+            .split(this.currentEndOfLine)
             .map((x, index) => {
                 if (options.skipFirst && index === 0) {
                     return x;
                 }
                 return this.getIndent(level) + x;
             })
-            .join("\n");
+            .join(this.currentEndOfLine);
     }
 
     private getIndent(level: number): string {
         let result = "";
-        for (let i = 0; i < level * this.options.tabs; i++) {
+        for (let i = 0; i < level * this.options.tabWidth; i++) {
             result += " ";
         }
         return result;

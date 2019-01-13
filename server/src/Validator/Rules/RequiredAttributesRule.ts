@@ -4,6 +4,7 @@ import { ISugarProjectContext } from "../Validator/ISugarProjectContext";
 
 import { SugarValidatorRuleBase } from "./Bases/SugarValidatorRuleBase";
 import { ValidationItem } from "./Bases/ValidationItem";
+import { constant, Decoder, optional } from "@mojotech/json-type-validation";
 
 export class RequiredAttributesRule extends SugarValidatorRuleBase {
     private readonly elementInfos: SugarElementInfo[];
@@ -14,6 +15,14 @@ export class RequiredAttributesRule extends SugarValidatorRuleBase {
         super("required-attribute");
         this.elementInfos = context.getSugarElementInfos();
         this.checkOnlyElementNames = ["form", "input", "atag1"];
+    }
+
+    protected getDefaultSettings(): undefined {
+        return;
+    }
+
+    protected createDecoder(): Decoder<undefined> {
+        return optional(constant(undefined));
     }
 
     public visitElement(element: SugarElement): void {

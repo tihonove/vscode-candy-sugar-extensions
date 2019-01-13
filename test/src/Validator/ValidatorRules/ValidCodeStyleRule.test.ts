@@ -2,7 +2,10 @@ import { suite, test } from "mocha-typescript";
 
 import { ISugarValidatorRule } from "../../../../server/src/Validator/Rules/Bases/ISugarValidatorRule";
 import { ValidCodeStyleRule } from "../../../../server/src/Validator/Rules/ValidCodeStyleRule";
+import { ValidatorSettings } from "../../../../server/src/Validator/Settings/ValidatorSettings";
 import { ISugarProjectContext } from "../../../../server/src/Validator/Validator/ISugarProjectContext";
+import { InvalidRuleOptionsError } from "../../../../server/src/Validator/Validator/SugarValidator";
+import { expect } from "../../Utils/Expect";
 
 import { SugarValidationRuleTestBase } from "./Bases/SugarValidationRuleTestBase";
 
@@ -10,6 +13,12 @@ import { SugarValidationRuleTestBase } from "./Bases/SugarValidationRuleTestBase
 export class ValidCodeStyleRuleTest extends SugarValidationRuleTestBase {
     protected createRule(context: ISugarProjectContext): ISugarValidatorRule {
         return new ValidCodeStyleRule(context);
+    }
+
+    protected getDefaultValidatorSettings(): ValidatorSettings {
+        return {
+            "code-style": ["error"],
+        };
     }
 
     @test
@@ -34,5 +43,13 @@ export class ValidCodeStyleRuleTest extends SugarValidationRuleTestBase {
             },
             message: "Replace '></atag1>' with '·/>⏎'",
         });
+    }
+
+    @test
+    public invalidSettingsTest(): void {
+        const invalidSettings: ValidatorSettings = {
+            "code-style": ["error", { tabWidth: "str" }],
+        };
+        expect(() => this.assertValidCode("<atag1 />\n", invalidSettings)).to.throw(InvalidRuleOptionsError);
     }
 }

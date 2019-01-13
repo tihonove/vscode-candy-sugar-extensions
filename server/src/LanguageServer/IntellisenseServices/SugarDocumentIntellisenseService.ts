@@ -41,11 +41,14 @@ import { createEvent } from "../../Utils/Event";
 import { CodePosition } from "../../Utils/PegJSUtils/Types";
 import { isNotNullOrUndefined } from "../../Utils/TypingUtils";
 import { UriUtils } from "../../Utils/UriUtils";
+import { ValidCodeStyleRule } from "../../Validator/Rules/ValidCodeStyleRule";
+import { SettingsResolver } from "../../Validator/Settings/SettingsResolver";
 import { SugarValidator } from "../../Validator/Validator/SugarValidator";
 import { createDefaultValidator } from "../../Validator/ValidatorFactory";
 import { HelpUrlBuilder } from "../HelpUrlBuilder";
 import { ILogger } from "../Logging/Logger";
 import { MarkdownUtils } from "../MarkdownUtils";
+import { ISettings } from "../Settings/ISettings";
 
 import { SugarProjectIntellisenseService } from "./SugarProjectIntellisenseService";
 import { SugarProjectIntellisenseServiceCollection } from "./SugarProjectIntellisenseServiceCollection";
@@ -68,6 +71,7 @@ export class SugarDocumentIntellisenseService {
     private offsetToNodeMap?: OffsetToNodeMap;
     private userDefinedTypeUsagesInfo?: UserDefinedTypeUsagesInfo[];
     private updateDomListeners: Array<() => void> = [];
+    private readonly settings: ISettings;
 
     public sendValidationsEvent = createEvent<[Diagnostic[]]>();
     public schemaChangedEvent = createEvent<[string]>();
@@ -77,8 +81,10 @@ export class SugarDocumentIntellisenseService {
         logger: ILogger,
         documentUri: string,
         offsetPositionResolver: IDocumentOffsetPositionResolver,
-        sugarProjects: SugarProjectIntellisenseServiceCollection
+        sugarProjects: SugarProjectIntellisenseServiceCollection,
+        settings: ISettings
     ) {
+        this.settings = settings;
         this.sugarProject = sugarProjects.getOrCreateServiceBySugarFileUri(documentUri);
         this.sugarProject.dataSchemaChangeEvent.addListener(this.handleChangeDataSchema);
         this.documentUri = documentUri;
@@ -91,9 +97,13 @@ export class SugarDocumentIntellisenseService {
         this.helpUrlBuilder = new HelpUrlBuilder(sugarElementsGroups);
     }
 
-    public reformatDocument(text: string): string | undefined {
+    public async reformatDocument(text: string): Promise<string | undefined> {
         try {
-            const formatter = new SugarFormatter({ tabs: 4, maxLength: 120 });
+            const formatter = new SugarFormatter(
+                ValidCodeStyleRule.getSugarFormatterOptionsFromValidatorSettings(
+                    await SettingsResolver.resolveSettings(UriUtils.toFileName(this.documentUri))
+                )
+            );
             return formatter.format(text);
         } catch (ignoreError) {
             return undefined;
@@ -104,7 +114,10 @@ export class SugarDocumentIntellisenseService {
         return this.sugarProject.getDataSchema();
     }
 
-    public getCodeLenses(): undefined | CodeLens[] {
+    public async getCodeLenses(): Promise<undefined | CodeLens[]> {
+        if (!(await this.settings.getShowTypeUsageInfoAsCodeLens())) {
+            return undefined;
+        }
         if (this.userDefinedTypeUsagesInfo != undefined) {
             return this.userDefinedTypeUsagesInfo.map<CodeLens>(x => ({
                 range: this.pegjsPositionToVsCodeRange(x.type.position),
@@ -124,9 +137,12 @@ export class SugarDocumentIntellisenseService {
         this.sendEmptyValidations();
     }
 
-    public validateTextDocument(text: string): void {
+    public async validateTextDocument(text: string): Promise<void> {
         this.logger.info(`Begin document validation. (${this.documentUri})`);
-        const validationResults = this.validator.validate(text);
+        const validationResults = this.validator.validate(
+            text,
+            await SettingsResolver.resolveSettings(UriUtils.toFileName(this.documentUri))
+        );
         this.sendValidationsEvent.emit(
             validationResults.map(x => ({
                 message: x.message,
@@ -139,7 +155,7 @@ export class SugarDocumentIntellisenseService {
         this.logger.info(`End document validation. (${this.documentUri})`);
     }
 
-    public processChangeDocumentContent(text: string): void {
+    public async processChangeDocumentContent(text: string): Promise<void> {
         this.logger.info(`Begin handle document change. (${this.documentUri})`);
         this.updateDomDebounced(text);
         this.validateTextDocument(text);

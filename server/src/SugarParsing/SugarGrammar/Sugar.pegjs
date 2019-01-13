@@ -1,3 +1,7 @@
+{
+    var stack = [];
+}
+
 Document = XmlPreamble? (NonElementContent / _)* element: Element (NonElementContent / _)* {
     return element;
 }
@@ -14,6 +18,11 @@ Element =
             ">" Content "</" ElementName ">"
         )
     ) {
+    if (content[0] === ">") {
+        if (content[3].value !== name.value) {
+            throw new peg$SyntaxError("Expecting </" + name.value + ">, but </" + content[3].value + "> found", "</" + name.value + ">", "</" + content[3].value + ">", content[3].position);
+        }
+    }
     const result = {
         type: "Element",
         position: location(),

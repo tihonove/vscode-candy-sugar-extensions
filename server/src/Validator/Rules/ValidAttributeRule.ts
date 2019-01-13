@@ -4,6 +4,7 @@ import { ISugarProjectContext } from "../Validator/ISugarProjectContext";
 
 import { SugarValidatorRuleBase } from "./Bases/SugarValidatorRuleBase";
 import { ValidationItem } from "./Bases/ValidationItem";
+import { constant, Decoder, optional } from "@mojotech/json-type-validation";
 
 export class ValidAttributeRule extends SugarValidatorRuleBase {
     private readonly elementInfos: SugarElementInfo[];
@@ -12,6 +13,14 @@ export class ValidAttributeRule extends SugarValidatorRuleBase {
     public constructor(context: ISugarProjectContext) {
         super("valid-attribute");
         this.elementInfos = context.getSugarElementInfos();
+    }
+
+    protected getDefaultSettings(): undefined {
+        return;
+    }
+
+    protected createDecoder(): Decoder<undefined> {
+        return optional(constant(undefined));
     }
 
     public visitAttributeName(attributeName: SugarAttributeName): void {

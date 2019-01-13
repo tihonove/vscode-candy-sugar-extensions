@@ -1,3 +1,5 @@
+import { constant, Decoder, optional } from "@mojotech/json-type-validation";
+
 import { TypeInfoExtractor } from "../../SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
 import { UserDefinedTypeUsagesBuilder } from "../../SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesBuilder";
 import { SugarElementInfo } from "../../SugarElements/SugarElementInfo";
@@ -16,6 +18,14 @@ export class NoUnusedTypesRule extends SugarValidatorRuleBase {
         super("no-unused-types");
         this.context = context;
         this.sugarElementInfos = context.getSugarElementInfos();
+    }
+
+    protected getDefaultSettings(): undefined {
+        return;
+    }
+
+    protected createDecoder(): Decoder<undefined> {
+        return optional(constant(undefined));
     }
 
     public beforeProcess(sugarDocument: SugarElement): void {

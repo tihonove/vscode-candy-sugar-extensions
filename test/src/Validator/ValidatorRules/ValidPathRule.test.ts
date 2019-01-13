@@ -3,6 +3,7 @@ import { suite, test } from "mocha-typescript";
 import { ISugarValidatorRule } from "../../../../server/src/Validator/Rules/Bases/ISugarValidatorRule";
 import { ValidPathRule } from "../../../../server/src/Validator/Rules/ValidPathRule";
 import { ISugarProjectContext } from "../../../../server/src/Validator/Validator/ISugarProjectContext";
+import { ValidatorSettings } from "../../../../server/src/Validator/Settings/ValidatorSettings";
 
 import { SugarValidationRuleTestBase } from "./Bases/SugarValidationRuleTestBase";
 
@@ -10,6 +11,12 @@ import { SugarValidationRuleTestBase } from "./Bases/SugarValidationRuleTestBase
 export class ValidPathRuleTest extends SugarValidationRuleTestBase {
     protected createRule(context: ISugarProjectContext): ISugarValidatorRule {
         return new ValidPathRule(context);
+    }
+
+    protected getDefaultValidatorSettings(): ValidatorSettings {
+        return {
+            "valid-path": ["error"],
+        };
     }
 
     @test
@@ -61,6 +68,6 @@ export class ValidPathRuleTest extends SugarValidationRuleTestBase {
 
     @test
     public absolutePathWithScopedElementWithRoot_CaseTwo(): void {
-        this.assertValidCode(`<atag1 path="/Root"><atag><atag1 path="Children1/Child1"/></atag1></atag>`);
+        this.assertValidCode(`<atag1 path="/Root"><atag><atag1 path="Children1/Child1"/></atag></atag1>`);
     }
 }

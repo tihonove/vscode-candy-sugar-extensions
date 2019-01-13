@@ -85,7 +85,7 @@
             "properties": {
                 "candySugarExtension.showTypeUsageInfoAsCodeLens": {
                     "scope": "resource",
-                    "type": "boolean",                    
+                    "type": "boolean",
                     "default": true,
                     "description": "Показывать информации об использовании типов в виде CodeLens."
                 }
@@ -131,6 +131,7 @@
         "@babel/preset-env": "^7.0.0",
         "@babel/preset-typescript": "^7.0.0",
         "@babel/register": "^7.0.0",
+        "@mojotech/json-type-validation": "^3.0.0",
         "@types/chai": "^4.1.4",
         "@types/glob": "^7.1.1",
         "@types/lodash": "^4.14.116",

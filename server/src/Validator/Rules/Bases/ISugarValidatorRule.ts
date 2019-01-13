@@ -5,6 +5,7 @@ import { ValidationItem } from "./ValidationItem";
 
 export interface ISugarValidatorRule extends ISugarDomVisitor {
     readonly name: string;
+    setRuleSettings(settings: unknown): void;
     getValidations(): ValidationItem[];
     beforeProcess(sugarDocument: SugarElement, input: string): void;
 }
