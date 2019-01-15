@@ -88,7 +88,7 @@ Text = value: [^<]+ {
     };
 }
 
-ElementName = value:[a-zA-Z0-9-_]+ {
+ElementName = value:[a-zа-я0-9-_]i+ {
     return {
         type: "ElementName",
         value: value.join(""),
@@ -123,7 +123,7 @@ Attribute =
 
 EqualsAfterAttributeName = "{!{FAKE_NODE}!}"? "="
 
-AttributeName = value:[a-zA-Z0-9-:_]+ {
+AttributeName = value:[a-zа-я0-9-:_]i+ {
     return {
         type: "AttributeName",
         position: location(),

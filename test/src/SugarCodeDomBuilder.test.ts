@@ -454,6 +454,18 @@ export class SugarCodeDomBuilderTest {
             ],
         });
     }
+    @test
+    public testCodeDomForRussianElementNames(): void {
+        this.checkCodeDom(`<РусскийТэг русскийАттрибут="Текст" />`, {
+            type: "Element",
+            name: { value: "РусскийТэг" },
+            attributes: [
+                {
+                    name: { value: "русскийАттрибут" },
+                },
+            ],
+        });
+    }
 
     @test
     public testCodeDomForJavascriptLiterals(): void {
