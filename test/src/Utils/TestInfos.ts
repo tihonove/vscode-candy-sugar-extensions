@@ -37,22 +37,20 @@ export const testSugarElementInfos: SugarElementInfo[] = [
             {
                 name: "path",
                 valueTypes: [AttributeType.Path],
-                optional: true,
             },
             {
                 name: "type",
                 valueTypes: [AttributeType.Type],
-                optional: true,
+                required: false,
             },
             {
                 name: "optional-attr",
                 valueTypes: [AttributeType.String],
-                optional: true,
             },
             {
                 name: "required-attr",
                 valueTypes: [AttributeType.Number],
-                optional: false,
+                required: true,
             },
             {
                 name: "number-attr",
@@ -62,7 +60,6 @@ export const testSugarElementInfos: SugarElementInfo[] = [
             {
                 name: "boolean-attr",
                 valueTypes: [AttributeType.Boolean],
-                optional: false,
             },
         ],
         availableChildren: {

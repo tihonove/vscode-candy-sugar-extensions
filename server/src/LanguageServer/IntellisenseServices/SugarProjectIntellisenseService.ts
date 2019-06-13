@@ -6,7 +6,7 @@ import { SchemaRngConverter } from "../../DataSchema/DataSchemaParser/SchemaRngC
 import { OffsetToNodeMapBuilder } from "../../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
 import { TemplatesExtractor } from "../../SugarAnalyzing/TemplatesExtraction/TemplatesExtractor";
 import { TypeInfoExtractor } from "../../SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
-import { standardElements } from "../../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
+import { standardElements } from "../../SugarElements/SugarElements";
 import { SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { UserDefinedSugarTemplateInfo } from "../../SugarElements/UserDefinedSugarTemplateInfo";
 import { UserDefinedSugarTypeInfo } from "../../SugarElements/UserDefinedSugarTypeInfo";

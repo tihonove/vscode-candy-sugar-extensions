@@ -32,20 +32,20 @@ export class RequiredAttributesRule extends SugarValidatorRuleBase {
         if (elementInfo == undefined || elementInfo.attributes == undefined || elementInfo.attributes.length === 0) {
             return;
         }
+
         if (
             !this.checkOnlyElementNames.includes(elementInfo.name) &&
-            elementInfo.definedType !== SugarElementDefinedType.Template
+            elementInfo.definedType !== SugarElementDefinedType.Template &&
+            !elementInfo.verified
         ) {
             return;
         }
         const attributeInfos = elementInfo.attributes;
         for (const attributeInfo of attributeInfos) {
-            if (!attributeInfo.optional && !attributeNames.includes(attributeInfo.name)) {
+            if (attributeInfo.required && !attributeNames.includes(attributeInfo.name)) {
                 this.validations.push({
                     position: element.position,
-                    message: `Элемент ${element.name.value} должен содержать обязательный атрибут '${
-                        attributeInfo.name
-                    }'`,
+                    message: `Элемент ${element.name.value} должен содержать обязательный атрибут '${attributeInfo.name}'`,
                 });
             }
         }

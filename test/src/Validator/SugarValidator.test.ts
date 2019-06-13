@@ -19,7 +19,7 @@ export class SugarValidatorTest {
                     start: { offset: 5 },
                     end: { offset: 5 },
                 },
-                message: 'Expected "/>", ">", [ \\r\\n\\t], or [a-zA-Z0-9\\-:_] but end of input found.',
+                message: 'Expected "/>", ">", [ \\r\\n\\t], or [a-zа-я0-9\\-:_] but end of input found.',
                 ruleName: "valid-syntax",
             },
         ]);
