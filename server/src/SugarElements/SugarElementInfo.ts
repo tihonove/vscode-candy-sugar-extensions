@@ -15,10 +15,10 @@ export enum AttributeType {
 }
 
 export enum AvailableChildrenType {
-    NoChildren,
-    Any,
-    TextOny,
-    List,
+    NoChildren = "NoChildren",
+    Any = "Any",
+    TextOnly = "TextOnly",
+    List = "List",
 }
 
 export interface SugarAttributeInfo {
@@ -27,7 +27,7 @@ export interface SugarAttributeInfo {
     markdownDescription?: string;
     shortMarkdownDescription?: string;
     defaultValue?: string;
-    optional?: boolean;
+    required?: boolean;
     deprecated?: boolean;
 }
 
@@ -39,7 +39,7 @@ export type SugarElementAvailableChildrenInfo =
           type: AvailableChildrenType.NoChildren;
       }
     | {
-          type: AvailableChildrenType.TextOny;
+          type: AvailableChildrenType.TextOnly;
       }
     | {
           type: AvailableChildrenType.List;

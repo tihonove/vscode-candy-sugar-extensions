@@ -24,8 +24,9 @@ import { OffsetToNodeMap } from "../../SugarAnalyzing/OffsetToNodeMaping/OffsetT
 import { OffsetToNodeMapBuilder } from "../../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
 import { UserDefinedTypeUsagesBuilder } from "../../SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesBuilder";
 import { UserDefinedTypeUsagesInfo } from "../../SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesInfo";
-import { allElements } from "../../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
 import { sugarElementsGroups } from "../../SugarElements/DefaultSugarElementInfos/DefaultSugarElementsGrouped";
+//import { allElements } from "../../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
+import { allElements } from "../../SugarElements/SugarElements";
 import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { defaultBuiltInTypeNames, TypeKind } from "../../SugarElements/UserDefinedSugarTypeInfo";
 import { SugarFormatter } from "../../SugarFormatter/SugarFormatter";

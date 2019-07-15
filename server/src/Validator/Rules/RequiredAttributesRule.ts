@@ -27,7 +27,7 @@ export class RequiredAttributesRule extends SugarValidatorRuleBase {
         }
         const attributeInfos = elementInfo.attributes;
         for (const attributeInfo of attributeInfos) {
-            if (!attributeInfo.optional && !attributeNames.includes(attributeInfo.name)) {
+            if (attributeInfo.required && !attributeNames.includes(attributeInfo.name)) {
                 this.validations.push({
                     position: element.position,
                     message: `Элемент ${element.name.value} должен содержать обязательный атрибут '${
