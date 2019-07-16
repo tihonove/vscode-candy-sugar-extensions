@@ -12,6 +12,7 @@ export enum AttributeType {
     Enum = "Enum",
     Color = "Color",
     PathList = "PathList",
+    TemplateParameterType = "TemplateParameterType",
 }
 
 export enum AvailableChildrenType {
@@ -52,4 +53,14 @@ export interface SugarElementInfo {
     attributes?: SugarAttributeInfo[];
     availableChildren: SugarElementAvailableChildrenInfo;
     markdownDescription?: string;
+    definedType?: SugarElementDefinedType;
+}
+
+export enum TemplateParameterType {
+    String = "string",
+    Sugar = "sugar",
+}
+
+export enum SugarElementDefinedType {
+    Template,
 }

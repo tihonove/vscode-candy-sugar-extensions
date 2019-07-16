@@ -1,16 +1,16 @@
 import { Location } from "vscode-languageserver-types";
 
 import { SugarElementInfo } from "../../SugarElements/SugarElementInfo";
-import { UserDefinedSugarTypeInfo } from "../../SugarElements/UserDefinedSugarTypeInfo";
+import { UserDefinedSugarTemplateInfo } from "../../SugarElements/UserDefinedSugarTemplateInfo";
 import { ISugarProjectContext } from "../../Validator/Validator/ISugarProjectContext";
 import { CodeContext } from "../ContextResolving/CodeContext";
 import { ReferencesBuilder } from "../ReferencesBuilder";
 import { traverseSugar } from "../Traversing/TraverseSugar";
 
-import { UserDefinedTypeUsagesInfoType } from "./UserDefinedTypeUsagesInfo";
-import { UserDefinedTypeUsagesVisitor } from "./UserDefinedTypeUsagesVisitor";
+import { UserDefinedTemplateUsagesInfo } from "./UserDefinedTemplateUsagesInfo";
+import { UserDefinedTemplateUsagesVisitor } from "./UserDefinedTemplateUsagesVisitor";
 
-export class UserDefinedTypeUsagesBuilder extends ReferencesBuilder {
+export class UserDefinedTemplateUsagesBuilder extends ReferencesBuilder {
     private readonly sugarElementInfos: SugarElementInfo[];
 
     public constructor(sugarElementInfos: SugarElementInfo[]) {
@@ -18,11 +18,11 @@ export class UserDefinedTypeUsagesBuilder extends ReferencesBuilder {
         this.sugarElementInfos = sugarElementInfos;
     }
 
-    public buildUsages(
-        userDefinedTypes: UserDefinedSugarTypeInfo[],
+    public buildTemplateUsages(
+        userDefinedTemplates: UserDefinedSugarTemplateInfo[],
         projectContext: ISugarProjectContext
-    ): UserDefinedTypeUsagesInfoType {
-        const visitor = new UserDefinedTypeUsagesVisitor(userDefinedTypes, this.sugarElementInfos);
+    ): UserDefinedTemplateUsagesInfo {
+        const visitor = new UserDefinedTemplateUsagesVisitor(userDefinedTemplates, this.sugarElementInfos);
         for (const projectFilePath of projectContext.getAllProjectFilePaths()) {
             visitor.currentlyTraversingFilePath = projectFilePath;
             traverseSugar(projectContext.getSugarDomByFilePath(projectFilePath), visitor);
@@ -31,11 +31,11 @@ export class UserDefinedTypeUsagesBuilder extends ReferencesBuilder {
         return visitor.getUsages();
     }
 
-    public findReferences(context: CodeContext, usagesGroups: UserDefinedTypeUsagesInfoType): Location[] {
-        const typeElement = this.findNearestElementByName(context.contextNode, "type");
-        const typeName = this.getValueAttributeByName(typeElement, "name");
-        if (typeName != undefined && usagesGroups != undefined) {
-            const usages = usagesGroups.find(x => x.source.name === typeName);
+    public findReferences(context: CodeContext, usagesGroups: UserDefinedTemplateUsagesInfo): Location[] {
+        const templateElement = this.findNearestElementByName(context.contextNode, "template");
+        const templateName = this.getValueAttributeByName(templateElement, "name");
+        if (templateName != undefined && usagesGroups != undefined) {
+            const usages = usagesGroups.find(x => x.source.name === templateName);
             if (usages != undefined) {
                 return this.mapUsages(usages.usages);
             }

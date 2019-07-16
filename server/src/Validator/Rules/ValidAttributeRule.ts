@@ -1,10 +1,11 @@
+import { constant, Decoder, optional } from "@mojotech/json-type-validation";
+
 import { SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { SugarAttributeName } from "../../SugarParsing/SugarGrammar/SugarParser";
 import { ISugarProjectContext } from "../Validator/ISugarProjectContext";
 
 import { SugarValidatorRuleBase } from "./Bases/SugarValidatorRuleBase";
 import { ValidationItem } from "./Bases/ValidationItem";
-import { constant, Decoder, optional } from "@mojotech/json-type-validation";
 
 export class ValidAttributeRule extends SugarValidatorRuleBase {
     private readonly elementInfos: SugarElementInfo[];
@@ -35,6 +36,14 @@ export class ValidAttributeRule extends SugarValidatorRuleBase {
             this.validations.push({
                 position: attribute.position,
                 message: `Элемент ${element.name.value} не может имееть атрибута '${attributeName.value}'`,
+            });
+        }
+
+        const usesAttribute = (element.attributes || []).filter(x => x.name.value === attributeName.value);
+        if (usesAttribute.length > 1) {
+            this.validations.push({
+                position: attribute.position,
+                message: `Элемент ${element.name.value} уже использует атрибут '${attributeName.value}'`,
             });
         }
     }

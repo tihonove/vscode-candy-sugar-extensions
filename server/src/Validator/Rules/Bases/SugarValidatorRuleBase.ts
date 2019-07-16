@@ -6,7 +6,8 @@ import { SugarElement } from "../../../SugarParsing/SugarGrammar/SugarParser";
 import { ISugarValidatorRule } from "./ISugarValidatorRule";
 import { ValidationItem } from "./ValidationItem";
 
-export class SugarValidatorRuleBase<TSettings = undefined> extends EmptySugarDomVisitor implements ISugarValidatorRule {
+export abstract class SugarValidatorRuleBase<TSettings = undefined> extends EmptySugarDomVisitor
+    implements ISugarValidatorRule {
     protected settings: TSettings;
 
     public readonly name: string;
@@ -17,13 +18,9 @@ export class SugarValidatorRuleBase<TSettings = undefined> extends EmptySugarDom
         this.settings = this.getDefaultSettings();
     }
 
-    protected getDefaultSettings(): TSettings {
-        throw new Error("AbstractError");
-    }
+    protected abstract getDefaultSettings(): TSettings;
 
-    protected createDecoder(): Decoder<undefined | TSettings> {
-        throw new Error("AbstractError");
-    }
+    protected abstract createDecoder(): Decoder<undefined | TSettings>;
 
     public setRuleSettings(options: unknown): void {
         const decoder = this.createDecoder();

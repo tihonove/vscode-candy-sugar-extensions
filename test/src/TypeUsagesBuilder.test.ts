@@ -3,7 +3,7 @@ import { suite, test } from "mocha-typescript";
 import { OffsetToNodeMapBuilder } from "../../server/src/SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
 import { TypeInfoExtractor } from "../../server/src/SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
 import { UserDefinedTypeUsagesBuilder } from "../../server/src/SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesBuilder";
-import { UserDefinedTypeUsagesInfo } from "../../server/src/SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesInfo";
+import { UserDefinedTypeUsagesInfoType } from "../../server/src/SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesInfo";
 
 import { TestProjectContext } from "./TestProjectContext";
 import { expect } from "./Utils/Expect";
@@ -25,7 +25,7 @@ export class UserDefinedTypeUsagesBuilderTest {
         `);
         expect(usages).to.shallowDeepEqual([
             {
-                type: { name: "type-1" },
+                source: { name: "type-1" },
                 usages: [
                     {
                         attributeValueNode: {
@@ -63,7 +63,7 @@ export class UserDefinedTypeUsagesBuilderTest {
         );
         expect(usages).to.shallowDeepEqual([
             {
-                type: { name: "type-1" },
+                source: { name: "type-1" },
                 usages: [
                     {
                         attributeValueNode: {
@@ -102,7 +102,7 @@ export class UserDefinedTypeUsagesBuilderTest {
         input: string,
         currentFile: string = "",
         files: { [filePath: string]: string } = {}
-    ): UserDefinedTypeUsagesInfo[] {
+    ): UserDefinedTypeUsagesInfoType {
         const builder = new OffsetToNodeMapBuilder();
         const sugarDocument = builder.buildCodeDom(input);
         const typeInfoExtractor = new TypeInfoExtractor();

@@ -5,7 +5,12 @@ import { SuggestionItem, SuggestionItemType } from "../../server/src/SugarAnalyz
 import { TypeKind } from "../../server/src/SugarElements/UserDefinedSugarTypeInfo";
 
 import { expect } from "./Utils/Expect";
-import { testDataSchema, testSugarElementInfos, testSugarTypes } from "./Utils/TestInfos";
+import {
+    testDataSchema,
+    testSugarElementInfos,
+    testSugarTypes,
+    testTemplatesSugarElementInfos,
+} from "./Utils/TestInfos";
 
 @suite
 export class CompletionSuggesterTest {
@@ -383,6 +388,52 @@ export class CompletionSuggesterTest {
         expect(suggestions.items.filter(x => x.name === "gYear").length).to.eql(1);
     }
 
+    @test
+    public "После обновления UserDefined-типов, они появляется в подсказках"(): void {
+        const fileSuggester = this.createTestCompletionSuggesterWithoutTypes();
+        fileSuggester.updateUserDefinedSugarType(testSugarTypes);
+        const suggestions = fileSuggester.suggest('<atag1 type="');
+        expect(suggestions.items).to.shallowDeepEqual([
+            {
+                type: SuggestionItemType.Type,
+                name: "a-type1",
+                typeKind: TypeKind.UserDefined,
+            },
+            {
+                type: SuggestionItemType.Type,
+                name: "b-type2",
+                typeKind: TypeKind.UserDefined,
+            },
+            {
+                type: SuggestionItemType.Type,
+                name: "gYear",
+                typeKind: TypeKind.UserDefined,
+            },
+            {
+                type: SuggestionItemType.Type,
+                name: "string",
+                typeKind: TypeKind.BuiltIn,
+            },
+        ]);
+    }
+
+    @test
+    public "После добавления шаблонов они появляются в подсказках"(): void {
+        const fileSuggester = this.createTestCompletionSuggester();
+        fileSuggester.updateUserDefinedSugarInfos(testTemplatesSugarElementInfos);
+        const suggestions = fileSuggester.suggest("<");
+
+        expect(suggestions).to.shallowDeepEqual({
+            items: {
+                length: 4,
+                [3]: {
+                    type: SuggestionItemType.Element,
+                    name: "templateName",
+                },
+            },
+        });
+    }
+
     private assertSuggestions(textToCursor: string, items: Array<Partial<SuggestionItem>>): void {
         const fileSuggester = this.createTestCompletionSuggester();
         const suggestions = fileSuggester.suggest(textToCursor);
@@ -390,6 +441,10 @@ export class CompletionSuggesterTest {
     }
 
     private createTestCompletionSuggester(): CompletionSuggester {
-        return new CompletionSuggester(testSugarTypes, testSugarElementInfos, testDataSchema);
+        return new CompletionSuggester(testSugarTypes, testSugarElementInfos, [], testDataSchema);
+    }
+
+    private createTestCompletionSuggesterWithoutTypes(): CompletionSuggester {
+        return new CompletionSuggester([], testSugarElementInfos, [], testDataSchema);
     }
 }

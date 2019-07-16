@@ -22,21 +22,11 @@ import { CodeContext } from "../../SugarAnalyzing/ContextResolving/CodeContext";
 import { CodeContextByNodeResolver } from "../../SugarAnalyzing/ContextResolving/CodeContextByNodeResolver";
 import { OffsetToNodeMap } from "../../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMap";
 import { OffsetToNodeMapBuilder } from "../../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
-import { UserDefinedTypeUsagesBuilder } from "../../SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesBuilder";
-import { UserDefinedTypeUsagesInfo } from "../../SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesInfo";
-import { allElements } from "../../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
+import { standardElements } from "../../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
 import { sugarElementsGroups } from "../../SugarElements/DefaultSugarElementInfos/DefaultSugarElementsGrouped";
 import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { defaultBuiltInTypeNames, TypeKind } from "../../SugarElements/UserDefinedSugarTypeInfo";
 import { SugarFormatter } from "../../SugarFormatter/SugarFormatter";
-import {
-    SugarAttribute,
-    SugarAttributeName,
-    SugarAttributeValue,
-    SugarElement,
-    SugarElementName,
-} from "../../SugarParsing/SugarGrammar/SugarParser";
-import { oc } from "../../Utils/ChainWrapper";
 import { createEvent } from "../../Utils/Event";
 import { CodePosition } from "../../Utils/PegJSUtils/Types";
 import { isNotNullOrUndefined } from "../../Utils/TypingUtils";
@@ -48,6 +38,7 @@ import { createDefaultValidator } from "../../Validator/ValidatorFactory";
 import { HelpUrlBuilder } from "../HelpUrlBuilder";
 import { ILogger } from "../Logging/Logger";
 import { MarkdownUtils } from "../MarkdownUtils";
+import { ReferencesService } from "../ReferencesService";
 import { ISettings } from "../Settings/ISettings";
 
 import { SugarProjectIntellisenseService } from "./SugarProjectIntellisenseService";
@@ -68,8 +59,8 @@ export class SugarDocumentIntellisenseService {
     private readonly sugarElements: SugarElementInfo[];
     private readonly helpUrlBuilder: HelpUrlBuilder;
     private readonly sugarProject: SugarProjectIntellisenseService;
+    private readonly referencesService: ReferencesService;
     private offsetToNodeMap?: OffsetToNodeMap;
-    private userDefinedTypeUsagesInfo?: UserDefinedTypeUsagesInfo[];
     private updateDomListeners: Array<() => void> = [];
     private readonly settings: ISettings;
 
@@ -90,11 +81,17 @@ export class SugarDocumentIntellisenseService {
         this.documentUri = documentUri;
         this.logger = logger;
         this.offsetPositionResolver = offsetPositionResolver;
-        this.suggester = new CompletionSuggester([], allElements, this.sugarProject.getDataSchema());
-        this.sugarElements = allElements;
+        this.suggester = new CompletionSuggester(
+            [],
+            standardElements,
+            this.sugarProject.userDefinedTemplateElements,
+            this.sugarProject.getDataSchema()
+        );
+        this.sugarElements = this.sugarProject.getSugarElementInfos();
         this.validator = createDefaultValidator(this.sugarProject);
         this.builder = new OffsetToNodeMapBuilder();
         this.helpUrlBuilder = new HelpUrlBuilder(sugarElementsGroups);
+        this.referencesService = new ReferencesService(this.sugarProject, this.documentUri);
     }
 
     public async reformatDocument(text: string): Promise<string | undefined> {
@@ -118,17 +115,7 @@ export class SugarDocumentIntellisenseService {
         if (!(await this.settings.getShowTypeUsageInfoAsCodeLens())) {
             return undefined;
         }
-        if (this.userDefinedTypeUsagesInfo != undefined) {
-            return this.userDefinedTypeUsagesInfo.map<CodeLens>(x => ({
-                range: this.pegjsPositionToVsCodeRange(x.type.position),
-                command: {
-                    command: x.usages.length > 0 ? "vscode-candy-sugar.open-usages-at-offset" : "",
-                    title: x.usages.length === 1 ? `1 usage` : `${x.usages.length} usages`,
-                    arguments: [x.type.position.start.offset + 1],
-                },
-            }));
-        }
-        return undefined;
+        return this.referencesService.getAllCodeLenses();
     }
 
     public handleCloseTextDocument({ document }: TextDocumentChangeEvent): void {
@@ -167,23 +154,7 @@ export class SugarDocumentIntellisenseService {
         if (context == undefined) {
             return undefined;
         }
-        const typeElement = this.findNearestTypeElement(context.contextNode);
-        const typeName = oc(typeElement)
-            .with(x => x.attributes)
-            .with(x => x.find(x => x.name.value === "name"))
-            .with(x => x.value)
-            .with(x => x.value)
-            .return(x => x, undefined);
-        if (typeName != undefined && this.userDefinedTypeUsagesInfo != undefined) {
-            const usages = this.userDefinedTypeUsagesInfo.find(x => x.type.name === typeName);
-            if (usages != undefined) {
-                return usages.usages.map(x => ({
-                    uri: UriUtils.fileNameToUri(x.absoluteSugarFilePath),
-                    range: this.pegjsPositionToVsCodeRange(x.elementPosition),
-                }));
-            }
-        }
-        return undefined;
+        return this.referencesService.findAllReferences(context);
     }
 
     public getHelpUrlForCurrentPosition(caretOffset: number): undefined | string {
@@ -342,6 +313,17 @@ export class SugarDocumentIntellisenseService {
                 uri: UriUtils.fileNameToUri(userDefinedTypeInfo.absoluteSugarFilePath),
             };
         }
+        const userDefinedTemplates = this.sugarProject.userDefinedTemplateSource;
+        if (context.type === "ElementName" && userDefinedTemplates != undefined) {
+            const userDefinedTypeInfo = userDefinedTemplates.find(x => x.name === context.contextNode.value);
+            if (userDefinedTypeInfo == undefined || userDefinedTypeInfo.absoluteSugarFilePath == undefined) {
+                return undefined;
+            }
+            return {
+                range: this.pegjsPositionToVsCodeRange(userDefinedTypeInfo.position),
+                uri: UriUtils.fileNameToUri(userDefinedTypeInfo.absoluteSugarFilePath),
+            };
+        }
         if (context.type === "DataAttributeValue" && context.currentDataContext != undefined) {
             const dataNode = this.getDataElementOrAttributeByPath(context.currentDataContext);
             if (dataNode == undefined) {
@@ -432,7 +414,7 @@ export class SugarDocumentIntellisenseService {
         const vsCodeCompletionItem = item;
 
         if (suggestionItem.type === SuggestionItemType.Element) {
-            const elementInfo = allElements.find(x => x.name === suggestionItem.name);
+            const elementInfo = this.sugarProject.getSugarElementInfos().find(x => x.name === suggestionItem.name);
 
             if (elementInfo != undefined) {
                 if (elementInfo.attributes != undefined && elementInfo.attributes.length > 0) {
@@ -448,7 +430,9 @@ export class SugarDocumentIntellisenseService {
         }
 
         if (suggestionItem.type === SuggestionItemType.Attribute) {
-            const elementInfo = allElements.find(x => x.name === suggestionItem.parentElementName);
+            const elementInfo = this.sugarProject
+                .getSugarElementInfos()
+                .find(x => x.name === suggestionItem.parentElementName);
             if (elementInfo != undefined) {
                 if (elementInfo.attributes != undefined && elementInfo.attributes.length > 0) {
                     const attributeInfo = elementInfo.attributes.find(x => x.name === suggestionItem.name);
@@ -532,18 +516,6 @@ export class SugarDocumentIntellisenseService {
         this.schemaChangedEvent.emit(this.documentUri);
     };
 
-    private findNearestTypeElement(
-        contextNode: SugarAttribute | SugarElement | SugarElementName | SugarAttributeName | SugarAttributeValue
-    ): undefined | SugarElement {
-        if (contextNode.type === "Element" && contextNode.name.value === "type") {
-            return contextNode;
-        }
-        if (contextNode.parent == undefined) {
-            return undefined;
-        }
-        return this.findNearestTypeElement(contextNode.parent);
-    }
-
     private updateDom(text: string): void {
         this.logger.info("Begin update");
         try {
@@ -551,13 +523,8 @@ export class SugarDocumentIntellisenseService {
             this.offsetToNodeMap = this.builder.buildOffsetToNodeMapFromDom(sugarDocument);
             this.sugarProject.updateDocumentDom(this.documentUri, sugarDocument);
             this.suggester.updateUserDefinedSugarType(this.sugarProject.userDefinedTypes);
-            const usagesBuilder = new UserDefinedTypeUsagesBuilder(this.sugarElements);
-            const currentUserDefinedTypes = this.sugarProject.getUserDefinedTypesBySugarFile(this.documentUri);
-            if (currentUserDefinedTypes != undefined) {
-                this.userDefinedTypeUsagesInfo = usagesBuilder.buildUsages(currentUserDefinedTypes, this.sugarProject);
-            } else {
-                this.userDefinedTypeUsagesInfo = undefined;
-            }
+            this.suggester.updateUserDefinedSugarInfos(this.sugarProject.userDefinedTemplateElements);
+            this.referencesService.buildAllUsages();
             this.domUpdateCompleted();
         } catch (ignoreError) {
             // По всей вимдости код невалиден. Просто оставим последний валидный map
@@ -581,7 +548,10 @@ export class SugarDocumentIntellisenseService {
         if (this.offsetToNodeMap == undefined) {
             return undefined;
         }
-        const contextAtCursorResolver = new CodeContextByNodeResolver(this.sugarElements);
+        const contextAtCursorResolver = new CodeContextByNodeResolver(
+            this.sugarElements,
+            this.sugarProject.userDefinedTemplateElements
+        );
         const node = this.offsetToNodeMap.getNodeByOffset(offset);
         if (node == undefined) {
             return undefined;

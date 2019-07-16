@@ -42,6 +42,9 @@ export class AttributeTypeUtils {
             case AttributeType.PathList:
                 return "PathList";
                 break;
+            case AttributeType.TemplateParameterType:
+                return "TemplateParameterType";
+                break;
             default:
                 const fallbackAttributeValue: never = attributeType;
                 return fallbackAttributeValue;

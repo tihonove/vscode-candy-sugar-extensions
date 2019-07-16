@@ -7,9 +7,15 @@ import { CodeContext } from "./CodeContext";
 
 export class CodeContextByNodeResolver {
     private readonly sugarElementInfos: SugarElementInfo[];
+    private userDefinedSugarElementInfos: SugarElementInfo[];
 
-    public constructor(sugarElementInfos: SugarElementInfo[]) {
-        this.sugarElementInfos = sugarElementInfos;
+    public constructor(sugarElementInfos: SugarElementInfo[], userDefinedSugarElementInfos?: SugarElementInfo[]) {
+        this.sugarElementInfos = sugarElementInfos || [];
+        this.userDefinedSugarElementInfos = userDefinedSugarElementInfos || [];
+    }
+
+    public updateUserDefinedSugarTemplate(userDefinedSugarElementInfos: SugarElementInfo[]): void {
+        this.userDefinedSugarElementInfos = userDefinedSugarElementInfos || [];
     }
 
     public resolveContext(node: NodeWithDefinition): undefined | CodeContext {
@@ -80,6 +86,10 @@ export class CodeContextByNodeResolver {
         return undefined;
     }
 
+    private get sugarElementInfo(): SugarElementInfo[] {
+        return [...this.sugarElementInfos, ...this.userDefinedSugarElementInfos];
+    }
+
     private withoutLast<T>(items: T[]): T[] {
         return items.slice(0, -1);
     }
@@ -89,7 +99,7 @@ export class CodeContextByNodeResolver {
         if (lastElement == undefined) {
             return undefined;
         }
-        return this.sugarElementInfos.find(x => x.name === lastElement.name.value);
+        return this.sugarElementInfo.find(x => x.name === lastElement.name.value);
     }
 
     private resolveDataContext(elementStack: SugarElement[]): string[] {

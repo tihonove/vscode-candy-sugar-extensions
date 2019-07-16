@@ -3,10 +3,10 @@ import { UserDefinedSugarTypeInfo } from "../../SugarElements/UserDefinedSugarTy
 import { SugarAttribute } from "../../SugarParsing/SugarGrammar/SugarParser";
 import { EmptySugarDomVisitor } from "../Traversing/EmptySugarDomVisitor";
 
-import { UserDefinedTypeUsagesInfo } from "./UserDefinedTypeUsagesInfo";
+import { UserDefinedTypeUsagesInfoType } from "./UserDefinedTypeUsagesInfo";
 
 export class UserDefinedTypeUsagesVisitor extends EmptySugarDomVisitor {
-    private readonly usages: UserDefinedTypeUsagesInfo[];
+    private readonly usages: UserDefinedTypeUsagesInfoType;
     private readonly sugarElementInfos: SugarElementInfo[];
     private readonly userDefinedTypes: UserDefinedSugarTypeInfo[];
 
@@ -16,10 +16,13 @@ export class UserDefinedTypeUsagesVisitor extends EmptySugarDomVisitor {
         super();
         this.sugarElementInfos = sugarElementInfos;
         this.userDefinedTypes = userDefinedTypes;
-        this.usages = this.userDefinedTypes.map<UserDefinedTypeUsagesInfo>(x => ({ type: x, usages: [] }));
+        this.usages = this.userDefinedTypes.map(x => ({
+            source: x,
+            usages: [],
+        }));
     }
 
-    public getUsages(): UserDefinedTypeUsagesInfo[] {
+    public getUsages(): UserDefinedTypeUsagesInfoType {
         return this.usages;
     }
 
@@ -48,9 +51,9 @@ export class UserDefinedTypeUsagesVisitor extends EmptySugarDomVisitor {
         if (userDefinedType == undefined) {
             return;
         }
-        let usageInfo = this.usages.find(x => x.type === userDefinedType);
+        let usageInfo = this.usages.find(x => x.source === userDefinedType);
         if (usageInfo == undefined) {
-            usageInfo = { type: userDefinedType, usages: [] };
+            usageInfo = { source: userDefinedType, usages: [] };
             this.usages.push(usageInfo);
         }
         if (attribute.value.type !== "AttributeValue") {

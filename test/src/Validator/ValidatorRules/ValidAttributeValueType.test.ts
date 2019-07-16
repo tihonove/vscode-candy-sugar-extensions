@@ -2,8 +2,8 @@ import { suite, test } from "mocha-typescript";
 
 import { ISugarValidatorRule } from "../../../../server/src/Validator/Rules/Bases/ISugarValidatorRule";
 import { ValidAttributeValueType } from "../../../../server/src/Validator/Rules/ValidAttributeValueType";
-import { ISugarProjectContext } from "../../../../server/src/Validator/Validator/ISugarProjectContext";
 import { ValidatorSettings } from "../../../../server/src/Validator/Settings/ValidatorSettings";
+import { ISugarProjectContext } from "../../../../server/src/Validator/Validator/ISugarProjectContext";
 
 import { SugarValidationRuleTestBase } from "./Bases/SugarValidationRuleTestBase";
 

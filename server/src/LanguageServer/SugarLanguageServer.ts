@@ -6,7 +6,6 @@ import {
     Connection,
     createConnection,
     DidChangeConfigurationNotification,
-    DidChangeConfigurationParams,
     DidChangeWatchedFilesParams,
     DocumentFormattingParams,
     InitializeParams,
