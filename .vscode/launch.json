@@ -8,7 +8,7 @@
 			"runtimeExecutable": "${execPath}",
 			"args": ["--extensionDevelopmentPath=${workspaceRoot}"],
 			"outFiles": ["${workspaceRoot}/client/out/**/*.js"],
-			"preLaunchTask": "npm: compile:client"
+			"preLaunchTask": "compile:client"
 		},
 		{
 			"type": "node",
@@ -17,7 +17,7 @@
 			"port": 6009,
 			"restart": true,
             "outFiles": ["${workspaceRoot}/server/out/**/*.js"],
-            "preLaunchTask": "npm: compile:server"
+            "preLaunchTask": "compile:server"
 		},
 		{
 			"name": "Language Server E2E Test",

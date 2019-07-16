@@ -7,39 +7,38 @@
 				"kind": "build",
 				"isDefault": true
 			},
-			"dependsOn": [
-				{
-					"type": "npm",
-					"script": "compile:client"
-				},
-				{
-					"type": "npm",
-					"script": "compile:server"
-				}
-			],
+			"dependsOn": ["compile:client", "compile:server"],
 			"problemMatcher": []
 		},
 		{
-			"type": "npm",
-			"script": "compile:client",
+			"label": "compile:client",
+			"type": "shell",
+			"command": "yarn",
 			"group": "build",
+			"args": [
+				"compile:client"
+			],
 			"presentation": {
 				"panel": "dedicated",
 				"reveal": "never"
 			},
-			"problemMatcher": [
+			"problemMatcher": [				
 				"$tsc"
 			]
 		},
 		{
-			"type": "npm",
-			"script": "compile:server",
+			"label": "compile:server",
+			"type": "shell",
+			"command": "yarn",
 			"group": "build",
+			"args": [
+				"compile:server"
+			],
 			"presentation": {
 				"panel": "dedicated",
 				"reveal": "never"
 			},
-			"problemMatcher": [
+			"problemMatcher": [				
 				"$tsc"
 			]
 		}
