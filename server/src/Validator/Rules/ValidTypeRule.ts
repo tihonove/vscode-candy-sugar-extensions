@@ -1,3 +1,5 @@
+import { constant, Decoder, optional } from "@mojotech/json-type-validation";
+
 import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { defaultBuiltInTypeNames, UserDefinedSugarTypeInfo } from "../../SugarElements/UserDefinedSugarTypeInfo";
 import { SugarAttribute } from "../../SugarParsing/SugarGrammar/SugarParser";
@@ -15,6 +17,14 @@ export class ValidTypeRule extends SugarValidatorRuleBase {
         super("valid-type");
         this.userDefinedTypes = context.getAllUserDefinedTypes();
         this.elementInfos = context.getSugarElementInfos();
+    }
+
+    protected getDefaultSettings(): undefined {
+        return;
+    }
+
+    protected createDecoder(): Decoder<undefined> {
+        return optional(constant(undefined));
     }
 
     public visitAttribute(attribute: SugarAttribute): void {

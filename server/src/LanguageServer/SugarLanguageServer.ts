@@ -6,6 +6,7 @@ import {
     Connection,
     createConnection,
     DidChangeConfigurationNotification,
+    DidChangeConfigurationParams,
     DidChangeWatchedFilesParams,
     DocumentFormattingParams,
     InitializeParams,
@@ -26,6 +27,7 @@ import {
 import { SugarProjectIntellisenseServiceCollection } from "./IntellisenseServices/SugarProjectIntellisenseServiceCollection";
 import { ILogger } from "./Logging/Logger";
 import { VsCodeServerLogger } from "./Logging/VsCodeServerLogger";
+import { Settings } from "./Settings/Settings";
 
 class DocumentOffsetPositionResolver implements IDocumentOffsetPositionResolver {
     private readonly documents: TextDocuments;
@@ -59,6 +61,7 @@ export class SugarLanguageServer {
     private readonly documents: TextDocuments;
     private readonly documentServices: { [uri: string]: undefined | SugarDocumentIntellisenseService };
     private readonly projects: SugarProjectIntellisenseServiceCollection;
+    private readonly settings: Settings;
 
     public constructor() {
         this.connection = createConnection(ProposedFeatures.all);
@@ -81,28 +84,38 @@ export class SugarLanguageServer {
         this.connection.onReferences(this.handleFindAllReferences);
         this.connection.onDocumentFormatting(this.handleDocumentFormatting);
         this.projects = new SugarProjectIntellisenseServiceCollection(this.logger);
+        this.settings = new Settings(this.connection);
     }
 
     public listen(): void {
         this.documents.listen(this.connection);
         this.connection.listen();
-        this.connection.client.register(DidChangeConfigurationNotification.type, undefined);
+        this.connection.onDidChangeConfiguration(this.handleChangeConfiguration);
         this.connection.onDidChangeWatchedFiles(this.handleChangeWatchedFiles);
     }
 
-    private readonly handleChangeWatchedFiles = (params: DidChangeWatchedFilesParams): void => {
+    private readonly handleChangeConfiguration = (): void => {
+        // if (p.settings.candySugarExtension.showTypeUsageInfoAsCodeLens != undefined) {
+        //     this.settings.showTypeUsageInfoAsCodeLens = p.settings.candySugarExtension.showTypeUsageInfoAsCodeLens;
+        // }
+        this.logger.info(`Settings updated`);
+    };
+
+    private readonly handleChangeWatchedFiles = async (params: DidChangeWatchedFilesParams): Promise<void> => {
         for (const uri of params.changes.map(x => x.uri)) {
             const project = this.projects.getOrCreateServiceBySchemaFileUri(uri);
             project.updateSchema();
         }
     };
 
-    private readonly handleDocumentFormatting = (params: DocumentFormattingParams): TextEdit[] | undefined => {
+    private readonly handleDocumentFormatting = async (
+        params: DocumentFormattingParams
+    ): Promise<TextEdit[] | undefined> => {
         const documentUri = params.textDocument.uri;
         const document = this.documents.get(documentUri);
         const documentService = this.documentServices[documentUri];
         if (document != undefined && documentService != undefined) {
-            const reformattedText = documentService.reformatDocument(document.getText());
+            const reformattedText = await documentService.reformatDocument(document.getText());
             if (reformattedText != undefined) {
                 return [
                     {
@@ -159,24 +172,27 @@ export class SugarLanguageServer {
         }
     };
 
-    private readonly handleInitialize = (_params: InitializeParams): InitializeResult => ({
-        capabilities: {
-            textDocumentSync: this.documents.syncKind,
-            documentFormattingProvider: true,
-            hoverProvider: true,
-            definitionProvider: true,
-            referencesProvider: true,
-            completionProvider: {
-                resolveProvider: true,
-                triggerCharacters: ["/"],
+    private readonly handleInitialize = (_params: InitializeParams): InitializeResult => {
+        this.connection.client.register(DidChangeConfigurationNotification.type, { section: "candySugarExtension" });
+        return {
+            capabilities: {
+                textDocumentSync: this.documents.syncKind,
+                documentFormattingProvider: true,
+                hoverProvider: true,
+                definitionProvider: true,
+                referencesProvider: true,
+                completionProvider: {
+                    resolveProvider: true,
+                    triggerCharacters: ["/"],
+                },
+                codeLensProvider: {
+                    resolveProvider: true,
+                },
             },
-            codeLensProvider: {
-                resolveProvider: true,
-            },
-        },
-    });
+        };
+    };
 
-    private readonly handleChangeDocumentContent = (change: TextDocumentChangeEvent) => {
+    private readonly handleChangeDocumentContent = async (change: TextDocumentChangeEvent): Promise<void> => {
         const documentUri = change.document.uri;
         if (change.document.languageId !== "sugar-xml") {
             return;
@@ -187,7 +203,7 @@ export class SugarLanguageServer {
             this.documentServices[documentUri] = documentService;
         }
         this.logger.info("Begin process change");
-        documentService.processChangeDocumentContent(change.document.getText());
+        await documentService.processChangeDocumentContent(change.document.getText());
         this.logger.info("End process change");
     };
 
@@ -196,7 +212,8 @@ export class SugarLanguageServer {
             this.logger,
             documentUri,
             new DocumentOffsetPositionResolver(this.documents, documentUri),
-            this.projects
+            this.projects,
+            this.settings
         );
 
         result.sendValidationsEvent.addListener(validations => {

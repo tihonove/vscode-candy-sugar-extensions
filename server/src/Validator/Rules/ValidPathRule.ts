@@ -1,3 +1,5 @@
+import { constant, Decoder, optional } from "@mojotech/json-type-validation";
+
 import { DataPathUtils } from "../../DataSchema/DataPathUtils";
 import { DataSchemaElementNode } from "../../DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "../../DataSchema/DataSchemaUtils";
@@ -18,6 +20,14 @@ export class ValidPathRule extends SugarValidatorRuleBase {
         super("valid-path");
         this.dataSchema = context.getDataSchema();
         this.elementInfos = context.getSugarElementInfos();
+    }
+
+    protected getDefaultSettings(): undefined {
+        return;
+    }
+
+    protected createDecoder(): Decoder<undefined> {
+        return optional(constant(undefined));
     }
 
     public enterElement(element: SugarElement): void {

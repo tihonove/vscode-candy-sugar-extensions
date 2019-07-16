@@ -11,6 +11,7 @@ export async function runCommandLineApp(entryPoint: () => void | Promise<void>):
         } else if (error instanceof Error) {
             console.error("Fatal error");
             console.error(error.message);
+            console.error(error.stack);
         } else {
             console.error(error);
         }

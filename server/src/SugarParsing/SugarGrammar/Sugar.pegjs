@@ -1,3 +1,7 @@
+{
+    var stack = [];
+}
+
 Document = XmlPreamble? (NonElementContent / _)* element: Element (NonElementContent / _)* {
     return element;
 }
@@ -14,6 +18,11 @@ Element =
             ">" Content "</" ElementName ">"
         )
     ) {
+    if (content[0] === ">") {
+        if (content[3].value !== name.value) {
+            throw new peg$SyntaxError("Expecting </" + name.value + ">, but </" + content[3].value + "> found", "</" + name.value + ">", "</" + content[3].value + ">", content[3].position);
+        }
+    }
     const result = {
         type: "Element",
         position: location(),
@@ -79,7 +88,7 @@ Text = value: [^<]+ {
     };
 }
 
-ElementName = value:[a-zA-Z0-9-_]+ {
+ElementName = value:[a-zа-я0-9-_]i+ {
     return {
         type: "ElementName",
         value: value.join(""),
@@ -114,7 +123,7 @@ Attribute =
 
 EqualsAfterAttributeName = "{!{FAKE_NODE}!}"? "="
 
-AttributeName = value:[a-zA-Z0-9-:_]+ {
+AttributeName = value:[a-zа-я0-9-:_]i+ {
     return {
         type: "AttributeName",
         position: location(),

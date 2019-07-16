@@ -695,6 +695,12 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
+"@mojotech/json-type-validation@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@mojotech/json-type-validation/-/json-type-validation-3.0.0.tgz#9aaddada9ba606a61b916d487819b5141af9ef29"
+  dependencies:
+    lodash.isequal "^4.5.0"
+
 "@types/chai@^4.1.4":
   version "4.1.4"
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.1.4.tgz#5ca073b330d90b4066d6ce18f60d57f2084ce8ca"
@@ -1984,6 +1990,10 @@ lodash.flattendeep@^4.4.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/lodash.flattendeep/-/lodash.flattendeep-4.4.0.tgz#fb030917f86a3134e5bc9bec0d69e0013ddfedb2"
 
+lodash.isequal@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
+
 lodash@^4.17.10, lodash@^4.17.5:
   version "4.17.11"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
@@ -3150,9 +3160,9 @@ vscode-jsonrpc@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/vscode-jsonrpc/-/vscode-jsonrpc-4.0.0.tgz#a7bf74ef3254d0a0c272fab15c82128e378b3be9"
 
-vscode-languageserver-types@^3.13.0:
-  version "3.13.0"
-  resolved "https://registry.yarnpkg.com/vscode-languageserver-types/-/vscode-languageserver-types-3.13.0.tgz#b704b024cef059f7b326611c99b9c8753c0a18b4"
+vscode-languageserver-types@^3.14.0:
+  version "3.14.0"
+  resolved "https://registry.yarnpkg.com/vscode-languageserver-types/-/vscode-languageserver-types-3.14.0.tgz#d3b5952246d30e5241592b6dde8280e03942e743"
 
 which-module@^2.0.0:
   version "2.0.0"

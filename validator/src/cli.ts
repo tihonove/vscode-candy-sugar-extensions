@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as glob from "glob";
 import * as path from "path";
 
+import { SettingsResolver } from "../../server/src/Validator/Settings/SettingsResolver";
 import { createDefaultValidator } from "../../server/src/Validator/ValidatorFactory";
 
 import { StaticSugarProjectContext } from "./staticSugarProjectContext";
@@ -9,7 +10,7 @@ import { runCommandLineApp } from "./CommandLineUtils/CommandLineRunner";
 import { parseArguments } from "./CommandLineUtils/ParseArguments";
 import { createReporter } from "./Reporters/ReporterFactory";
 
-function sugarValidatorEntryPoint(): void {
+async function sugarValidatorEntryPoint(): Promise<void> {
     const options = parseArguments(process.argv);
     const filesToValidate = options.fileGlobs
         .map(fileGlob => glob.sync(fileGlob))
@@ -25,7 +26,11 @@ function sugarValidatorEntryPoint(): void {
         const sugarProject = loadProjectBySugarFile(fileToValidate);
         const validator = createDefaultValidator(sugarProject);
         const fileContent = fs.readFileSync(fileToValidate, "utf8");
-        const validationResult = validator.validate(fileContent);
+
+        const validationResult = validator.validate(
+            fileContent,
+            await SettingsResolver.resolveSettings(fileToValidate)
+        );
         reporter.report(fileToValidate, validationResult);
     }
     reporter.endValidate();

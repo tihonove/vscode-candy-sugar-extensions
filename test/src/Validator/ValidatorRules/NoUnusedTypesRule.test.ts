@@ -2,6 +2,7 @@ import { suite, test } from "mocha-typescript";
 
 import { ISugarValidatorRule } from "../../../../server/src/Validator/Rules/Bases/ISugarValidatorRule";
 import { NoUnusedTypesRule } from "../../../../server/src/Validator/Rules/NoUnusedTypesRule";
+import { ValidatorSettings } from "../../../../server/src/Validator/Settings/ValidatorSettings";
 import { ISugarProjectContext } from "../../../../server/src/Validator/Validator/ISugarProjectContext";
 
 import { SugarValidationRuleTestBase } from "./Bases/SugarValidationRuleTestBase";
@@ -10,6 +11,12 @@ import { SugarValidationRuleTestBase } from "./Bases/SugarValidationRuleTestBase
 export class NoUnusedTypesRuleTest extends SugarValidationRuleTestBase {
     protected createRule(context: ISugarProjectContext): ISugarValidatorRule {
         return new NoUnusedTypesRule(context);
+    }
+
+    protected getDefaultValidatorSettings(): ValidatorSettings {
+        return {
+            "no-unused-types": ["error"],
+        };
     }
 
     @test
