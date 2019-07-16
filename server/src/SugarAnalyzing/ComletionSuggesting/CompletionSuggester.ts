@@ -24,6 +24,7 @@ export interface Suggestions {
 
 export class CompletionSuggester {
     private readonly sugarElementInfos: SugarElementInfo[];
+    private userDefinedSugarElementInfos: SugarElementInfo[];
     private sugarTypes: UserDefinedSugarTypeInfo[];
     private dataSchemaRoot: DataSchemaElementNode;
     private readonly contextResolver: CodeContextByNodeResolver;
@@ -31,12 +32,14 @@ export class CompletionSuggester {
     public constructor(
         sugarTypes: UserDefinedSugarTypeInfo[],
         sugarElementInfos: SugarElementInfo[],
+        userDefinedSugarElementInfos: SugarElementInfo[],
         dataSchemaRoot: DataSchemaElementNode
     ) {
         this.sugarTypes = sugarTypes;
         this.sugarElementInfos = sugarElementInfos;
+        this.userDefinedSugarElementInfos = userDefinedSugarElementInfos;
         this.dataSchemaRoot = dataSchemaRoot;
-        this.contextResolver = new CodeContextByNodeResolver(this.sugarElementInfos);
+        this.contextResolver = new CodeContextByNodeResolver(this.sugarElementInfos, this.userDefinedSugarElementInfos);
     }
 
     public updateDataSchema(dataSchema: DataSchemaElementNode): void {
@@ -45,6 +48,11 @@ export class CompletionSuggester {
 
     public updateUserDefinedSugarType(sugarTypes: UserDefinedSugarTypeInfo[]): void {
         this.sugarTypes = sugarTypes;
+    }
+
+    public updateUserDefinedSugarInfos(userDefinedSugarElementInfos: SugarElementInfo[]): void {
+        this.userDefinedSugarElementInfos = userDefinedSugarElementInfos;
+        this.contextResolver.updateUserDefinedSugarTemplate(userDefinedSugarElementInfos);
     }
 
     public suggest(codeBeforeCursor: string): Suggestions {
@@ -63,7 +71,7 @@ export class CompletionSuggester {
         }
         if (completionContext.expectedToken === ExpectedTokenType.ElementName) {
             return {
-                items: this.sugarElementInfos.map<SuggestionItem>(x => ({
+                items: this.projectElementInfos.map<SuggestionItem>(x => ({
                     type: SuggestionItemType.Element,
                     name: x.name,
                 })),
@@ -88,6 +96,10 @@ export class CompletionSuggester {
             };
         }
         return emptyResult;
+    }
+
+    private get projectElementInfos(): SugarElementInfo[] {
+        return [...this.sugarElementInfos, ...this.userDefinedSugarElementInfos];
     }
 
     private suggestAttributeValue(completionContext: CompletionContext, codeContext: CodeContext): SuggestionItem[] {

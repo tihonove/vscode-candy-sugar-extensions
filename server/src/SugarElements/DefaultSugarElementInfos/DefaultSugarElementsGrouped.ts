@@ -7,6 +7,7 @@ import { layoutElementsGroup } from "./LayoutElements/layoutElementsGroup";
 import { listElementsGroup } from "./ListElements/listElementsGroup";
 import { systemElementsGroup } from "./SystemElements/systemElementsGroup";
 import { tableElementsGroup } from "./TableElements/tableElementsGroup";
+import { templatesElementsGroup } from "./TemplatesElements/templatesElementsGroup";
 import { tourElementsGroup } from "./TourElements/tourElementsGroup";
 import { typeDefinitionElementsGroup } from "./TypeDefinitionElements/typeDefinitionElementsGroup";
 
@@ -20,4 +21,5 @@ export const sugarElementsGroups: SugarElementGroupInfo[] = [
     tableElementsGroup,
     tourElementsGroup,
     typeDefinitionElementsGroup,
+    templatesElementsGroup,
 ];

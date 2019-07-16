@@ -4,16 +4,17 @@ import path from "path";
 import { DataSchemaElementNode } from "../../DataSchema/DataSchemaNode";
 import { SchemaRngConverter } from "../../DataSchema/DataSchemaParser/SchemaRngConverter";
 import { OffsetToNodeMapBuilder } from "../../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
+import { TemplatesExtractor } from "../../SugarAnalyzing/TemplatesExtraction/TemplatesExtractor";
 import { TypeInfoExtractor } from "../../SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
-import { allElements } from "../../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
+import { standardElements } from "../../SugarElements/DefaultSugarElementInfos/DefaultSugarElements";
 import { SugarElementInfo } from "../../SugarElements/SugarElementInfo";
+import { UserDefinedSugarTemplateInfo } from "../../SugarElements/UserDefinedSugarTemplateInfo";
 import { UserDefinedSugarTypeInfo } from "../../SugarElements/UserDefinedSugarTypeInfo";
 import { SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
 import { createEvent } from "../../Utils/Event";
+import { isNotNullOrUndefined } from "../../Utils/TypingUtils";
 import { UriUtils } from "../../Utils/UriUtils";
 import { ISugarProjectContext } from "../../Validator/Validator/ISugarProjectContext";
-
-import { isNotNullOrUndefined } from "../../Utils/TypingUtils";
 import { ILogger } from "../Logging/Logger";
 
 export class SugarProjectIntellisenseService implements ISugarProjectContext {
@@ -21,6 +22,13 @@ export class SugarProjectIntellisenseService implements ISugarProjectContext {
     private readonly logger: ILogger;
     private dataSchema: DataSchemaElementNode;
     private readonly typeInfoExtractor: TypeInfoExtractor;
+    private readonly templatesExtractor: TemplatesExtractor;
+    private readonly templatesElementInfos: {
+        [sugarDocumentUri: string]: {
+            elements: SugarElementInfo[];
+            templates: UserDefinedSugarTemplateInfo[];
+        };
+    } = {};
     private readonly builder: OffsetToNodeMapBuilder;
     private readonly documentsDoms: { [sugarDocumentUri: string]: undefined | SugarElement } = {};
     private readonly documentsUserDefinedTypes: {
@@ -33,8 +41,10 @@ export class SugarProjectIntellisenseService implements ISugarProjectContext {
         this.logger = logger;
         this.dataSchema = this.loadDataSchema();
         this.typeInfoExtractor = new TypeInfoExtractor();
+        this.templatesExtractor = new TemplatesExtractor();
         this.builder = new OffsetToNodeMapBuilder();
         this.loadUserDefinedTypesFromDisk();
+        this.loadUserDefinedTemplatesFromDisk();
     }
 
     public get userDefinedTypes(): UserDefinedSugarTypeInfo[] {
@@ -43,9 +53,33 @@ export class SugarProjectIntellisenseService implements ISugarProjectContext {
             .reduce((x, y) => x.concat(y), []);
     }
 
+    public get userDefinedTemplateElements(): SugarElementInfo[] {
+        return Object.values(this.templatesElementInfos)
+            .filter(isNotNullOrUndefined)
+            .map(x => x.elements)
+            .reduce((x, y) => x.concat(y), []);
+    }
+
+    public get userDefinedTemplateSource(): UserDefinedSugarTemplateInfo[] {
+        return Object.values(this.templatesElementInfos)
+            .filter(isNotNullOrUndefined)
+            .map(x => x.templates)
+            .reduce((x, y) => x.concat(y), []);
+    }
+
     public getUserDefinedTypesBySugarFile(documentUri: string): undefined | UserDefinedSugarTypeInfo[] {
         const sugarFileName = path.basename(UriUtils.toFileName(documentUri));
         return this.documentsUserDefinedTypes[sugarFileName];
+    }
+
+    public getUserDefinedElementsBySugarFile(documentUri: string): undefined | SugarElementInfo[] {
+        const sugarFileName = path.basename(UriUtils.toFileName(documentUri));
+        return this.templatesElementInfos[sugarFileName].elements;
+    }
+
+    public getUserDefinedTemplatesBySugarFile(documentUri: string): undefined | UserDefinedSugarTemplateInfo[] {
+        const sugarFileName = path.basename(UriUtils.toFileName(documentUri));
+        return this.templatesElementInfos[sugarFileName].templates;
     }
 
     public updateDocumentDom(documentUri: string, sugarDocument: SugarElement): void {
@@ -54,6 +88,10 @@ export class SugarProjectIntellisenseService implements ISugarProjectContext {
         this.documentsDoms[absoluteSugarFilePath] = sugarDocument;
         const sugarFileName = path.basename(absoluteSugarFilePath);
         this.documentsUserDefinedTypes[sugarFileName] = userDefinedTypes;
+        this.templatesElementInfos[sugarFileName] = {
+            elements: this.templatesExtractor.extractElements(sugarDocument),
+            templates: this.templatesExtractor.extractTemplates(sugarDocument, absoluteSugarFilePath),
+        };
     }
 
     public getDataSchema(): DataSchemaElementNode {
@@ -76,7 +114,7 @@ export class SugarProjectIntellisenseService implements ISugarProjectContext {
     }
 
     public getSugarElementInfos(): SugarElementInfo[] {
-        return allElements;
+        return [...standardElements, ...this.userDefinedTemplateElements];
     }
 
     public getAllProjectFilePaths(): string[] {
@@ -92,18 +130,21 @@ export class SugarProjectIntellisenseService implements ISugarProjectContext {
     }
 
     private loadUserDefinedTypesFromDisk(): void {
-        const sugarFileNames = this.getAllSugarFileNames();
-        for (const sugarFileName of sugarFileNames) {
-            try {
-                const fileContent = fs.readFileSync(sugarFileName, "utf8");
-                const sugarDocument = this.builder.buildCodeDom(fileContent);
-                this.documentsDoms[sugarFileName] = sugarDocument;
-                const userDefinedTypes = this.typeInfoExtractor.extractTypeInfos(sugarDocument, sugarFileName);
-                this.documentsUserDefinedTypes[sugarFileName] = userDefinedTypes;
-            } catch (ignoreError) {
-                // ignore error
-            }
-        }
+        this.loadFile((sugarDocument, absoluteSugarFilePath) => {
+            const sugarFileName = path.basename(absoluteSugarFilePath);
+            const userDefinedTypes = this.typeInfoExtractor.extractTypeInfos(sugarDocument, sugarFileName);
+            this.documentsUserDefinedTypes[sugarFileName] = userDefinedTypes;
+        });
+    }
+
+    private loadUserDefinedTemplatesFromDisk(): void {
+        this.loadFile((sugarDocument, absoluteSugarFilePath) => {
+            const sugarFileName = path.basename(absoluteSugarFilePath);
+            this.templatesElementInfos[sugarFileName] = {
+                elements: this.templatesExtractor.extractElements(sugarDocument),
+                templates: this.templatesExtractor.extractTemplates(sugarDocument, sugarFileName),
+            };
+        });
     }
 
     private getAllSugarFileNames(): string[] {
@@ -125,6 +166,20 @@ export class SugarProjectIntellisenseService implements ISugarProjectContext {
             return emptyDataSchema;
             this.logger.info(`Failed to load schema. (${this.absolutePathToProject})`);
             // ignore read error
+        }
+    }
+
+    private loadFile(callback: (sugarDocument: SugarElement, sugarFileName: string) => void): void {
+        const sugarFileNames = this.getAllSugarFileNames();
+        for (const sugarFileName of sugarFileNames) {
+            try {
+                const fileContent = fs.readFileSync(sugarFileName, "utf8");
+                const sugarDocument = this.builder.buildCodeDom(fileContent);
+                this.documentsDoms[sugarFileName] = sugarDocument;
+                callback(sugarDocument, sugarFileName);
+            } catch (ignoreError) {
+                // ignore error
+            }
         }
     }
 }

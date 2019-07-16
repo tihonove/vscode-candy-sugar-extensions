@@ -158,3 +158,13 @@ export const testDataSchema: DataSchemaElementNode = {
         },
     ],
 };
+
+export const testTemplatesSugarElementInfos: SugarElementInfo[] = [
+    {
+        name: "templateName",
+        createPathScope: true,
+        availableChildren: {
+            type: AvailableChildrenType.Any,
+        },
+    },
+];

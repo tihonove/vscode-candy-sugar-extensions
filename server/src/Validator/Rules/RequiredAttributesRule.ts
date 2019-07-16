@@ -1,10 +1,11 @@
-import { SugarElementInfo } from "../../SugarElements/SugarElementInfo";
+import { constant, Decoder, optional } from "@mojotech/json-type-validation";
+
+import { SugarElementDefinedType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
 import { ISugarProjectContext } from "../Validator/ISugarProjectContext";
 
 import { SugarValidatorRuleBase } from "./Bases/SugarValidatorRuleBase";
 import { ValidationItem } from "./Bases/ValidationItem";
-import { constant, Decoder, optional } from "@mojotech/json-type-validation";
 
 export class RequiredAttributesRule extends SugarValidatorRuleBase {
     private readonly elementInfos: SugarElementInfo[];
@@ -14,7 +15,7 @@ export class RequiredAttributesRule extends SugarValidatorRuleBase {
     public constructor(context: ISugarProjectContext) {
         super("required-attribute");
         this.elementInfos = context.getSugarElementInfos();
-        this.checkOnlyElementNames = ["form", "input", "atag1"];
+        this.checkOnlyElementNames = ["form", "input", "template", "param", "atag1"];
     }
 
     protected getDefaultSettings(): undefined {
@@ -31,7 +32,10 @@ export class RequiredAttributesRule extends SugarValidatorRuleBase {
         if (elementInfo == undefined || elementInfo.attributes == undefined || elementInfo.attributes.length === 0) {
             return;
         }
-        if (!this.checkOnlyElementNames.includes(elementInfo.name)) {
+        if (
+            !this.checkOnlyElementNames.includes(elementInfo.name) &&
+            elementInfo.definedType !== SugarElementDefinedType.Template
+        ) {
             return;
         }
         const attributeInfos = elementInfo.attributes;

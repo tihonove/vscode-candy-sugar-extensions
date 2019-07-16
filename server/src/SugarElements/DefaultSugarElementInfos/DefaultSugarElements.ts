@@ -58,7 +58,7 @@ import { infoorg } from "./StrangeElements/infoorg";
 import { sign } from "./StrangeElements/sign";
 import { address, corrnumber, cross, ferm_vb_j, force, ifns, reorganization, signer } from "./UnclassifiedElements";
 
-export const allElements: SugarElementInfo[] = [
+export const standardElements: SugarElementInfo[] = [
     ...sugarElementsGroups.map(x => x.elements).reduce((x, y) => x.concat(y), []),
     Checkbox,
     content,

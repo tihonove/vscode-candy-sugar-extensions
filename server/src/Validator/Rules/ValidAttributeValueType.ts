@@ -1,3 +1,5 @@
+import { constant, Decoder, optional } from "@mojotech/json-type-validation";
+
 import { AttributeTypeUtils } from "../../SugarElements/AttributeTypeUtils";
 import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { SugarAttribute } from "../../SugarParsing/SugarGrammar/SugarParser";
@@ -5,7 +7,6 @@ import { ISugarProjectContext } from "../Validator/ISugarProjectContext";
 
 import { SugarValidatorRuleBase } from "./Bases/SugarValidatorRuleBase";
 import { ValidationItem } from "./Bases/ValidationItem";
-import { constant, Decoder, optional } from "@mojotech/json-type-validation";
 
 export class ValidAttributeValueType extends SugarValidatorRuleBase {
     private readonly elementInfos: SugarElementInfo[];

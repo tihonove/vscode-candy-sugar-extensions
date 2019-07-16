@@ -1,7 +1,8 @@
-.idea/workspace.xml
+.idea
 .nyc_output
 coverage
 out
 node_modules
 .vscode-test
 dist
+.vscode

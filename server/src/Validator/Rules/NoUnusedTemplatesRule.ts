@@ -1,7 +1,7 @@
 import { constant, Decoder, optional } from "@mojotech/json-type-validation";
 
-import { TypeInfoExtractor } from "../../SugarAnalyzing/TypeInfoExtraction/TypeInfoExtractor";
-import { UserDefinedTypeUsagesBuilder } from "../../SugarAnalyzing/UserDefinedTypeUsagesAnalizing/UserDefinedTypeUsagesBuilder";
+import { TemplatesExtractor } from "../../SugarAnalyzing/TemplatesExtraction/TemplatesExtractor";
+import { UserDefinedTemplateUsagesBuilder } from "../../SugarAnalyzing/UserDefinedTemplateUsagesAnalizing/UserDefinedTemplateUsagesBuilder";
 import { SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
 import { ISugarProjectContext } from "../Validator/ISugarProjectContext";
@@ -9,13 +9,13 @@ import { ISugarProjectContext } from "../Validator/ISugarProjectContext";
 import { SugarValidatorRuleBase } from "./Bases/SugarValidatorRuleBase";
 import { ValidationItem } from "./Bases/ValidationItem";
 
-export class NoUnusedTypesRule extends SugarValidatorRuleBase {
+export class NoUnusedTemplateRule extends SugarValidatorRuleBase {
     private readonly sugarElementInfos: SugarElementInfo[];
     private readonly context: ISugarProjectContext;
     private readonly validations: ValidationItem[] = [];
 
     public constructor(context: ISugarProjectContext) {
-        super("no-unused-types");
+        super("no-unused-templates");
         this.context = context;
         this.sugarElementInfos = context.getSugarElementInfos();
     }
@@ -29,14 +29,14 @@ export class NoUnusedTypesRule extends SugarValidatorRuleBase {
     }
 
     public beforeProcess(sugarDocument: SugarElement): void {
-        const typeInfoExtractor = new TypeInfoExtractor();
-        const userDefinedTypes = typeInfoExtractor.extractTypeInfos(sugarDocument);
-        const userDefinedTypeUsagesBuilder = new UserDefinedTypeUsagesBuilder(this.sugarElementInfos);
-        const usages = userDefinedTypeUsagesBuilder.buildUsages(userDefinedTypes, this.context);
+        const templateInfoExtractor = new TemplatesExtractor();
+        const userDefinedTemplates = templateInfoExtractor.extractTemplates(sugarDocument);
+        const userDefinedTypeUsagesBuilder = new UserDefinedTemplateUsagesBuilder(this.sugarElementInfos);
+        const usages = userDefinedTypeUsagesBuilder.buildTemplateUsages(userDefinedTemplates, this.context);
         this.validations.push(
             ...usages.filter(x => x.usages.length === 0).map(x => ({
                 position: x.source.position,
-                message: `Тип '${x.source.name}' не используется`,
+                message: `Шаблон '${x.source.name}' не используется`,
             }))
         );
     }
