@@ -665,10 +665,10 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
-"@kontur.candy/generator@^4.112.1-ext-docs.1":
-  version "4.112.1-ext-docs.1"
-  resolved "https://registry.yarnpkg.com/@kontur.candy/generator/-/generator-4.112.1-ext-docs.1.tgz#dc47a8a691af990b503255ee6612c6c26fe79904"
-  integrity sha512-ilEA+TlWE6vn5cay15YB7tsoVMLSIeZyKM+1BCELeoqdOyKJS8MgRjOUNOIBv7j0mSPWPJf7jvTuAR1Cn8fbNA==
+"@kontur.candy/generator@^4.113.0":
+  version "4.113.0"
+  resolved "https://registry.yarnpkg.com/@kontur.candy/generator/-/generator-4.113.0.tgz#54f5978e75b7278a2b1d516e4c500900d77f10e2"
+  integrity sha512-gVEyCiiBf2cD5YaxhpCRYKPkEXGTXdEEs6MBzL9XOYyVnfx1FcSV2T/O9RUqQE5iTaMynemswbendZCOWPDS5Q==
   dependencies:
     "@babel/core" "^7.0.0"
     "@babel/generator" "^7.0.0"
