@@ -11,8 +11,11 @@
 		"type": "git",
 		"url": "https://github.com/Microsoft/vscode-extension-samples"
 	},
-	"dependencies": {
+	"devDependencies": {
 		"@types/lodash": "^4.14.116",
+		"@kontur.candy/generator": "^4.113.0"
+	},
+	"dependencies": {
 		"lodash": "^4.17.11",
 		"vscode-languageserver": "^5.2.1"
 	},
