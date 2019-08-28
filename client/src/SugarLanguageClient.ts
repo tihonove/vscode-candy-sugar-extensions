@@ -25,7 +25,12 @@ export function startSugarLanguageServer(context: ExtensionContext): LanguageCli
         },
     };
 
-    const client = new LanguageClient("languageServerExample", "Language Server Example", serverOptions, clientOptions);
+    const client = new LanguageClient(
+        "sugarServerExample",
+        "Candy.Sugar Language Server",
+        serverOptions,
+        clientOptions
+    );
     client.start();
     return client;
 }
