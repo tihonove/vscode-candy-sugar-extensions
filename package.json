@@ -93,8 +93,9 @@
         }
     },
     "scripts": {
-        "postinstall": "vscode-install",
-        "vscode:prepublish": "vscode-install",
+        "update-vscode": "vscode-install",
+        "postinstall": "npm-run-all update-vscode",
+        "vscode:prepublish": "npm-run-all update-vscode compile",
         "compile:client": "webpack --config client.webpack.config.js",
         "compile:server": "webpack --config server.webpack.config.js",
         "compile:validator": "babel --source-maps --extensions \".ts,.js\" ./server/src --out-dir ./validator/dist/server/src && babel --source-maps --extensions \".ts,.js\" ./validator/src --out-dir ./validator/dist/validator/src",
