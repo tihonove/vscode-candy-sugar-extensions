@@ -7,6 +7,6 @@ export const prd: SugarElementInfo = {
     availableChildren: { type: AvailableChildrenType.Any },
     attributes: [
         ...commonContentAttributes,
-        { name: "defaultValue", valueTypes: [AttributeType.String], optional: true },
+        { name: "defaultValue", valueTypes: [AttributeType.String], required: false },
     ],
 };

@@ -1,9 +1,8 @@
-import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../SugarElementInfo";
-
 import { fetchFnAttribute } from "../DefaultSugarElementInfos/Commons/fetchFnAttribute";
 import { pathAttribute } from "../DefaultSugarElementInfos/Commons/pathAttribute";
 import { typeAttribute } from "../DefaultSugarElementInfos/Commons/typeAttribute";
 import { visibilityPathAttribute } from "../DefaultSugarElementInfos/Commons/visibilityPathAttribute";
+import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../SugarElementInfo";
 
 export const digest: SugarElementInfo = {
     name: "digest",
@@ -20,8 +19,8 @@ export const digest: SugarElementInfo = {
         { name: "display", valueTypes: [AttributeType.Enum] },
         { name: "savedescription", valueTypes: [AttributeType.Boolean] },
         { name: "title", valueTypes: [AttributeType.String] },
-        { name: "defaultValue", valueTypes: [AttributeType.String], optional: true },
-        { name: "openbutton", valueTypes: [AttributeType.Boolean], optional: true },
-        { name: "optional", valueTypes: [AttributeType.Boolean], optional: true },
+        { name: "defaultValue", valueTypes: [AttributeType.String], required: true },
+        { name: "openbutton", valueTypes: [AttributeType.Boolean], required: true },
+        { name: "optional", valueTypes: [AttributeType.Boolean], required: true },
     ],
 };

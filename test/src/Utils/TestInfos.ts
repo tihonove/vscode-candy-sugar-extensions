@@ -55,7 +55,7 @@ export const testSugarElementInfos: SugarElementInfo[] = [
             {
                 name: "number-attr",
                 valueTypes: [AttributeType.Boolean],
-                optional: false,
+                required: true,
             },
             {
                 name: "boolean-attr",

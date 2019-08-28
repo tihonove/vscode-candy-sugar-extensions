@@ -45,7 +45,7 @@ export class TemplateElementsExtractionVisitor extends EmptySugarDomVisitor {
                 this.attributes.push({
                     name: name,
                     valueTypes: [this.getAttributeValue(element, "type") as AttributeType],
-                    optional: this.getAttributeValue(element, "required") !== "true",
+                    required: this.getAttributeValue(element, "required") === "true",
                 });
             }
         }

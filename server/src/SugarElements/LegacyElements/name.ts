@@ -7,6 +7,6 @@ export const name: SugarElementInfo = {
     },
     attributes: [
         { name: "caption", valueTypes: [AttributeType.String] },
-        { name: "editable", valueTypes: [AttributeType.Boolean], optional: true },
+        { name: "editable", valueTypes: [AttributeType.Boolean], required: false },
     ],
 };

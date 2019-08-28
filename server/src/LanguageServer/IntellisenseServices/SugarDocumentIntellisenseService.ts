@@ -22,7 +22,6 @@ import { CodeContext } from "../../SugarAnalyzing/ContextResolving/CodeContext";
 import { CodeContextByNodeResolver } from "../../SugarAnalyzing/ContextResolving/CodeContextByNodeResolver";
 import { OffsetToNodeMap } from "../../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMap";
 import { OffsetToNodeMapBuilder } from "../../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
-import { sugarElementsGroups } from "../../SugarElements/DefaultSugarElementInfos/DefaultSugarElementsGrouped";
 import { standardElements } from "../../SugarElements/SugarElements";
 import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { defaultBuiltInTypeNames, TypeKind } from "../../SugarElements/UserDefinedSugarTypeInfo";
@@ -90,7 +89,7 @@ export class SugarDocumentIntellisenseService {
         this.sugarElements = this.sugarProject.getSugarElementInfos();
         this.validator = createDefaultValidator(this.sugarProject);
         this.builder = new OffsetToNodeMapBuilder();
-        this.helpUrlBuilder = new HelpUrlBuilder(sugarElementsGroups);
+        this.helpUrlBuilder = new HelpUrlBuilder(this.sugarElements);
         this.referencesService = new ReferencesService(this.sugarProject, this.documentUri);
     }
 
