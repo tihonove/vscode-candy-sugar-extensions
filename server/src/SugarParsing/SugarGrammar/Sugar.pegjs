@@ -207,11 +207,11 @@ JSString =
     }
 
 JSDoubleQuotedStringContent = value: ("\\\"" / [^"\n])* {
-    return value.join("");
+    return value.map(x => x === '\\"' ? '"' : x).join("");
 }
 
 JSSingleQuotedStringContent = value: ("\\'" / [^'\n])* {
-    return value.join("");
+    return value.map(x => x === "\\'" ? "'" : x).join("");
 }
 
 JSObjectLiteral = "{" _? firstProp: JSObjectLiteralProperty? restProps: (_? "," _? JSObjectLiteralProperty)* _? ","? _? "}" {

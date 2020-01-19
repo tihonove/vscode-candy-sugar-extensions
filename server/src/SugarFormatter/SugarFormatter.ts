@@ -205,9 +205,12 @@ export class SugarFormatter {
             return { inline: `${attribute.name.value}`, regular: `${attribute.name.value}` };
         }
         if (attribute.value.type === "AttributeValue") {
+            const formattedAttributeValue = attribute.value.value.includes('"')
+                ? `'${attribute.value.value}'`
+                : `"${attribute.value.value}"`;
             return {
-                inline: `${attribute.name.value}="${attribute.value.value}"`,
-                regular: `${attribute.name.value}="${attribute.value.value}"`,
+                inline: `${attribute.name.value}=${formattedAttributeValue}`,
+                regular: `${attribute.name.value}=${formattedAttributeValue}`,
             };
         } else {
             const attributeValuePrefix = `${attribute.name.value}={`;
@@ -240,8 +243,8 @@ export class SugarFormatter {
     private formatJavaScriptLiteral(value: SugarJavaScriptLiteral, maxLength: number): FormattingResult {
         if (value.type === "JavaScriptStringLiteral") {
             return {
-                inline: `"${value.value}"`,
-                regular: `"${value.value}"`,
+                inline: `${JSON.stringify(value.value)}`,
+                regular: `${JSON.stringify(value.value)}`,
             };
         }
         if (value.type === "JavaScriptBooleanLiteral") {

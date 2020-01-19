@@ -96,7 +96,7 @@ export class SugarFormatterTest {
 
         this.checkFormat(
             `<a><!-- 1234567890
-   
+
 1234567890 --></a>`,
             `<a>
     <!--
@@ -265,7 +265,7 @@ export class SugarFormatterTest {
         this.checkFormat(
             `<a>
     1234567890098765432109876543210987654321
-    0987654321    
+    0987654321
 </a>
 `,
             `<a>
@@ -414,6 +414,20 @@ export class SugarFormatterTest {
     @test
     public testJavascriptStringAttributesFormat(): void {
         this.checkFormat(`<tag4 x={"str"}></tag4>`, `<tag4 x={"str"} />\n`);
+    }
+
+    @test
+    public testJavascriptStringAttributesWithQuotes(): void {
+        this.checkFormat(`<tag4 x={'str"1"'}></tag4>`, `<tag4 x={"str\\\"1\\\"} />\n`);
+        this.checkFormat(`<tag4 x={"str'1'"}></tag4>`, `<tag4 x={"str'1'"} />\n`);
+        this.checkFormat(`<tag4 x={"str\\\"1\\\""}></tag4>`, `<tag4 x={"str\\\"1\\\""} />\n`);
+        this.checkFormat(`<tag4 x={'str\\\'1\\\''}></tag4>`, `<tag4 x={"str'1'"} />\n`);
+    }
+
+    @test
+    public testStringAttributesWithQuotes(): void {
+        this.checkFormat(`<tag4 x='str"1"'></tag4>`, `<tag4 x='str"1"' />\n`);
+        this.checkFormat(`<tag4 x="str'1'"></tag4>`, `<tag4 x="str'1'" />\n`);
     }
 
     private checkFormat(input: string, expected: string, options?: Partial<SugarFormatterOptions>): void {
