@@ -1,5 +1,5 @@
 export function getCloseTag(text: string, excludedTags: string[]): undefined | string {
-    const regex = /<(\/?[a-zA-Z][a-zA-Z0-9:\-_.]*)(?:\s+[^<>]*?[^\s/<>=]+?)*?\s?>/g;
+    const regex = /<(\/?[a-zA-Z][a-zA-Z0-9:\-_.]*)(?:\s+[^<>]*)?(?<!\/)>/g;
     let result;
     const stack = [];
     // tslint:disable-next-line:no-conditional-assignment
