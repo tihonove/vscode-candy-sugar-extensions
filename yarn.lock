@@ -740,9 +740,9 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
-"@kontur.candy/generator@^4.113.0":
-  version "4.117.0"
-  resolved "https://registry.yarnpkg.com/@kontur.candy/generator/-/generator-4.117.0.tgz#f76d442ab226ddec5a5bc77e73897a94d114851a"
+"@kontur.candy/generator@^4.142.0":
+  version "4.142.0"
+  resolved "https://registry.yarnpkg.com/@kontur.candy/generator/-/generator-4.142.0.tgz#860d5c46147ed663ff2703fdbeebc595a8eceeaf"
   dependencies:
     "@babel/core" "^7.0.0"
     "@babel/generator" "^7.0.0"
