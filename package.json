@@ -102,11 +102,10 @@
         "compile": "yarn compile:client && yarn compile:server",
         "watch:client": "webpack --config client.webpack.config.js --watch",
         "watch:server": "webpack --config server.webpack.config.js --watch",
-        "lint:server": "tslint --project ./server/tsconfig.json",
-        "lint:client": "tslint --project ./client/tsconfig.json",
+        "lint": "tslint --project ./tsconfig.json",
         "lint:test": "tslint --project ./test/tsconfig.json",
-        "lint": "npm-run-all --continue-on-error lint:*",
         "test": "mocha",
+        "verify": "tsc",
         "test:coverage": "nyc --reporter=html --reporter=text mocha"
     },
     "devDependencies": {

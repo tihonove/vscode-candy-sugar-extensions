@@ -33,5 +33,10 @@
                 "mockTypeScriptVersion": false
             }
         ]
-    }
+    },
+    "include": [
+        "server/src/**/*",
+        "client/src/**/*",
+        "test/src/**/*"
+    ]
 }
