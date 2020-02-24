@@ -59,7 +59,12 @@ export class MarkdownUtils {
             : [];
         return {
             kind: MarkupKind.Markdown,
-            value: [...headerLines, currentAttributeInfo.markdownDescription].filter(isNotNullOrUndefined).join("\n"),
+            value: [
+                ...headerLines,
+                currentAttributeInfo.markdownDescription || currentAttributeInfo.shortMarkdownDescription,
+            ]
+                .filter(isNotNullOrUndefined)
+                .join("\n"),
         };
     }
     public static buildElementDetails(
