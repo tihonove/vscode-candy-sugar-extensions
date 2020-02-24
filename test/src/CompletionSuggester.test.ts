@@ -87,6 +87,24 @@ export class CompletionSuggesterTest {
     }
 
     @test
+    public "Аттрибут типа enum"(): void {
+        const fileSuggester = this.createTestCompletionSuggester();
+        const suggestions = fileSuggester.suggest('<atag1 enum-attr="');
+        expect(suggestions).to.shallowDeepEqual({
+            items: [
+                {
+                    type: SuggestionItemType.EnumItem,
+                    name: "value1",
+                },
+                {
+                    type: SuggestionItemType.EnumItem,
+                    name: "value2",
+                },
+            ],
+        });
+    }
+
+    @test
     public "Не предлагать ничего на строковых атрибутах"(): void {
         const fileSuggester = this.createTestCompletionSuggester();
         const suggestions = fileSuggester.suggest('<atag1 optional-attr="');

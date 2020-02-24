@@ -8,7 +8,6 @@ import {
     SugarElementName,
     SugarJavaScriptLiteral,
 } from "../SugarParsing/SugarGrammar/SugarParser";
-import { oc } from "../Utils/ChainWrapper";
 import { CodePosition } from "../Utils/PegJSUtils/Types";
 import { UriUtils } from "../Utils/UriUtils";
 
@@ -42,12 +41,7 @@ export class ReferencesBuilder {
         element: undefined | SugarElement,
         attributeName: string
     ): undefined | SugarJavaScriptLiteral | string {
-        return oc(element)
-            .with(x => x.attributes)
-            .with(x => x.find(x => x.name.value === attributeName))
-            .with(x => x.value)
-            .with(x => x.value)
-            .return(x => x, undefined);
+        return element?.attributes?.find(x => x.name.value === attributeName)?.value?.value ?? undefined;
     }
 
     protected findNearestElementByName(

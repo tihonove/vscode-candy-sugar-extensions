@@ -15,14 +15,16 @@ export enum AttributeTypeKind {
     TemplateParameterType = "TemplateParameterType",
 }
 
+export interface AttributeEnumType {
+    type: AttributeTypeKind.Enum;
+    values: string[];
+}
+
 export type AttributeType =
     | {
           type: Exclude<AttributeTypeKind, AttributeTypeKind.Enum>;
       }
-    | {
-          type: AttributeTypeKind.Enum;
-          values: string[];
-      };
+    | AttributeEnumType;
 
 export class AttributeTypes {
     public static Path: AttributeType = { type: AttributeTypeKind.Path };

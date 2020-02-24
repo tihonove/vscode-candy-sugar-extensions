@@ -388,6 +388,17 @@ export class SugarDocumentIntellisenseService {
                         commitCharacters: ['"'],
                     };
                 }
+                if (x.type === SuggestionItemType.EnumItem) {
+                    return {
+                        label: x.name,
+                        kind: CompletionItemKind.EnumMember,
+                        data: {
+                            suggestionItem: x,
+                            uri: this.documentUri,
+                        },
+                        commitCharacters: ['"'],
+                    };
+                }
                 if (x.type === SuggestionItemType.Type) {
                     return {
                         label: x.name,

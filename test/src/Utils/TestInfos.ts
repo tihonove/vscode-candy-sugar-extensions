@@ -1,5 +1,6 @@
 import { DataSchemaElementNode } from "../../../server/src/DataSchema/DataSchemaNode";
 import {
+    AttributeTypeKind,
     AttributeTypes,
     AvailableChildrenType,
     SugarElementInfo,
@@ -60,6 +61,10 @@ export const testSugarElementInfos: SugarElementInfo[] = [
             {
                 name: "boolean-attr",
                 valueTypes: [AttributeTypes.Boolean],
+            },
+            {
+                name: "enum-attr",
+                valueTypes: [{ type: AttributeTypeKind.Enum, values: ["value1", "value2"] }],
             },
         ],
         availableChildren: {

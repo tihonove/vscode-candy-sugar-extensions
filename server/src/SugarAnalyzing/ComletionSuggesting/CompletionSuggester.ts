@@ -1,7 +1,7 @@
 import { DataPathUtils } from "../../DataSchema/DataPathUtils";
 import { DataSchemaAttribute, DataSchemaElementNode } from "../../DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "../../DataSchema/DataSchemaUtils";
-import { AttributeTypeKind, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
+import { AttributeEnumType, AttributeTypeKind, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import {
     defaultBuiltInTypeNames,
     TypeKind,
@@ -110,10 +110,15 @@ export class CompletionSuggester {
             codeContext.type === "AttributeValue" &&
             completionContext.expectedToken === ExpectedTokenType.AttributeValueContent &&
             codeContext.currentAttributeInfo != undefined &&
-            codeContext.currentAttributeInfo.valueTypes != undefined &&
-            codeContext.currentAttributeInfo.valueTypes.some(x => x.type === AttributeTypeKind.Type)
+            codeContext.currentAttributeInfo.valueTypes != undefined
         ) {
-            return this.suggestType();
+            if (codeContext.currentAttributeInfo.valueTypes.some(x => x.type === AttributeTypeKind.Type)) {
+                return this.suggestType();
+            }
+            const enumType = codeContext.currentAttributeInfo.valueTypes.find(x => x.type === AttributeTypeKind.Enum);
+            if (enumType != undefined && enumType.type === AttributeTypeKind.Enum) {
+                return this.suggestEnumValue(enumType);
+            }
         }
         if (
             codeContext.type === "DataAttributeValue" &&
@@ -142,6 +147,13 @@ export class CompletionSuggester {
                     typeKind: TypeKind.BuiltIn,
                 })),
         ];
+    }
+
+    private suggestEnumValue(enumType: AttributeEnumType): SuggestionItem[] {
+        return enumType.values.map<SuggestionItem>(x => ({
+            type: SuggestionItemType.EnumItem,
+            name: x,
+        }));
     }
 
     private suggestDataPath(

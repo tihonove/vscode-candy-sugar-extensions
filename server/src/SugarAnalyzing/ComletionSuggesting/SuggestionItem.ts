@@ -6,6 +6,7 @@ export enum SuggestionItemType {
     DataElement,
     DataAttribute,
     Type,
+    EnumItem,
 }
 
 export type SuggestionItem =
@@ -32,4 +33,8 @@ export type SuggestionItem =
           type: SuggestionItemType.Type;
           name: string;
           typeKind: TypeKind;
+      }
+    | {
+          type: SuggestionItemType.EnumItem;
+          name: string;
       };

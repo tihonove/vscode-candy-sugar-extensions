@@ -1,6 +1,5 @@
 import { UserDefinedSugarTemplateInfo } from "../../SugarElements/UserDefinedSugarTemplateInfo";
 import { SugarComment, SugarElement, SugarText } from "../../SugarParsing/SugarGrammar/SugarParser";
-import { oc } from "../../Utils/ChainWrapper";
 import { isNotNullOrUndefined } from "../../Utils/TypingUtils";
 import { EmptySugarDomVisitor } from "../Traversing/EmptySugarDomVisitor";
 
@@ -69,11 +68,7 @@ export class TemplateInfoExtractionVisitor extends EmptySugarDomVisitor {
     }
 
     private getAttributeValue(element: SugarElement, attributeName: string): undefined | string {
-        const value = oc(element.attributes)
-            .with(x => x.find(a => a.name.value === attributeName))
-            .with(x => x.value)
-            .with(x => x.value)
-            .return(x => x, undefined);
+        const value = element?.attributes?.find(a => a.name.value === attributeName)?.value?.value ?? undefined;
         if (typeof value === "string") {
             return value;
         } else {
