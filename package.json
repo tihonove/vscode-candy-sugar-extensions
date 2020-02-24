@@ -118,7 +118,7 @@
         "@babel/preset-env": "^7.0.0",
         "@babel/preset-typescript": "^7.0.0",
         "@babel/register": "^7.0.0",
-        "@kontur.candy/generator": "^4.142.0",
+        "@kontur.candy/generator": "^4.150.0",
         "@mojotech/json-type-validation": "^3.0.0",
         "@types/chai": "^4.1.4",
         "@types/fs-extra": "^5.0.4",

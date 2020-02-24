@@ -1,15 +1,17 @@
 import {
     AttributeType,
+    AttributeTypeKind,
     AttributeTypes,
     AvailableChildrenType,
     SugarAttributeInfo,
     SugarElementAvailableChildrenInfo,
-    SugarElementInfo
+    SugarElementInfo,
 } from "../SugarElementInfo";
 
 import elementsFromGeneratorJson from "./CompileTimeDocumentationFromGeneratorSource";
 import {
     AttributeTypeFromGenerator,
+    AttributeTypeKindFromGenerator,
     AvailableChildrenTypeFromGenerator,
     SugarAttributeInfoFromGenerator,
     SugarElementAvailableChildrenInfoFromGenerator,
@@ -40,34 +42,34 @@ function attributeFromGenerator(x: SugarAttributeInfoFromGenerator): SugarAttrib
 }
 
 function attributeTypeFromGenerator(x: AttributeTypeFromGenerator): AttributeType {
-    switch (x) {
-        case AttributeTypeFromGenerator.Path:
+    switch (x.type) {
+        case AttributeTypeKindFromGenerator.Enum:
+            return { type: AttributeTypeKind.Enum, values: x.values };
+        case AttributeTypeKindFromGenerator.Path:
             return AttributeTypes.Path;
-        case AttributeTypeFromGenerator.VisibilityPath:
+        case AttributeTypeKindFromGenerator.VisibilityPath:
             return AttributeTypes.VisibilityPath;
-        case AttributeTypeFromGenerator.Type:
+        case AttributeTypeKindFromGenerator.Type:
             return AttributeTypes.Type;
-        case AttributeTypeFromGenerator.String:
+        case AttributeTypeKindFromGenerator.String:
             return AttributeTypes.String;
-        case AttributeTypeFromGenerator.Number:
+        case AttributeTypeKindFromGenerator.Number:
             return AttributeTypes.Number;
-        case AttributeTypeFromGenerator.Boolean:
+        case AttributeTypeKindFromGenerator.Boolean:
             return AttributeTypes.Boolean;
-        case AttributeTypeFromGenerator.FunctionName:
+        case AttributeTypeKindFromGenerator.FunctionName:
             return AttributeTypes.FunctionName;
-        case AttributeTypeFromGenerator.CssClassName:
+        case AttributeTypeKindFromGenerator.CssClassName:
             return AttributeTypes.CssClassName;
-        case AttributeTypeFromGenerator.PicklistId:
+        case AttributeTypeKindFromGenerator.PicklistId:
             return AttributeTypes.PicklistId;
-        case AttributeTypeFromGenerator.JavaScriptLiteral:
+        case AttributeTypeKindFromGenerator.JavaScriptLiteral:
             return AttributeTypes.JavaScriptLiteral;
-        case AttributeTypeFromGenerator.Enum:
-            return AttributeTypes.String;
-        case AttributeTypeFromGenerator.Color:
+        case AttributeTypeKindFromGenerator.Color:
             return AttributeTypes.Color;
-        case AttributeTypeFromGenerator.PathList:
+        case AttributeTypeKindFromGenerator.PathList:
             return AttributeTypes.PathList;
-        case AttributeTypeFromGenerator.TemplateParameterType:
+        case AttributeTypeKindFromGenerator.TemplateParameterType:
             return AttributeTypes.TemplateParameterType;
         default:
             return x;

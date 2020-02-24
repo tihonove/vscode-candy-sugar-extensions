@@ -20,7 +20,7 @@ export type SugarElementAvailableChildrenInfoFromGenerator =
           list: string[];
       };
 
-export enum AttributeTypeFromGenerator {
+export enum AttributeTypeKindFromGenerator {
     Path = "Path",
     VisibilityPath = "VisibilityPath",
     Type = "Type",
@@ -36,6 +36,17 @@ export enum AttributeTypeFromGenerator {
     PathList = "PathList",
     TemplateParameterType = "TemplateParameterType",
 }
+
+export interface AttributeEnumTypeFromGenerator {
+    type: AttributeTypeKindFromGenerator.Enum;
+    values: string[];
+}
+
+export type AttributeTypeFromGenerator =
+    | {
+          type: Exclude<AttributeTypeKindFromGenerator, AttributeTypeKindFromGenerator.Enum>;
+      }
+    | AttributeEnumTypeFromGenerator;
 
 export interface SugarAttributeInfoFromGenerator {
     name: string;
