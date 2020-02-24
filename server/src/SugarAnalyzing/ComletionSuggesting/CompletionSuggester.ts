@@ -134,11 +134,13 @@ export class CompletionSuggester {
                 name: x.name,
                 typeKind: TypeKind.UserDefined,
             })),
-            ...defaultBuiltInTypeNames.filter(x => this.sugarTypes.every(y => y.name !== x)).map<SuggestionItem>(x => ({
-                type: SuggestionItemType.Type,
-                name: x,
-                typeKind: TypeKind.BuiltIn,
-            })),
+            ...defaultBuiltInTypeNames
+                .filter(x => this.sugarTypes.every(y => y.name !== x))
+                .map<SuggestionItem>(x => ({
+                    type: SuggestionItemType.Type,
+                    name: x,
+                    typeKind: TypeKind.BuiltIn,
+                })),
         ];
     }
 

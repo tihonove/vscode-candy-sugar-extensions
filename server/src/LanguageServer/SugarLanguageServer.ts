@@ -222,16 +222,14 @@ export class SugarLanguageServer {
             });
         });
 
-        result.schemaChangedEvent.addListener(
-            (sugarDocumentUri: string): void => {
-                const textDocument = this.documents.get(sugarDocumentUri);
-                const sugarDocumentService = this.documentServices[sugarDocumentUri];
-                if (textDocument != undefined && sugarDocumentService != undefined) {
-                    const text = textDocument.getText();
-                    sugarDocumentService.validateTextDocument(text);
-                }
+        result.schemaChangedEvent.addListener((sugarDocumentUri: string): void => {
+            const textDocument = this.documents.get(sugarDocumentUri);
+            const sugarDocumentService = this.documentServices[sugarDocumentUri];
+            if (textDocument != undefined && sugarDocumentService != undefined) {
+                const text = textDocument.getText();
+                sugarDocumentService.validateTextDocument(text);
             }
-        );
+        });
 
         return result;
     }
