@@ -5,7 +5,7 @@ import {
     visibilityPathAttribute,
     visibilityPathValueAttribute,
 } from "../DefaultSugarElementInfos/Commons/visibilityPathAttribute";
-import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../SugarElementInfo";
+import { AttributeTypes, AvailableChildrenType, SugarElementInfo } from "../SugarElementInfo";
 
 export const content: SugarElementInfo = {
     name: "content",
@@ -31,6 +31,6 @@ export const content: SugarElementInfo = {
         visibilityPathValueAttribute,
         invisibilityPathAttribute,
         invisibilityPathValuettribute,
-        { name: "style", valueTypes: [AttributeType.JavaScriptLiteral], required: false },
+        { name: "style", valueTypes: [AttributeTypes.JavaScriptLiteral], required: false },
     ],
 };

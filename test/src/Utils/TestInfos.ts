@@ -1,6 +1,6 @@
 import { DataSchemaElementNode } from "../../../server/src/DataSchema/DataSchemaNode";
 import {
-    AttributeType,
+    AttributeTypes,
     AvailableChildrenType,
     SugarElementInfo,
 } from "../../../server/src/SugarElements/SugarElementInfo";
@@ -36,30 +36,30 @@ export const testSugarElementInfos: SugarElementInfo[] = [
         attributes: [
             {
                 name: "path",
-                valueTypes: [AttributeType.Path],
+                valueTypes: [AttributeTypes.Path],
             },
             {
                 name: "type",
-                valueTypes: [AttributeType.Type],
+                valueTypes: [AttributeTypes.Type],
                 required: false,
             },
             {
                 name: "optional-attr",
-                valueTypes: [AttributeType.String],
+                valueTypes: [AttributeTypes.String],
             },
             {
                 name: "required-attr",
-                valueTypes: [AttributeType.Number],
+                valueTypes: [AttributeTypes.Number],
                 required: true,
             },
             {
                 name: "number-attr",
-                valueTypes: [AttributeType.Boolean],
+                valueTypes: [AttributeTypes.Boolean],
                 required: true,
             },
             {
                 name: "boolean-attr",
-                valueTypes: [AttributeType.Boolean],
+                valueTypes: [AttributeTypes.Boolean],
             },
         ],
         availableChildren: {
@@ -72,11 +72,11 @@ export const testSugarElementInfos: SugarElementInfo[] = [
         attributes: [
             {
                 name: "path",
-                valueTypes: [AttributeType.Path],
+                valueTypes: [AttributeTypes.Path],
             },
             {
                 name: "type",
-                valueTypes: [AttributeType.Type],
+                valueTypes: [AttributeTypes.Type],
             },
         ],
         availableChildren: {
@@ -90,7 +90,7 @@ export const testSugarElementInfos: SugarElementInfo[] = [
         attributes: [
             {
                 name: "path",
-                valueTypes: [AttributeType.Path],
+                valueTypes: [AttributeTypes.Path],
             },
         ],
         availableChildren: {

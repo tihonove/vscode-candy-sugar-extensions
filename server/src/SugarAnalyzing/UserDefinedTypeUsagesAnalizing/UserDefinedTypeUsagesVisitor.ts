@@ -1,4 +1,4 @@
-import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
+import { AttributeTypeKind, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { UserDefinedSugarTypeInfo } from "../../SugarElements/UserDefinedSugarTypeInfo";
 import { SugarAttribute } from "../../SugarParsing/SugarGrammar/SugarParser";
 import { EmptySugarDomVisitor } from "../Traversing/EmptySugarDomVisitor";
@@ -44,7 +44,7 @@ export class UserDefinedTypeUsagesVisitor extends EmptySugarDomVisitor {
         if (attributeInfo == undefined) {
             return;
         }
-        if (!attributeInfo.valueTypes.includes(AttributeType.Type)) {
+        if (!attributeInfo.valueTypes.some(x => x.type === AttributeTypeKind.Type)) {
             return;
         }
         const userDefinedType = this.userDefinedTypes.find(x => x.name === attributeValue);

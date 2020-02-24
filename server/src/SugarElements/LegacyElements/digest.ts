@@ -2,7 +2,7 @@ import { fetchFnAttribute } from "../DefaultSugarElementInfos/Commons/fetchFnAtt
 import { pathAttribute } from "../DefaultSugarElementInfos/Commons/pathAttribute";
 import { typeAttribute } from "../DefaultSugarElementInfos/Commons/typeAttribute";
 import { visibilityPathAttribute } from "../DefaultSugarElementInfos/Commons/visibilityPathAttribute";
-import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../SugarElementInfo";
+import { AttributeTypes, AvailableChildrenType, SugarElementInfo } from "../SugarElementInfo";
 
 export const digest: SugarElementInfo = {
     name: "digest",
@@ -12,15 +12,15 @@ export const digest: SugarElementInfo = {
         typeAttribute,
         fetchFnAttribute,
         visibilityPathAttribute,
-        { name: "kind", valueTypes: [AttributeType.Enum] },
-        { name: "gId", valueTypes: [AttributeType.Number] },
-        { name: "width", valueTypes: [AttributeType.Number] },
-        { name: "placeholder", valueTypes: [AttributeType.String] },
-        { name: "display", valueTypes: [AttributeType.Enum] },
-        { name: "savedescription", valueTypes: [AttributeType.Boolean] },
-        { name: "title", valueTypes: [AttributeType.String] },
-        { name: "defaultValue", valueTypes: [AttributeType.String], required: true },
-        { name: "openbutton", valueTypes: [AttributeType.Boolean], required: true },
-        { name: "optional", valueTypes: [AttributeType.Boolean], required: true },
+        { name: "kind", valueTypes: [AttributeTypes.String] },
+        { name: "gId", valueTypes: [AttributeTypes.Number] },
+        { name: "width", valueTypes: [AttributeTypes.Number] },
+        { name: "placeholder", valueTypes: [AttributeTypes.String] },
+        { name: "display", valueTypes: [AttributeTypes.String] },
+        { name: "savedescription", valueTypes: [AttributeTypes.Boolean] },
+        { name: "title", valueTypes: [AttributeTypes.String] },
+        { name: "defaultValue", valueTypes: [AttributeTypes.String], required: true },
+        { name: "openbutton", valueTypes: [AttributeTypes.Boolean], required: true },
+        { name: "optional", valueTypes: [AttributeTypes.Boolean], required: true },
     ],
 };

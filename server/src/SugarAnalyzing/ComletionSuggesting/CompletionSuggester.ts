@@ -1,7 +1,7 @@
 import { DataPathUtils } from "../../DataSchema/DataPathUtils";
 import { DataSchemaAttribute, DataSchemaElementNode } from "../../DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "../../DataSchema/DataSchemaUtils";
-import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
+import { AttributeTypeKind, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import {
     defaultBuiltInTypeNames,
     TypeKind,
@@ -111,7 +111,7 @@ export class CompletionSuggester {
             completionContext.expectedToken === ExpectedTokenType.AttributeValueContent &&
             codeContext.currentAttributeInfo != undefined &&
             codeContext.currentAttributeInfo.valueTypes != undefined &&
-            codeContext.currentAttributeInfo.valueTypes.includes(AttributeType.Type)
+            codeContext.currentAttributeInfo.valueTypes.some(x => x.type === AttributeTypeKind.Type)
         ) {
             return this.suggestType();
         }
@@ -120,7 +120,7 @@ export class CompletionSuggester {
             completionContext.expectedToken === ExpectedTokenType.AttributeValueContent &&
             codeContext.currentAttributeInfo != undefined &&
             codeContext.currentAttributeInfo.valueTypes != undefined &&
-            codeContext.currentAttributeInfo.valueTypes.includes(AttributeType.Path)
+            codeContext.currentAttributeInfo.valueTypes.some(x => x.type === AttributeTypeKind.Path)
         ) {
             return this.suggestDataPath(codeContext.dataContext, this.dataSchemaRoot, completionContext.node.value);
         }

@@ -1,7 +1,7 @@
 import { constant, Decoder, optional } from "@mojotech/json-type-validation";
 
 import { AttributeTypeUtils } from "../../SugarElements/AttributeTypeUtils";
-import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
+import { AttributeType, AttributeTypeKind, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { SugarAttribute } from "../../SugarParsing/SugarGrammar/SugarParser";
 import { ISugarProjectContext } from "../Validator/ISugarProjectContext";
 
@@ -56,19 +56,19 @@ export class ValidAttributeValueType extends SugarValidatorRuleBase {
     }
 
     private isValueMatchToType(attributeValue: string | undefined, attributeType: AttributeType): boolean {
-        if (attributeType === AttributeType.Number) {
+        if (attributeType.type === AttributeTypeKind.Number) {
             if (attributeValue === undefined) {
                 return false;
             }
             return /^[+\-]?\d*\.?\d+(?:[Ee][+\-]?\d+)?$/.test(attributeValue);
         }
-        if (attributeType === AttributeType.Color) {
+        if (attributeType.type === AttributeTypeKind.Color) {
             if (attributeValue === undefined) {
                 return false;
             }
             return /^#([\da-f]{3})|([\da-f]{6)$/i.test(attributeValue);
         }
-        if (attributeType === AttributeType.Boolean) {
+        if (attributeType.type === AttributeTypeKind.Boolean) {
             if (attributeValue === undefined) {
                 return false;
             }

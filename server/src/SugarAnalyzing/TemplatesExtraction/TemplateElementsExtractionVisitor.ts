@@ -1,12 +1,12 @@
 import {
     AttributeType,
+    AttributeTypes,
     AvailableChildrenType,
     SugarAttributeInfo,
     SugarElementDefinedType,
     SugarElementInfo,
 } from "../../SugarElements/SugarElementInfo";
 import { SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
-import { oc } from "../../Utils/ChainWrapper";
 import { EmptySugarDomVisitor } from "../Traversing/EmptySugarDomVisitor";
 
 export class TemplateElementsExtractionVisitor extends EmptySugarDomVisitor {
@@ -44,10 +44,19 @@ export class TemplateElementsExtractionVisitor extends EmptySugarDomVisitor {
             if (name) {
                 this.attributes.push({
                     name: name,
-                    valueTypes: [this.getAttributeValue(element, "type") as AttributeType],
+                    valueTypes: [(this.templateAttributeTypeToType(element))],
                     required: this.getAttributeValue(element, "required") === "true",
                 });
             }
+        }
+    }
+
+    private templateAttributeTypeToType(element: SugarElement): AttributeType {
+        const result = this.getAttributeValue(element, "type");
+        if (result === "string") {
+            return AttributeTypes.String;
+        } else {
+            return AttributeTypes.String;
         }
     }
 
@@ -65,11 +74,7 @@ export class TemplateElementsExtractionVisitor extends EmptySugarDomVisitor {
     }
 
     private getAttributeValue(element: SugarElement, attributeName: string): undefined | string {
-        const value = oc(element.attributes)
-            .with(x => x.find(a => a.name.value === attributeName))
-            .with(x => x.value)
-            .with(x => x.value)
-            .return(x => x, undefined);
+        const value = element?.attributes?.find(a => a.name.value === attributeName)?.value?.value;
         if (typeof value === "string") {
             return value;
         } else {

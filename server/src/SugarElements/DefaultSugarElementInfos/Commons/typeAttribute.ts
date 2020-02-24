@@ -1,3 +1,3 @@
-import { AttributeType, SugarAttributeInfo } from "../../SugarElementInfo";
+import { AttributeTypes, SugarAttributeInfo } from "../../SugarElementInfo";
 
-export const typeAttribute: SugarAttributeInfo = { name: "type", valueTypes: [AttributeType.Type] };
+export const typeAttribute: SugarAttributeInfo = { name: "type", valueTypes: [AttributeTypes.Type] };

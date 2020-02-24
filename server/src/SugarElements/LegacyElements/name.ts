@@ -1,4 +1,4 @@
-import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../SugarElementInfo";
+import { AttributeTypes, AvailableChildrenType, SugarElementInfo } from "../SugarElementInfo";
 
 export const name: SugarElementInfo = {
     name: "name",
@@ -6,7 +6,7 @@ export const name: SugarElementInfo = {
         type: AvailableChildrenType.Any,
     },
     attributes: [
-        { name: "caption", valueTypes: [AttributeType.String] },
-        { name: "editable", valueTypes: [AttributeType.Boolean], required: false },
+        { name: "caption", valueTypes: [AttributeTypes.String] },
+        { name: "editable", valueTypes: [AttributeTypes.Boolean], required: false },
     ],
 };

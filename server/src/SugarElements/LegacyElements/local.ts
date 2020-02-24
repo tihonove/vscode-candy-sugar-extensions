@@ -1,6 +1,6 @@
-import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../SugarElementInfo";
 import { fetchFnAttribute } from "../DefaultSugarElementInfos/Commons/fetchFnAttribute";
 import { typeAttribute } from "../DefaultSugarElementInfos/Commons/typeAttribute";
+import { AttributeTypes, AvailableChildrenType, SugarElementInfo } from "../SugarElementInfo";
 
 export const local: SugarElementInfo = {
     name: "local",
@@ -8,7 +8,7 @@ export const local: SugarElementInfo = {
     attributes: [
         typeAttribute,
         fetchFnAttribute,
-        { name: "gIdIp", valueTypes: [AttributeType.PicklistId] },
-        { name: "gIdOrg", valueTypes: [AttributeType.PicklistId] },
+        { name: "gIdIp", valueTypes: [AttributeTypes.PicklistId] },
+        { name: "gIdOrg", valueTypes: [AttributeTypes.PicklistId] },
     ],
 };

@@ -1,6 +1,6 @@
-import { AttributeType, SugarAttributeInfo } from "../SugarElementInfo";
+import { AttributeTypes, SugarAttributeInfo } from "../SugarElementInfo";
 
 export const commonContentAttributes: SugarAttributeInfo[] = [
-    { name: "caption", valueTypes: [AttributeType.String], required: false },
-    { name: "gId", valueTypes: [AttributeType.PicklistId], required: false },
+    { name: "caption", valueTypes: [AttributeTypes.String], required: false },
+    { name: "gId", valueTypes: [AttributeTypes.PicklistId], required: false },
 ];

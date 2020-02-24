@@ -1,7 +1,7 @@
-import { AttributeType, SugarAttributeInfo } from "../../SugarElementInfo";
+import { AttributeTypes, SugarAttributeInfo } from "../../SugarElementInfo";
 
 export const fetchFnAttribute: SugarAttributeInfo = {
     name: "fetchfn",
-    valueTypes: [AttributeType.FunctionName],
+    valueTypes: [AttributeTypes.FunctionName],
     required: false,
 };

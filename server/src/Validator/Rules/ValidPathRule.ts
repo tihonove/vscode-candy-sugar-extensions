@@ -3,7 +3,7 @@ import { constant, Decoder, optional } from "@mojotech/json-type-validation";
 import { DataPathUtils } from "../../DataSchema/DataPathUtils";
 import { DataSchemaElementNode } from "../../DataSchema/DataSchemaNode";
 import { DataSchemaUtils } from "../../DataSchema/DataSchemaUtils";
-import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
+import { AttributeTypeKind, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { SugarAttribute, SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
 import { ISugarProjectContext } from "../Validator/ISugarProjectContext";
 
@@ -61,7 +61,7 @@ export class ValidPathRule extends SugarValidatorRuleBase {
         if (attributeInfo == undefined) {
             return;
         }
-        if (attributeInfo.valueTypes.length === 1 && attributeInfo.valueTypes[0] === AttributeType.Path) {
+        if (attributeInfo.valueTypes.length === 1 && attributeInfo.valueTypes[0].type === AttributeTypeKind.Path) {
             if (attributeInfo.name === "visibilityPath") {
                 // TODO разобраться с правилом задания пути для такого атрибута
                 return;

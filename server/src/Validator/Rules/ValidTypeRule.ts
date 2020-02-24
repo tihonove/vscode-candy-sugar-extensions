@@ -1,6 +1,6 @@
 import { constant, Decoder, optional } from "@mojotech/json-type-validation";
 
-import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
+import { AttributeTypeKind, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { defaultBuiltInTypeNames, UserDefinedSugarTypeInfo } from "../../SugarElements/UserDefinedSugarTypeInfo";
 import { SugarAttribute } from "../../SugarParsing/SugarGrammar/SugarParser";
 import { ISugarProjectContext } from "../Validator/ISugarProjectContext";
@@ -41,7 +41,7 @@ export class ValidTypeRule extends SugarValidatorRuleBase {
         if (attributeInfo == undefined) {
             return;
         }
-        if (attributeInfo.valueTypes.length === 1 && attributeInfo.valueTypes[0] === AttributeType.Type) {
+        if (attributeInfo.valueTypes.length === 1 && attributeInfo.valueTypes[0].type === AttributeTypeKind.Type) {
             const typeName = attribute.value.value;
             if (typeof typeName === "string" && !this.isTypeExists(typeName)) {
                 this.validations.push({

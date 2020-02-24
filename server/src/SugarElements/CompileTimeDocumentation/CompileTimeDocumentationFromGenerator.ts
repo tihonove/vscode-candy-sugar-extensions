@@ -1,5 +1,6 @@
 import {
     AttributeType,
+    AttributeTypes,
     AvailableChildrenType,
     SugarAttributeInfo,
     SugarElementAvailableChildrenInfo,
@@ -41,33 +42,33 @@ function attributeFromGenerator(x: SugarAttributeInfoFromGenerator): SugarAttrib
 function attributeTypeFromGenerator(x: AttributeTypeFromGenerator): AttributeType {
     switch (x) {
         case AttributeTypeFromGenerator.Path:
-            return AttributeType.Path;
+            return AttributeTypes.Path;
         case AttributeTypeFromGenerator.VisibilityPath:
-            return AttributeType.VisibilityPath;
+            return AttributeTypes.VisibilityPath;
         case AttributeTypeFromGenerator.Type:
-            return AttributeType.Type;
+            return AttributeTypes.Type;
         case AttributeTypeFromGenerator.String:
-            return AttributeType.String;
+            return AttributeTypes.String;
         case AttributeTypeFromGenerator.Number:
-            return AttributeType.Number;
+            return AttributeTypes.Number;
         case AttributeTypeFromGenerator.Boolean:
-            return AttributeType.Boolean;
+            return AttributeTypes.Boolean;
         case AttributeTypeFromGenerator.FunctionName:
-            return AttributeType.FunctionName;
+            return AttributeTypes.FunctionName;
         case AttributeTypeFromGenerator.CssClassName:
-            return AttributeType.CssClassName;
+            return AttributeTypes.CssClassName;
         case AttributeTypeFromGenerator.PicklistId:
-            return AttributeType.PicklistId;
+            return AttributeTypes.PicklistId;
         case AttributeTypeFromGenerator.JavaScriptLiteral:
-            return AttributeType.JavaScriptLiteral;
+            return AttributeTypes.JavaScriptLiteral;
         case AttributeTypeFromGenerator.Enum:
-            return AttributeType.Enum;
+            return AttributeTypes.String;
         case AttributeTypeFromGenerator.Color:
-            return AttributeType.Color;
+            return AttributeTypes.Color;
         case AttributeTypeFromGenerator.PathList:
-            return AttributeType.PathList;
+            return AttributeTypes.PathList;
         case AttributeTypeFromGenerator.TemplateParameterType:
-            return AttributeType.TemplateParameterType;
+            return AttributeTypes.TemplateParameterType;
         default:
             return x;
     }

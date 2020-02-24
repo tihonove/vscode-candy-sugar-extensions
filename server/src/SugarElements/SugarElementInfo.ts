@@ -1,4 +1,4 @@
-export enum AttributeType {
+export enum AttributeTypeKind {
     Path = "Path",
     VisibilityPath = "VisibilityPath",
     Type = "Type",
@@ -13,6 +13,31 @@ export enum AttributeType {
     Color = "Color",
     PathList = "PathList",
     TemplateParameterType = "TemplateParameterType",
+}
+
+export type AttributeType =
+    | {
+          type: Exclude<AttributeTypeKind, AttributeTypeKind.Enum>;
+      }
+    | {
+          type: AttributeTypeKind.Enum;
+          values: string[];
+      };
+
+export class AttributeTypes {
+    public static Path: AttributeType = { type: AttributeTypeKind.Path };
+    public static VisibilityPath: AttributeType = { type: AttributeTypeKind.VisibilityPath };
+    public static Type: AttributeType = { type: AttributeTypeKind.Type };
+    public static String: AttributeType = { type: AttributeTypeKind.String };
+    public static Number: AttributeType = { type: AttributeTypeKind.Number };
+    public static Boolean: AttributeType = { type: AttributeTypeKind.Boolean };
+    public static FunctionName: AttributeType = { type: AttributeTypeKind.FunctionName };
+    public static CssClassName: AttributeType = { type: AttributeTypeKind.CssClassName };
+    public static PicklistId: AttributeType = { type: AttributeTypeKind.PicklistId };
+    public static JavaScriptLiteral: AttributeType = { type: AttributeTypeKind.JavaScriptLiteral };
+    public static Color: AttributeType = { type: AttributeTypeKind.Color };
+    public static PathList: AttributeType = { type: AttributeTypeKind.PathList };
+    public static TemplateParameterType: AttributeType = { type: AttributeTypeKind.TemplateParameterType };
 }
 
 export enum AvailableChildrenType {

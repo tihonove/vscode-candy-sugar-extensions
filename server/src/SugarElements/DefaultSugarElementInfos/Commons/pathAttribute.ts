@@ -1,6 +1,6 @@
-import { AttributeType, SugarAttributeInfo } from "../../SugarElementInfo";
+import { AttributeTypes, SugarAttributeInfo } from "../../SugarElementInfo";
 
 export const pathAttribute: SugarAttributeInfo = {
     name: "path",
-    valueTypes: [AttributeType.Path],
+    valueTypes: [AttributeTypes.Path],
 };

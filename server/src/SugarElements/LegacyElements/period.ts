@@ -1,4 +1,4 @@
-import { AttributeType, AvailableChildrenType, SugarElementInfo } from "../SugarElementInfo";
+import { AttributeTypes, AvailableChildrenType, SugarElementInfo } from "../SugarElementInfo";
 
 export const period: SugarElementInfo = {
     name: "period",
@@ -6,7 +6,7 @@ export const period: SugarElementInfo = {
         type: AvailableChildrenType.Any,
     },
     attributes: [
-        { name: "caption", valueTypes: [AttributeType.String] },
-        { name: "gId", valueTypes: [AttributeType.PicklistId] },
+        { name: "caption", valueTypes: [AttributeTypes.String] },
+        { name: "gId", valueTypes: [AttributeTypes.PicklistId] },
     ],
 };

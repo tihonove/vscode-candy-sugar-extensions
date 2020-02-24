@@ -1,5 +1,5 @@
 import { DataPathUtils } from "../../DataSchema/DataPathUtils";
-import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
+import { AttributeTypeKind, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { SugarElement } from "../../SugarParsing/SugarGrammar/SugarParser";
 import { NodeWithDefinition } from "../OffsetToNodeMaping/OffsetToNodeMapBuilder";
 
@@ -60,7 +60,7 @@ export class CodeContextByNodeResolver {
             if (
                 currentAttributeInfo != undefined &&
                 currentAttributeInfo.valueTypes != undefined &&
-                currentAttributeInfo.valueTypes.includes(AttributeType.Path)
+                currentAttributeInfo.valueTypes.some(x => x.type === AttributeTypeKind.Path)
             ) {
                 return {
                     type: "DataAttributeValue",

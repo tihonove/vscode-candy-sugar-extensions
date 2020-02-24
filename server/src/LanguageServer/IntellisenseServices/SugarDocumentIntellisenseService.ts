@@ -23,7 +23,7 @@ import { CodeContextByNodeResolver } from "../../SugarAnalyzing/ContextResolving
 import { OffsetToNodeMap } from "../../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMap";
 import { OffsetToNodeMapBuilder } from "../../SugarAnalyzing/OffsetToNodeMaping/OffsetToNodeMapBuilder";
 import { standardElements } from "../../SugarElements/SugarElements";
-import { AttributeType, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
+import { AttributeTypeKind, SugarElementInfo } from "../../SugarElements/SugarElementInfo";
 import { defaultBuiltInTypeNames, TypeKind } from "../../SugarElements/UserDefinedSugarTypeInfo";
 import { SugarFormatter } from "../../SugarFormatter/SugarFormatter";
 import { createEvent } from "../../Utils/Event";
@@ -204,7 +204,7 @@ export class SugarDocumentIntellisenseService {
         }
 
         if (context.type === "AttributeValue" && context.currentAttributeInfo != undefined) {
-            if (context.currentAttributeInfo.valueTypes.includes(AttributeType.Type)) {
+            if (context.currentAttributeInfo.valueTypes.some(x => x.type === AttributeTypeKind.Type)) {
                 const typeName = context.contextNode.value;
                 const userDefinedTypes = this.sugarProject.userDefinedTypes;
                 if (userDefinedTypes != undefined) {
@@ -301,7 +301,7 @@ export class SugarDocumentIntellisenseService {
             context.type === "AttributeValue" &&
             userDefinedTypes != undefined &&
             context.currentAttributeInfo != undefined &&
-            context.currentAttributeInfo.valueTypes.includes(AttributeType.Type)
+            context.currentAttributeInfo.valueTypes.some(x => x.type === AttributeTypeKind.Type)
         ) {
             const userDefinedTypeInfo = userDefinedTypes.find(x => x.name === context.contextNode.value);
             if (userDefinedTypeInfo == undefined || userDefinedTypeInfo.absoluteSugarFilePath == undefined) {

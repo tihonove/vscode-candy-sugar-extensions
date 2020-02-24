@@ -1,48 +1,48 @@
-import { AttributeType } from "./SugarElementInfo";
+import { AttributeType, AttributeTypeKind } from "./SugarElementInfo";
 
 export class AttributeTypeUtils {
     public static valueTypeToString(attributeType: AttributeType): string {
-        switch (attributeType) {
-            case AttributeType.Boolean:
+        switch (attributeType.type) {
+            case AttributeTypeKind.Boolean:
                 return "boolean";
                 break;
-            case AttributeType.Number:
+            case AttributeTypeKind.Number:
                 return "number";
                 break;
-            case AttributeType.Path:
+            case AttributeTypeKind.Path:
                 return "DataPath";
                 break;
-            case AttributeType.String:
+            case AttributeTypeKind.String:
                 return "string";
                 break;
-            case AttributeType.Type:
+            case AttributeTypeKind.Type:
                 return "Type";
                 break;
-            case AttributeType.VisibilityPath:
+            case AttributeTypeKind.VisibilityPath:
                 return "DataPath";
                 break;
-            case AttributeType.FunctionName:
+            case AttributeTypeKind.FunctionName:
                 return "Function name";
                 break;
-            case AttributeType.CssClassName:
+            case AttributeTypeKind.CssClassName:
                 return "CssClassName";
                 break;
-            case AttributeType.PicklistId:
+            case AttributeTypeKind.PicklistId:
                 return "PicklistId";
                 break;
-            case AttributeType.JavaScriptLiteral:
+            case AttributeTypeKind.JavaScriptLiteral:
                 return "JavaScriptLiteral";
                 break;
-            case AttributeType.Enum:
+            case AttributeTypeKind.Enum:
                 return "Enum";
                 break;
-            case AttributeType.Color:
+            case AttributeTypeKind.Color:
                 return "Color";
                 break;
-            case AttributeType.PathList:
+            case AttributeTypeKind.PathList:
                 return "PathList";
                 break;
-            case AttributeType.TemplateParameterType:
+            case AttributeTypeKind.TemplateParameterType:
                 return "TemplateParameterType";
                 break;
             default:
