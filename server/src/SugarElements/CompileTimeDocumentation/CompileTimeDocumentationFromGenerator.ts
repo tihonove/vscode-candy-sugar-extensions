@@ -25,6 +25,7 @@ export const elementsFromGenerator: SugarElementInfo[] = elementsFromGeneratorJs
         attributes: element.attributes?.map(attributeFromGenerator),
         availableChildren: availableChildrenFromGenerator(element.availableChildren),
         markdownDescription: element.markdownDescription,
+        shortMarkdownDescription: element.shortMarkdownDescription,
         verified: element.verified,
     })
 );
@@ -32,7 +33,7 @@ export const elementsFromGenerator: SugarElementInfo[] = elementsFromGeneratorJs
 function attributeFromGenerator(x: SugarAttributeInfoFromGenerator): SugarAttributeInfo {
     return {
         name: x.name,
-        valueTypes: x.valueTypes.map(attributeTypeFromGenerator),
+        valueTypes: x.name === "path" ? [AttributeTypes.Path] : x.valueTypes.map(attributeTypeFromGenerator),
         markdownDescription: x.markdownDescription,
         shortMarkdownDescription: x.shortMarkdownDescription,
         defaultValue: x.defaultValue,

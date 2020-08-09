@@ -418,7 +418,7 @@ export class SugarFormatterTest {
 
     @test
     public testJavascriptStringAttributesWithQuotes(): void {
-        this.checkFormat(`<tag4 x={'str"1"'}></tag4>`, `<tag4 x={"str\\\"1\\\"} />\n`);
+        this.checkFormat(`<tag4 x={'str"1"'}></tag4>`, `<tag4 x={"str\\\"1\\\""} />\n`);
         this.checkFormat(`<tag4 x={"str'1'"}></tag4>`, `<tag4 x={"str'1'"} />\n`);
         this.checkFormat(`<tag4 x={"str\\\"1\\\""}></tag4>`, `<tag4 x={"str\\\"1\\\""} />\n`);
         this.checkFormat(`<tag4 x={'str\\\'1\\\''}></tag4>`, `<tag4 x={"str'1'"} />\n`);

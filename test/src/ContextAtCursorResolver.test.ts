@@ -167,7 +167,7 @@ export class ContextAtCursorResolverTest {
                 name: "atag1",
             },
             dataContext: ["Root", "Child1", "Child2", "Child3"],
-            currentDataContext: { length: 6, ...["Root", "Child1", "Child2", "Child3", "Child4", "Child5"] },
+            currentDataContext: { ...["Root", "Child1", "Child2", "Child3", "Child4", "Child5"], length: 6 },
             elementStack: [
                 {
                     type: "Element",
@@ -197,7 +197,7 @@ export class ContextAtCursorResolverTest {
                 name: "atag1",
             },
             dataContext: ["Root", "Child1", "Child2", "Child3"],
-            currentDataContext: { length: 6, ...["Root", "Child1", "Child2", "Child3", "Child4", "Child5"] },
+            currentDataContext: { ...["Root", "Child1", "Child2", "Child3", "Child4", "Child5"], length: 6 },
             elementStack: [
                 {
                     type: "Element",
@@ -223,7 +223,7 @@ export class ContextAtCursorResolverTest {
             )
         ).to.shallowDeepEqual({
             dataContext: ["Root", "Child1", "Child2", "Child3"],
-            currentDataContext: { length: 6, ...["Root", "Child1", "Child2", "Child3", "Child4", "Child5"] },
+            currentDataContext: { ...["Root", "Child1", "Child2", "Child3", "Child4", "Child5"], length: 6 },
         });
     }
 
@@ -235,7 +235,7 @@ export class ContextAtCursorResolverTest {
             )
         ).to.shallowDeepEqual({
             dataContext: ["Root", "Child1", "Child2", "Child3"],
-            currentDataContext: { length: 6, ...["Root", "Child1", "Child2", "Child3", "Child4", "Child5"] },
+            currentDataContext: { ...["Root", "Child1", "Child2", "Child3", "Child4", "Child5"], length: 6 },
         });
     }
 
@@ -249,7 +249,7 @@ export class ContextAtCursorResolverTest {
                 name: "atag1",
             },
             dataContext: [],
-            currentDataContext: { length: 2, ...["Root", "Child1"] },
+            currentDataContext: { ...["Root", "Child1"], length: 2 },
             elementStack: [
                 {
                     type: "Element",

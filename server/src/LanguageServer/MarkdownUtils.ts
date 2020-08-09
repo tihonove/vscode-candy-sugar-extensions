@@ -61,12 +61,15 @@ export class MarkdownUtils {
             kind: MarkupKind.Markdown,
             value: [
                 ...headerLines,
-                currentAttributeInfo.markdownDescription || currentAttributeInfo.shortMarkdownDescription,
+                this.updateDocumentationLinks(
+                    currentAttributeInfo.markdownDescription || currentAttributeInfo.shortMarkdownDescription
+                ),
             ]
                 .filter(isNotNullOrUndefined)
                 .join("\n"),
         };
     }
+
     public static buildElementDetails(
         sugarElementInfo: undefined | SugarElementInfo,
         options: ElementDetailsOptions
@@ -80,17 +83,33 @@ export class MarkdownUtils {
                 "",
                 "*Атрибуты*",
                 ...sugarElementInfo.attributes.map(
-                    x => `* \`${x.name}\` ${x.shortMarkdownDescription || x.markdownDescription || ""}`
+                    x =>
+                        `* \`${x.name}\` ${this.updateDocumentationLinks(
+                            x.shortMarkdownDescription || x.markdownDescription || ""
+                        )}`
                 ),
             ];
         }
         const headerLines = options.appendHeader ? ["```xml", `<${sugarElementInfo.name}>`, "```"] : [];
         return {
             kind: MarkupKind.Markdown,
-            value: [...headerLines, sugarElementInfo.markdownDescription, ...attributesLines]
+            value: [
+                ...headerLines,
+                this.updateDocumentationLinks(
+                    sugarElementInfo.shortMarkdownDescription ?? sugarElementInfo.markdownDescription
+                ),
+                ...attributesLines,
+            ]
                 .filter(isNotNullOrUndefined)
                 .join("\n"),
         };
+    }
+
+    private static updateDocumentationLinks(markdown: string | undefined): string | undefined {
+        if (markdown == undefined) {
+            return undefined;
+        }
+        return markdown.replace(/\(#\//g, "(https://candy.gitlab-pages.kontur.host/docs/#/");
     }
 
     public static valueTypeToString(attributeType: AttributeType): string {

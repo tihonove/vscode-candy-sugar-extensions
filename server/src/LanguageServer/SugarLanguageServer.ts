@@ -13,11 +13,14 @@ import {
     Location,
     ProposedFeatures,
     ReferenceParams,
+    TextDocumentChangeEvent,
     TextDocumentPositionParams,
     TextDocuments,
+    TextDocumentSyncKind,
     TextEdit,
 } from "vscode-languageserver";
-import { Definition, Hover, Position, TextDocumentChangeEvent } from "vscode-languageserver-types";
+import { TextDocument } from "vscode-languageserver-textdocument";
+import { Definition, Hover, Position } from "vscode-languageserver-types";
 
 import {
     IDocumentOffsetPositionResolver,
@@ -29,10 +32,10 @@ import { VsCodeServerLogger } from "./Logging/VsCodeServerLogger";
 import { Settings } from "./Settings/Settings";
 
 class DocumentOffsetPositionResolver implements IDocumentOffsetPositionResolver {
-    private readonly documents: TextDocuments;
+    private readonly documents: TextDocuments<TextDocument>;
     private readonly documentUri: string;
 
-    public constructor(documents: TextDocuments, documentUri: string) {
+    public constructor(documents: TextDocuments<TextDocument>, documentUri: string) {
         this.documents = documents;
         this.documentUri = documentUri;
     }
@@ -57,7 +60,7 @@ class DocumentOffsetPositionResolver implements IDocumentOffsetPositionResolver 
 export class SugarLanguageServer {
     private readonly connection: Connection;
     private readonly logger: ILogger;
-    private readonly documents: TextDocuments;
+    private readonly documents: TextDocuments<TextDocument>;
     private readonly documentServices: { [uri: string]: undefined | SugarDocumentIntellisenseService };
     private readonly projects: SugarProjectIntellisenseServiceCollection;
     private readonly settings: Settings;
@@ -65,23 +68,26 @@ export class SugarLanguageServer {
     public constructor() {
         this.connection = createConnection(ProposedFeatures.all);
         this.logger = new VsCodeServerLogger(this.connection.console);
-        this.documents = new TextDocuments();
+        this.documents = new TextDocuments(TextDocument);
         this.documentServices = {};
         this.connection.onInitialize(this.handleInitialize);
+
         this.documents.onDidChangeContent(this.handleChangeDocumentContent);
         this.documents.onDidClose(this.handleCloseTextDocument);
         this.connection.onHover(this.handleHover);
         this.connection.onDefinition(this.handleResolveDefinition);
         this.connection.onCompletion(this.handleResolveCompletion);
         this.connection.onCompletionResolve(this.handleEnrichCompletionItem);
-        this.connection.onRequest(
-            new RequestType<[string, number], undefined | string, Error, void>("resolveHelpPage"),
-            this.handlerResolveHelpPage
-        );
         this.connection.onCodeLens(this.handleProvideCodeLenses);
         this.connection.onCodeLensResolve(this.handleResolveCodeLens);
         this.connection.onReferences(this.handleFindAllReferences);
         this.connection.onDocumentFormatting(this.handleDocumentFormatting);
+
+        this.connection.onRequest(
+            new RequestType<[string, number], undefined | string, Error, void>("resolveHelpPage"),
+            this.handlerResolveHelpPage
+        );
+
         this.projects = new SugarProjectIntellisenseServiceCollection(this.logger);
         this.settings = new Settings(this.connection);
     }
@@ -163,7 +169,7 @@ export class SugarLanguageServer {
         return "";
     };
 
-    private readonly handleCloseTextDocument = ({ document }: TextDocumentChangeEvent): void => {
+    private readonly handleCloseTextDocument = ({ document }: TextDocumentChangeEvent<TextDocument>): void => {
         const documentService = this.documentServices[document.uri];
         if (documentService != undefined) {
             documentService.handleCloseTextDocument({ document: document });
@@ -175,7 +181,7 @@ export class SugarLanguageServer {
         this.connection.client.register(DidChangeConfigurationNotification.type, { section: "candySugarExtension" });
         return {
             capabilities: {
-                textDocumentSync: this.documents.syncKind,
+                textDocumentSync: TextDocumentSyncKind.Incremental,
                 documentFormattingProvider: true,
                 hoverProvider: true,
                 definitionProvider: true,
@@ -191,7 +197,9 @@ export class SugarLanguageServer {
         };
     };
 
-    private readonly handleChangeDocumentContent = async (change: TextDocumentChangeEvent): Promise<void> => {
+    private readonly handleChangeDocumentContent = async (
+        change: TextDocumentChangeEvent<TextDocument>
+    ): Promise<void> => {
         const documentUri = change.document.uri;
         if (change.document.languageId !== "sugar-xml") {
             return;
@@ -214,6 +222,10 @@ export class SugarLanguageServer {
             this.projects,
             this.settings
         );
+        const document = this.documents.get(documentUri);
+        if (document != undefined) {
+            result.updateDomDebounced(document.getText());
+        }
 
         result.sendValidationsEvent.addListener(validations => {
             this.connection.sendDiagnostics({

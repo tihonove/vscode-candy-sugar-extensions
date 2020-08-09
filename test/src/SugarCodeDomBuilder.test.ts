@@ -212,7 +212,7 @@ export class SugarCodeDomBuilderTest {
             fields={ ["code1", "code2", "name1", "name2"] }
             headers={ ["Код", "Доходность", "Вид предпринимательской деятельности", "Физические показатели"] }
             columnsWidth={ [50, 90, 280, 190] }
-            type="kodvd" 
+            type="kodvd"
         />`);
     }
 
@@ -544,6 +544,13 @@ export class SugarCodeDomBuilderTest {
                 },
             ],
         });
+    }
+
+    @test
+    public testCodeDomForSpacesBetweenEql(): void {
+        this.checkIsValidSyntax(`<a b= "value-b" />`);
+        this.checkIsValidSyntax(`<a b ="value-b" />`);
+        this.checkIsValidSyntax(`<a b = "value-b" />`);
     }
 
     private checkCodeDom(input: string, expectedCodeDom: DeepPartial<SugarElement>): void {

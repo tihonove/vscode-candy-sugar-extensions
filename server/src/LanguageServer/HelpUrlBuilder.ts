@@ -16,6 +16,6 @@ export class HelpUrlBuilder {
         if (elementInfo == undefined) {
             return undefined;
         }
-        return `https://git.skbkontur.ru/ke/keforms-engine/blob/master/DOCUMENTATION.md#${elementInfo.name}`;
+        return `https://candy.gitlab-pages.kontur.host/docs/#/elements/${elementInfo.name}`;
     }
 }

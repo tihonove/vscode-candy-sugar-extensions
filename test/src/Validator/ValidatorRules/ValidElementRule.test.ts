@@ -25,6 +25,11 @@ export class ValidElementRuleTest extends SugarValidationRuleTestBase {
     }
 
     @test
+    public validElementTestIgnoreCase(): void {
+        this.assertValidCode("<aTaG1 />");
+    }
+
+    @test
     public invalidElementTest(): void {
         this.assertInvalidCode("<not-existing-tag />", {
             position: {

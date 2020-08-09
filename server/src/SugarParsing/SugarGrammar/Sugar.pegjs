@@ -106,13 +106,12 @@ AttributeList = attribute: Attribute attributes: (_? Attribute)* {
 }
 
 Attribute =
-    name: AttributeName value:(EqualsAfterAttributeName AttributeValue)? {
+    name: AttributeName value:(_? EqualsAfterAttributeName _? AttributeValue)? {
     const result = {
         type: "Attribute",
         name: name,
         position: location(),
-        value: value && value[1],
-        x: 1,
+        value: value && value[3],
     }
     result.name.parent = result;
     if (result.value != undefined) {

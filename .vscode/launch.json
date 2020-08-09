@@ -8,7 +8,6 @@
 			"runtimeExecutable": "${execPath}",
 			"args": ["--extensionDevelopmentPath=${workspaceRoot}"],
 			"outFiles": ["${workspaceRoot}/client/out/**/*.js"],
-			"preLaunchTask": "compile:client"
 		},
 		{
 			"type": "node",
@@ -17,14 +16,12 @@
 			"port": 6009,
 			"restart": true,
             "outFiles": ["${workspaceRoot}/server/out/**/*.js"],
-            "preLaunchTask": "compile:server"
 		}
 	],
 	"compounds": [
 		{
 			"name": "Client + Server",
 			"configurations": ["Launch Client", "Attach to Server"],
-			"preLaunchTask": "compile:server"
 		}
 	]
 }

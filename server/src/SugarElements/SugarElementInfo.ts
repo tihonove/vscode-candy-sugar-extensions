@@ -80,6 +80,7 @@ export interface SugarElementInfo {
     attributes?: SugarAttributeInfo[];
     availableChildren: SugarElementAvailableChildrenInfo;
     markdownDescription?: string;
+    shortMarkdownDescription?: string;
     definedType?: SugarElementDefinedType;
     verified?: boolean;
 }

@@ -1,7 +1,7 @@
 import { suite, test } from "mocha-typescript";
 
 import { TemplatesExtractor } from "../../server/src/SugarAnalyzing/TemplatesExtraction/TemplatesExtractor";
-import { SugarElementInfo, TemplateParameterType } from "../../server/src/SugarElements/SugarElementInfo";
+import { AttributeTypes, SugarElementInfo } from "../../server/src/SugarElements/SugarElementInfo";
 import { parseSugar } from "../../server/src/SugarParsing/SugarGrammar/SugarParser";
 import { NullTracer } from "../../server/src/Utils/PegJSUtils/NullTracer";
 
@@ -32,7 +32,7 @@ export class UserDefinedTemplatesExtractorTest {
         expect(templates).to.shallowDeepEqual([
             {
                 name: "templateName",
-                attributes: [{ name: "param", valueTypes: [TemplateParameterType.String], optional: false }],
+                attributes: [{ name: "param", valueTypes: [AttributeTypes.String], required: true }],
             },
         ]);
     }
@@ -56,8 +56,8 @@ export class UserDefinedTemplatesExtractorTest {
             {
                 name: "templateName",
                 attributes: [
-                    { name: "param1", valueTypes: [TemplateParameterType.String], optional: false },
-                    { name: "param2", valueTypes: [TemplateParameterType.Sugar], optional: true },
+                    { name: "param1", valueTypes: [AttributeTypes.String], required: true },
+                    { name: "param2", valueTypes: [AttributeTypes.String], required: false },
                 ],
             },
         ]);
@@ -92,15 +92,15 @@ export class UserDefinedTemplatesExtractorTest {
         expect(templates).to.shallowDeepEqual([
             {
                 name: "templateName1",
-                attributes: [{ name: "param1", valueTypes: [TemplateParameterType.String], optional: false }],
+                attributes: [{ name: "param1", valueTypes: [AttributeTypes.String], required: true }],
             },
             {
                 name: "templateName2",
-                attributes: [{ name: "param2", valueTypes: [TemplateParameterType.Sugar], optional: true }],
+                attributes: [{ name: "param2", valueTypes: [AttributeTypes.String], required: false }],
             },
             {
                 name: "templateName3",
-                attributes: [{ name: "param3", valueTypes: [TemplateParameterType.String], optional: false }],
+                attributes: [{ name: "param3", valueTypes: [AttributeTypes.String], required: true }],
             },
         ]);
     }

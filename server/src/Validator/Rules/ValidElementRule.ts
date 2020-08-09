@@ -25,7 +25,7 @@ export class ValidElementRule extends SugarValidatorRuleBase {
     }
 
     public visitElementName(elementName: SugarElementName): void {
-        if (this.elementInfos.find(x => x.name === elementName.value) === undefined) {
+        if (this.elementInfos.find(x => x.name.toLowerCase() === elementName.value.toLowerCase()) === undefined) {
             this.validations.push({
                 position: elementName.position,
                 message: `Неизвестное имя элемента: '${elementName.value}'`,

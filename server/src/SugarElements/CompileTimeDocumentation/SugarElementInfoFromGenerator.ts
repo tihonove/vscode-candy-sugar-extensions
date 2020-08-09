@@ -64,5 +64,6 @@ export interface SugarElementInfoFromGenerator {
     attributes?: SugarAttributeInfoFromGenerator[];
     availableChildren: SugarElementAvailableChildrenInfoFromGenerator;
     markdownDescription?: string;
+    shortMarkdownDescription?: string;
     verified?: boolean;
 }
