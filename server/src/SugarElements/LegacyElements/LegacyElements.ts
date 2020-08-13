@@ -1,3 +1,5 @@
+import { AttributeTypes, AvailableChildrenType, SugarElementInfo } from "../SugarElementInfo";
+
 import { address } from "./address";
 import { build } from "./build";
 import { corrnumber } from "./corrnumber";
@@ -58,7 +60,28 @@ import { typl } from "./typl";
 import { vid } from "./vid";
 import { year } from "./year";
 
+export const col: SugarElementInfo = {
+    name: "col",
+    availableChildren: { type: AvailableChildrenType.NoChildren },
+    attributes: [{ name: "width", valueTypes: [AttributeTypes.Number], required: true }],
+};
+
+export const colgroup: SugarElementInfo = {
+    name: "colgroup",
+    availableChildren: { type: AvailableChildrenType.List, list: ["col"] },
+    attributes: [],
+};
+
+export const sugar: SugarElementInfo = {
+    name: "sugar",
+    availableChildren: { type: AvailableChildrenType.NoChildren },
+    attributes: [{ name: "include", valueTypes: [AttributeTypes.String], required: true }],
+};
+
 export const legacyElements = [
+    col,
+    colgroup,
+    sugar,
     build,
     deyt,
     document_cretaion_date,
