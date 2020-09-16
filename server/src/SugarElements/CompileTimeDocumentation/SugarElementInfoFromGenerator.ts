@@ -60,7 +60,6 @@ export interface SugarAttributeInfoFromGenerator {
 
 export interface SugarElementInfoFromGenerator {
     name: string;
-    createPathScope?: boolean;
     attributes?: SugarAttributeInfoFromGenerator[];
     availableChildren: SugarElementAvailableChildrenInfoFromGenerator;
     markdownDescription?: string;

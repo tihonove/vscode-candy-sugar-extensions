@@ -21,7 +21,7 @@ import {
 export const elementsFromGenerator: SugarElementInfo[] = elementsFromGeneratorJson.map(
     (element): SugarElementInfo => ({
         name: element.name,
-        createPathScope: element.createPathScope,
+        createPathScope: true,
         attributes: element.attributes?.map(attributeFromGenerator),
         availableChildren: availableChildrenFromGenerator(element.availableChildren),
         markdownDescription: element.markdownDescription,
