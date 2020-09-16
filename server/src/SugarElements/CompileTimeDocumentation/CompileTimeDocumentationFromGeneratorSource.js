@@ -1,5 +1,5 @@
 // @preval
-const { getDocumentation } = require("C:/workspace/keforms/keforms.engine/Generator");
+const { getDocumentation } = require("@kontur.candy/generator");
 
 module.exports = getDocumentation();
 
