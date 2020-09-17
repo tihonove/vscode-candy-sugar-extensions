@@ -44,7 +44,7 @@ export class TemplateElementsExtractionVisitor extends EmptySugarDomVisitor {
             if (name) {
                 this.attributes.push({
                     name: name,
-                    valueTypes: [(this.templateAttributeTypeToType(element))],
+                    valueTypes: [this.templateAttributeTypeToType(element)],
                     required: this.getAttributeValue(element, "required") === "true",
                 });
             }
@@ -52,8 +52,12 @@ export class TemplateElementsExtractionVisitor extends EmptySugarDomVisitor {
     }
 
     private templateAttributeTypeToType(element: SugarElement): AttributeType {
-        const result = this.getAttributeValue(element, "type");
-        if (result === "string") {
+        const attributeTypeName = this.getAttributeValue(element, "type");
+        const attributeName = this.getAttributeValue(element, "name");
+        if (attributeName === "path") {
+            return AttributeTypes.Path;
+        }
+        if (attributeTypeName === "string") {
             return AttributeTypes.String;
         } else {
             return AttributeTypes.String;
