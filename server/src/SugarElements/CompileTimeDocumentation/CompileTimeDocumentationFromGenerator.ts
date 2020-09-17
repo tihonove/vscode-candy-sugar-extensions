@@ -19,15 +19,32 @@ import {
 
 // tslint:disable-next-line no-unsafe-any
 export const elementsFromGenerator: SugarElementInfo[] = elementsFromGeneratorJson.map(
-    (element): SugarElementInfo => ({
-        name: element.name,
-        createPathScope: true,
-        attributes: element.attributes?.map(attributeFromGenerator),
-        availableChildren: availableChildrenFromGenerator(element.availableChildren),
-        markdownDescription: element.markdownDescription,
-        shortMarkdownDescription: element.shortMarkdownDescription,
-        verified: element.verified,
-    })
+    (element): SugarElementInfo => {
+        const attributes = element.attributes ?? [];
+        if (!attributes.some(x => x.name === "path")) {
+            attributes.push({
+                name: "path",
+                valueTypes: [
+                    {
+                        type: AttributeTypeKindFromGenerator.Path,
+                    },
+                ],
+                deprecated: false,
+                markdownDescription: "Путь в схеме",
+                shortMarkdownDescription: undefined,
+                required: false,
+            });
+        }
+        return {
+            name: element.name,
+            createPathScope: true,
+            attributes: attributes.map(attributeFromGenerator),
+            availableChildren: availableChildrenFromGenerator(element.availableChildren),
+            markdownDescription: element.markdownDescription,
+            shortMarkdownDescription: element.shortMarkdownDescription,
+            verified: element.verified,
+        };
+    }
 );
 
 function attributeFromGenerator(x: SugarAttributeInfoFromGenerator): SugarAttributeInfo {
