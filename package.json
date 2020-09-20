@@ -136,7 +136,7 @@
         "chai-shallow-deep-equal": "^1.4.6",
         "concurrently": "^5.3.0",
         "fs-extra": "^7.0.0",
-        "lodash": "^4.17.11",
+        "lodash": "^4.17.19",
         "mocha": "^5.2.0",
         "mocha-typescript": "^1.1.17",
         "npm-run-all": "^4.1.3",
